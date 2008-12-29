@@ -7,6 +7,8 @@
     * Write more docs and help files
     * Bookmarklets
 * UI
+    * Switchable themes
+    * Create a more original theme than "nostalgia"
     * AJAXify post save / edit / delete
     * Tag management
     * Tag bundles
