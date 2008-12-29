@@ -2,7 +2,8 @@
 
 ## Overview
 
-This hopes one day to grow up to be an Open Source social bookmarking web application.
+This hopes one day to grow up to be an Open Source social bookmarking web
+application.
 
 ## Installation
 
@@ -11,9 +12,15 @@ This hopes one day to grow up to be an Open Source social bookmarking web applic
 
 [zf]: http://framework.zend.com/download/latest
 
-## Contributors
+## Credits
 
-* l.m.orchard - <http://decafbad.com/> <mailto:l.m.orchard@pobox.com>
+* Leslie Michael Orchard - <http://decafbad.com/> - <mailto:l.m.orchard@pobox.com>
+* Liberal portions stolen from <http://github.com/weierophinney/bugapp/tree/master>
+* Using [Markdown PHP][markdown] for documentation.
+* "nostalgia" theme inspired by [del.icio.us][del], circa 2005
+
+[del]: http://del.icio.us/
+[markdown]: http://michelf.com/projects/php-markdown/
 
 ## License
 

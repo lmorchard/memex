@@ -7,8 +7,9 @@
     * Write more docs and help files
     * Bookmarklets
 * UI
+    * Page controls - items per, etc
     * Switchable themes
-    * Create a more original theme than "nostalgia"
+        * Create a more original theme than "nostalgia"
     * AJAXify post save / edit / delete
     * Tag management
     * Tag bundles
@@ -27,7 +28,9 @@
     * Carbon-copy posts to other services (eg. delicious, magnolia, twitter, friendfeed)
     * Import from other services
     * Implement network / subscriptions based on RSS/Atom aggregation to login-less local proxy profiles
+    * [FeedSync?](http://dev.live.com/feedsync/spec/spec.aspx)
 * Misc
+    * More tests, controller tests, filter tests, validator tests, etc
     * Search
     * Bulk import via file upload
     * Fx addon

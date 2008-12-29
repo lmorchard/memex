@@ -178,21 +178,23 @@ class Memex_Plugin_Initialize extends Zend_Controller_Plugin_Abstract
      */
     public function initView()
     {
-        // Setup View
+        $config = $this->_getConfig();
+
         $view = new Zend_View();
-        $view->doctype('XHTML1_TRANSITIONAL');
-        $view->addHelperPath(
-            $this->_appPath . '/views/helpers', 'Memex_View_Helper'
-        );
-        $view->placeholder('nav')->setPrefix('<div id="nav">')
-                                 ->setPostfix('</div>');
+
+        if ($config->view->theme) {
+            // Set first path for resource search as the theme named in config.
+            $view->addBasePath($this->_appPath . '/views/' . $config->view->theme, 'Memex_View_');
+        }
+        // Next and default path in resource search is shared base path.
+        $view->addBasePath($this->_appPath . '/views/base', 'Memex_View_');
 
         // Set view in ViewRenderer
         $viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
         $viewRenderer->setView($view);
 
         // Initialize layouts
-        Zend_Layout::startMvc($this->_appPath . '/layouts/scripts');
+        Zend_Layout::startMvc();
 
         return $this;
     }
