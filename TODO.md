@@ -1,13 +1,36 @@
 # TODO
 
-* Make *-dist versions of config files, delete originals
-* Implement an installer that can produce local configs
-* v1 API
-* AtomPub API
-* {Atom,RSS,JSON} feeds
-* AJAXify post save / edit / delete
-* Implement network based on RSS/Atom aggregation
-* [Message / work queues and deferred processing](queues)
-* Make it scale
+* Installation
+    * Make *-dist versions of config files, delete originals
+    * Implement an installer that can produce local configs
+* Documentation
+    * Write more docs and help files
+    * Bookmarklets
+* UI
+    * AJAXify post save / edit / delete
+    * Tag management
+    * Tag bundles
+    * Item privacy / visibility
+* Profiles
+    * Prefs, login password change, screen name, bio, etc.
+    * Multiple logins per profile
+    * OpenID logins for profiles
+* API / data access
+    * [v1 API][v1api]
+    * v2 API
+    * AtomPub API
+    * {Atom,RSS,JSON} feeds
+    * Widgets and whatnot
+* Federation
+    * Carbon-copy posts to other services (eg. delicious, magnolia, twitter, friendfeed)
+    * Import from other services
+    * Implement network / subscriptions based on RSS/Atom aggregation to login-less local proxy profiles
+* Misc
+    * Search
+    * Bulk import via file upload
+    * Fx addon
+    * [Message / work queues and deferred processing][queues]
+    * Make it scale
 
+[v1api]: http://delicious.com/help/api
 [queues]: http://decafbad.com/blog/2008/07/04/queue-everything-and-delight-everyone

@@ -130,7 +130,9 @@ class AuthController extends Zend_Controller_Action
         $auth->getStorage()->write($identity);
 
         // We're authenticated! Redirect to the user page
-        $this->_helper->redirector('home');
+        return $this->_helper->redirector->gotoRoute(
+            array(), 'auth_home'
+        );
     }
 
     /**

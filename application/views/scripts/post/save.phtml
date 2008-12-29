@@ -6,7 +6,7 @@
 ?>
 
 <?php $this->placeholder('crumbs')->captureStart() ?>
-    / <a href="<?= $profile_home_url ?>"><?= $this->escape($this->auth_profile['screen_name']) ?></a>
+    / people / <a href="<?= $profile_home_url ?>"><?= $this->escape($this->auth_profile['screen_name']) ?></a>
 <?php $this->placeholder('crumbs')->captureEnd() ?>
 
 <?= $this->post_form ?>
