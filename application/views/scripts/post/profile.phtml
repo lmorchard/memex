@@ -1,0 +1,66 @@
+<?php
+    $profile_home_url = $this->url(
+        array('screen_name' => $this->screen_name), 
+        'post_profile'
+    );
+?>
+
+<?php $this->placeholder('crumbs')->captureStart() ?>
+    / people / <a href="<?= $profile_home_url ?>"><?= $this->escape($this->screen_name) ?></a>
+    <?php if ($this->tags): ?>
+        / <a href="<?= $this->url() ?>"><?= $this->escape(join(' + ', $this->tags)) ?></a>
+    <?php endif ?>
+<?php $this->placeholder('crumbs')->captureEnd() ?>
+
+<?php $this->placeholder('infobar')->captureStart() ?>
+    <?php
+        $whose_items = ($this->auth_profile && $this->screen_name == $this->auth_profile['screen_name']) ?
+            'your items' : $this->screen_name . "'s items";
+    ?>
+    <?php if (!$this->tags): ?>
+        All <?= $whose_items ?> (<?= $this->posts_count ?>)
+    <?php else: ?>
+        <?= $whose_items ?> tagged <?php foreach ($this->tags as $tag): ?>
+            <a href="<?= $profile_home_url . '/' . $this->escape(rawurlencode($tag)) ?>"><?= $this->escape($tag) ?></a>
+        <?php endforeach ?> (<?= $this->posts_count ?>)
+    <?php endif ?>
+<?php $this->placeholder('infobar')->captureEnd() ?>
+
+<?php if (empty($this->posts)): ?>
+
+    <div class="message">
+        <?php if (!$this->auth_profile || $this->screen_name != $this->auth_profile['screen_name']): ?>
+            <h2>No items found.</h2>
+        <?php else: ?>
+            <?php if (!$this->tags): ?>
+                <h2>You have no bookmarks, yet.</h2>
+                <p>
+                    Why not start by <a href="<?= $this->url(array(), 'post_save') ?>">saving a new bookmark</a>?
+                </p>
+            <?php else: ?>
+                <h2>You have no bookmarks tagged <?php foreach ($this->tags as $tag): ?><?= $this->escape($tag) ?><?php endforeach ?>.</h2>
+            <?php endif ?>
+        <?php endif ?>
+    </div>
+
+<?php else: ?>
+
+    <?= $this->paginationControl(
+        $this->paginator, 'Sliding', 'pagination_mini_control.phtml'
+    ); ?>
+
+    <ul class="posts">
+        <?php foreach ($this->posts as $post): ?>
+            <?= $this->partial('post.phtml', array(
+                'profile'      => $this->profile,
+                'auth_profile' => $this->auth_profile,
+                'post'         => $post
+            )); ?>
+        <?php endforeach; ?>
+    </ul>
+
+    <?= $this->paginationControl(
+        $this->paginator, 'Sliding', 'pagination_control.phtml'
+    ); ?>
+
+<?php endif ?>

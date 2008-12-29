@@ -1,0 +1,317 @@
+/**
+ *
+ */
+html, body, form { 
+    margin: 0; padding: 0; 
+}
+body { 
+    font-family: arial, sans-serif; 
+    background-color: #fff;
+}
+
+a:link { 
+    text-decoration: none; 
+    color: #00f; 
+}
+a:visited { 
+    text-decoration: none; 
+    color: #639; 
+}
+a:hover { 
+    text-decoration: underline; 
+}
+a:active { 
+    text-decoration: underline; 
+}
+
+#header {
+    font-size: 75%;
+    margin: 0.5em 1.5em 0.5em 1.5em; 
+    padding: 0 0 0 0;
+    height: 80px;
+    position: relative;
+}
+#header .logo {
+    float: left;
+}
+#header .logo span:before {
+    font-size: 75px;
+    content: '\2756';
+}
+#header .logo span {
+    padding: 0 15px 0 10px;
+}
+#header .crumbs {
+    font-size: 200%;
+    padding: 0.25em 0 0 0;
+}
+#header .crumbs .title {
+    display: inline;
+    font-weight: bold;
+}
+#header .main {
+    margin: 0 0 0 0;
+    padding: 0.75em 0 0 0;
+    position: absolute;
+    left: 85px;
+    bottom: 1.25em;
+}
+#header .main .nav {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    list-style: none;    
+}
+#header .main .nav li {
+    display: inline;
+    border-left: 1px solid #000; 
+    margin-left: 0.25em;
+    padding-left: 0.5em;
+}
+#header .main .nav li.first {
+    font-weight: bold;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+#header .main .title {
+    margin: 0 0 0.5em 0;
+    padding: 0 0 0 0;    
+}
+#header .sub {
+    position: absolute;
+    right: 0;
+    bottom: 1.25em;
+    margin: 1.25em 0 0 0;
+    padding: 0 0 0 0;
+}
+#header .sub .nav {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;  
+}
+#header .sub .nav li {
+    display: inline;
+    border-left: 1px solid #000; 
+    margin-left: 0.25em;
+    padding-left: 0.5em;
+}
+#header .sub .nav li.first {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+#infobar {
+    font-size: 75%;
+    margin: 0.5em 1.5em 1.5em 1.5em; 
+    padding: 0.5em 0.8em; 
+    background-color: #eee; 
+    border: 1px solid #ccc; 
+    border-left: none;
+    border-right: none;
+}
+#content {
+    font-size: 75%;
+    margin: 0em 1.5em 0em 1.5em; 
+}
+#footer {
+    position: relative;
+    font-size: 75%;
+    margin: 0em 1.5em 1.5em 1.5em;
+    padding: 0.5em 0 0 0; 
+    background-color: #eee; 
+}
+#footer .nav {
+    background-color: #fff; 
+    margin: 0 0 0 0;
+    padding: 0.5em 0 0 0;
+    border-top: 1px solid #ccc; 
+    list-style: none;    
+}
+#footer .nav:before {
+    content: "\2756";
+}
+#footer .nav li {
+    display: inline;
+    border-left: 1px solid #000; 
+    margin-left: 0.25em;
+    padding-left: 0.5em;
+}
+#footer .nav li.first {
+    font-weight: bold;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+#footer .license {
+    position: absolute;
+    top: 1em;
+    right: 0;
+}
+#footer .license img {
+    border: 0;
+}
+
+.posts {
+    clear: both;
+    margin: 0em 0em 1.5em 0em; 
+    padding: 0 0 0 0;
+    list-style: none;
+}
+.posts .post {
+    clear: both;
+    padding: 0.25em 0 0.75em 0;
+}
+.posts .post .title {
+    margin: 0; padding: 0;
+    font-weight: normal;
+    font-size: 132%;
+}
+.posts .post .notes {
+    margin: 0.125em 0.0em 0.125em 0.0em; 
+    padding: 0 0 0 0;
+}
+.posts .post .meta {
+    color: #999;
+}
+.posts .post .meta a { 
+    color: #99F; 
+}
+.posts .post .tags:before {
+    content: ' to ';
+}
+.posts .post .tags {
+    display: inline;
+    margin: 0; padding: 0;
+}
+.posts .post .tags .tag {
+    display: inline;
+    list-style: none;
+    padding: 0 0 0 0;
+    margin: 0 0.25ex 0 0.25ex;
+    margin: 0 0 0 0;
+}
+.posts .post .author:before {
+    content: ' by ';
+}
+.posts .post .author {
+}
+.posts .post .date:before {
+    content: ' ... on ';
+}
+.posts .post .date {
+}
+.posts .post .commands:before {
+    content: ' ... ';
+}
+.posts .post .commands {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    list-style: none;    
+    display: inline;
+}
+.posts .post .commands li {
+    display: inline;
+    /*
+    border-left: 1px solid #000; 
+    */
+    margin-left: 0;
+    padding-left: 0;
+}
+.posts .post .commands li:before {
+    content: ' / ';
+}
+.posts .post .commands li.first {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+.posts .post .commands li.first:before {
+    content: '';
+}
+
+.pagination {
+    clear: both;
+    margin: 0.5em 0em 0em 0em; 
+    padding: 0.5em 0 0.5em 0;
+    color: #666;
+    text-align: center;
+    background-color: #eee; 
+    border-top: 1px solid #ccc; 
+}
+.pagination .pages {
+    /* background-color: #fff; */
+    margin: 0 0 0em 0;
+    padding: 1.0em 0 0.75em 0;
+    list-style: none;    
+}
+.pagination .pages li {
+    display: inline;
+}
+.pagination .pages li.page {
+    display: inline;
+    margin: 0 0.125em 0 0.125em;
+}
+.pagination .pages li.page a, .pagination .pages li.page span.current {
+    border: 1px solid #ccc;
+    padding: 0 0.5em 0 0.5em;    
+}
+.pagination .pages li.page span.current {
+    background: #ccc;
+    font-weight: bold;
+    color: #333;
+}
+.pagination .pages li:after.page {
+    content: ' | ';
+}
+.pagination .pages li.previous {
+    padding-right: 0.5em;
+}
+.pagination .pages li.previous:before {
+    content: '\00AB';
+}
+.pagination .pages li.next {
+    padding-left: 0.5em;
+}
+.pagination .pages li.next:after {
+    content: '\00BB';
+}
+.pagination .page_position {
+    /* background: #fff; */
+}
+.pagination_mini {
+    margin: 0 0em 1.5em 0em; 
+    padding: 0 0 0 0;
+    list-style: none;    
+    color: #999;
+}
+.pagination_mini li {
+    display: inline;
+}
+.pagination_mini .next:before {
+}
+.pagination_mini .next:after {
+    content: '\00BB';
+}
+.pagination_mini .next {
+}
+.pagination_mini .next .disabled {
+}
+.pagination_mini .previous:before {
+    content: '\00AB';
+}
+.pagination_mini .previous:after {
+    content: ' | ';
+}
+.pagination_mini .previous {
+}
+.pagination_mini .previous .disabled {
+}
+.pagination_mini .page {
+    padding-left: 1.5em;
+}
+
+.ctrl_doc .doc_content {
+    font-size: 120%;
+    padding: 0 85px 0 85px;
+    line-height: 1.75em;
+}
+

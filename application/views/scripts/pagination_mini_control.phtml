@@ -1,0 +1,29 @@
+<?php
+    $url_first    = $this->queryUrl(array('page' => $this->first)); 
+    $url_previous = $this->queryUrl(array('page' => $this->previous)); 
+    $url_next     = $this->queryUrl(array('page' => $this->next)); 
+    $url_last     = $this->queryUrl(array('page' => $this->last)); 
+?>
+<ul class="pagination_mini">
+
+    <li class="previous">
+        <?php if (isset($this->previous)): ?>
+            <a href="<?= $url_previous ?>">previous</a>
+        <?php else: ?>
+            <span class="disabled">previous</span>
+        <?php endif; ?>
+    </li>
+
+    <li class="next">
+        <?php if (isset($this->next)): ?>
+            <a href="<?= $url_next ?>">next</a>
+        <?php else: ?>
+            <span class="disabled">next</span>
+        <?php endif; ?>
+    </li>
+
+    <li class="page">
+        page <?= $this->current ?> of <?= $this->last ?>
+    </li>
+
+</ul>
