@@ -31,16 +31,10 @@ abstract class Memex_Model
      *
      * @param string prefix for UUID
      */
-    public function uuid($prefix='')
+    public function uuid()
     {
-        $chars = md5(uniqid(mt_rand(), true));
-        return $prefix . join('-', array(
-            substr($chars,0,8),
-            substr($chars,8,4),
-            substr($chars,12,4),
-            substr($chars,16,4),
-            substr($chars,20,12)
-        ));
+        $u = new UUID();
+        return $u->toRFC4122String();
     }
 
     /**

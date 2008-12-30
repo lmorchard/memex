@@ -119,19 +119,25 @@ class Memex_Plugin_Initialize extends Zend_Controller_Plugin_Abstract
         $config = $this->_getConfig();
 
         // Set up logging from configuration.
-        switch ($config->log->writer) {
-            case 'Firebug':
-                $writer = new Zend_Log_Writer_Firebug();
-                break;
-            default:
-                $writer = new Zend_Log_Writer_Stream(
-                    $config->log->path
-                );
-                break;
+        if (empty($config->log->writer)) {
+            $writer = new Zend_Log_Writer_Null;
+        } else {
+            switch ($config->log->writer) {
+                case 'Firebug':
+                    $writer = new Zend_Log_Writer_Firebug();
+                    break;
+                default:
+                    $writer = new Zend_Log_Writer_Stream(
+                        $config->log->path
+                    );
+                    break;
+            }
         }
         $logger = new Zend_Log($writer);
+        
         $filter = new Zend_Log_Filter_Priority(
-            (int)$config->log->priority
+            empty($config->log->priority) ? 
+                Zend_Log::CRIT : (int)$config->log->priority
         );
         $logger->addFilter($filter);
 

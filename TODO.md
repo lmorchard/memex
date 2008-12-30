@@ -8,8 +8,7 @@
     * Bookmarklets
 * UI
     * Page controls - items per, etc
-    * Switchable themes
-        * Create a more original theme than "nostalgia"
+    * Create a more original theme than "nostalgia"
     * AJAXify post save / edit / delete
     * Tag management
     * Tag bundles

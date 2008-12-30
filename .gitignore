@@ -1,0 +1,12 @@
+.DS_Store
+tmp
+build
+Thumbs.db
+*.bak
+*.pyc
+*.swp
+xfers/
+logs/*log
+tests/log/report/*
+data/db/*.db*
+httpd.conf
