@@ -133,8 +133,8 @@ class Memex_Model_Logins extends Memex_Model
      */
     public function deleteAll()
     {
-        if ('testing' != APPLICATION_ENVIRONMENT)
-            throw new Exception('Mass deletion only supported during testing');
+        if (!Zend_Registry::get('config')->model->enable_delete_all)
+            throw new Exception('Mass deletion not enabled');
         $this->getDbTable()->delete('');
     }
 

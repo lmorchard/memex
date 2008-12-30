@@ -108,6 +108,14 @@ class Memex_Model_TagsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     *
+     */
+    public function testTagPositionUpdateOnTagChange()
+    {
+        $this->fail('TODO');
+    }
+
+    /**
      * Ensure that tag counts work.
      */
     public function testTagCounts()

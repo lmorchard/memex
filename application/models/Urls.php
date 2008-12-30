@@ -62,8 +62,10 @@ class Memex_Model_Urls extends Memex_Model
         $select = $table->select();
         if (null != $url) {
             $url = $this->normalize_url_filter->filter($url);
-            $select->where('url=?', $url);
-        } elseif (null != $hash) {
+            //$select->where('url=?', $url);
+            $hash = md5($url);
+        } 
+        if (null != $hash) {
             $select->where('hash=?', $hash);
         }
         $row = $table->fetchRow($select);
@@ -108,8 +110,8 @@ class Memex_Model_Urls extends Memex_Model
      */
     public function deleteAll()
     {
-        if ('testing' != APPLICATION_ENVIRONMENT)
-            throw new Exception('Mass deletion only supported during testing');
+        if (!Zend_Registry::get('config')->model->enable_delete_all)
+            throw new Exception('Mass deletion not enabled');
         $this->getDbTable()->delete('');
     }
 

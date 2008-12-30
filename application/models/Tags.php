@@ -81,12 +81,8 @@ class Memex_Model_Tags extends Memex_Model
 
         $tag_counts = array();
         foreach ($rows as $row) {
-            $tag_counts[] = array(
-                'tag'   => $row['"tags"."tag"'],
-                'count' => $row['count']
-            );
+            $tag_counts[] = $row->toArray();
         }
-
         return $tag_counts;
     }
 
@@ -146,9 +142,7 @@ class Memex_Model_Tags extends Memex_Model
         // Update the position index on all the updated tags.
         foreach ($new_tags as $position=>$tag) {
             $table->update(
-                array(
-                    'position' => $position
-                ),
+                array( 'position' => $position ),
                 array(
                     $db->quoteInto('post_id=?', $post_data['id']),
                     $db->quoteInto('tag=?', $tag)
@@ -164,7 +158,7 @@ class Memex_Model_Tags extends Memex_Model
      */
     public function deleteAll()
     {
-        if ('testing' != APPLICATION_ENVIRONMENT)
+        if (!Zend_Registry::get('config')->model->enable_delete_all)
             throw new Exception('Mass deletion only supported during testing');
         $this->getDbTable()->delete('');
     }

@@ -6,6 +6,7 @@
 // use bootstrap (contains prepared db adapter and prepared table 
 // component)
 define('BOOTSTRAP', true);
+//define('APPLICATION_ENVIRONMENT', 'production');
 include_once dirname(__FILE__) . '/../application/bootstrap.php';
 $init->init();
 
@@ -24,8 +25,15 @@ echo 'Writing Database Guestbook in (control-c to cancel): ' . PHP_EOL;
 // the schema file.
 try {
     $schemaSql = file_get_contents('./schema.sqlite.sql');
-    // use the connection directly to load sql in batches
-    $dbAdapter->getConnection()->exec($schemaSql);
+    // $schemaSql = file_get_contents('./schema.mysql.sql');
+
+    $schemaSql_parts = explode(';', $schemaSql);
+    foreach ($schemaSql_parts as $part) {
+        $part = trim($part);
+        if (!$part) continue;
+        $dbAdapter->getConnection()->exec($part.';');
+    }
+
     echo PHP_EOL;
     echo 'Database Created';
     echo PHP_EOL;

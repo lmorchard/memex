@@ -15,7 +15,7 @@ $tests       = $root . '/tests';
 $models      = $root . '/application/models';
 $controllers = $root . '/application/controllers';
 
-define('APPLICATION_ENVIRONMENT', 'testing');
+define('APPLICATION_ENVIRONMENT', 'testing_mysql');
 define('APPLICATION_PATH', $root.'/application');
 
 include_once $root . '/application/bootstrap.php';

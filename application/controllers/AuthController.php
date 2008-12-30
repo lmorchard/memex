@@ -11,11 +11,15 @@ class AuthController extends Zend_Controller_Action
     {
         if (Zend_Auth::getInstance()->hasIdentity()) {
             if (!in_array($this->getRequest()->getActionName(), array('logout', 'home'))) {
-                $this->_helper->redirector('home');
+                return $this->_helper->redirector->gotoRoute(
+                    array(), 'auth_home'
+                );
             }
         } else {
             if (!in_array($this->getRequest()->getActionName(), array('index', 'register', 'login'))) {
-                $this->_helper->redirector('index');
+                return $this->_helper->redirector->gotoRoute(
+                    array(), 'auth_login'
+                );
             }
         }
 

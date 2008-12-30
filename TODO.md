@@ -18,7 +18,8 @@
     * Tag management
     * Tag bundles
     * Item privacy / visibility
-* Profiles
+* Logins / Profiles
+    * Email password recovery
     * Prefs, login password change, screen name, bio, etc.
     * Multiple logins per profile
     * OpenID logins for profiles

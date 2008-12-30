@@ -294,9 +294,11 @@ class Memex_Plugin_Initialize extends Zend_Controller_Plugin_Abstract
      */
     protected function _setEnv($env)
     {
+        /*
         if (!in_array($env, array('development', 'testing', 'production'))) {
             $env = 'development';
         }
+        */
         $this->_env = $env;
     }
 }
