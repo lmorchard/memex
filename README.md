@@ -17,10 +17,12 @@ application.
 * Leslie Michael Orchard - <http://decafbad.com/> - <mailto:l.m.orchard@pobox.com>
 * Liberal portions stolen from <http://github.com/weierophinney/bugapp/tree/master>
 * Using [Markdown PHP][markdown] for documentation.
+* Using [UUID implementation][uuid] from OmniTI 
 * "nostalgia" theme inspired by [del.icio.us][del], circa 2005
 
 [del]: http://del.icio.us/
 [markdown]: http://michelf.com/projects/php-markdown/
+[uuid]: https://labs.omniti.com/trac/alexandria/browser/trunk/OmniTI/UUID.php?rev=7
 
 ## License
 
