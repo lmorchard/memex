@@ -46,17 +46,53 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
         $this->tags_model = new Memex_Model_Tags();
         $this->tags_model->deleteAll();
 
-        $this->profile_id = $this->profiles_model->create(array(
+        $this->profile_1 = $this->profiles_model->create(array(
             'screen_name' => 'tester1_screenname',
             'full_name'   => 'Tess T. Erone',
             'bio'         => 'I live!'
         ));
 
-        $this->profile_id_2 = $this->profiles_model->create(array(
+        $this->profile_2 = $this->profiles_model->create(array(
             'screen_name' => 'tester2_screenname',
             'full_name'   => 'Joe Tester',
             'bio'         => 'I exist!'
         ));
+
+        $posts_keys = array('profile_id', 'url', 'title', 'notes', 'tags');
+        $posts_data = array(
+            array($this->profile_1['id'], 'http://example.com/1','Example 1','These are notes for example 1','foo bar baz quux'),
+            array($this->profile_2['id'], 'http://example.com/2','Example 2','These are notes for example 2','    bar baz quux'),
+            array($this->profile_1['id'], 'http://example.com/3','Example 3','These are notes for example 3','foo     baz quux'),
+            array($this->profile_2['id'], 'http://example.com/4','Example 4','These are notes for example 4','    bar     quux'),
+            array($this->profile_1['id'], 'http://example.com/5','Example 5','These are notes for example 5','foo bar baz     '),
+            array($this->profile_2['id'], 'http://example.com/6','Example 6','These are notes for example 6','        baz quux'),
+            array($this->profile_1['id'], 'http://example.com/7','Example 7','These are notes for example 7','foo bar baz quux'),
+            array($this->profile_2['id'], 'http://example.com/8','Example 8','These are notes for example 8','    bar     quux'),
+            array($this->profile_1['id'], 'http://example.com/9','Example 9','These are notes for example 9','foo     baz quux'),
+            array($this->profile_2['id'], 'http://example.com/a','Example a','These are notes for example a','    bar baz     '),
+            array($this->profile_1['id'], 'http://example.com/b','Example b','These are notes for example b','foo bar baz quux'),
+            array($this->profile_2['id'], 'http://example.com/c','Example c','These are notes for example c','            quux')
+        );
+        $this->test_posts = array();
+        foreach ($posts_data as $post_flat) {
+            $this->test_posts[] = array_merge(
+                array_combine($posts_keys, $post_flat)
+            );
+        }
+
+        $this->tag_intersections = array(
+            '',
+            'foo',
+            '    bar',
+            '        baz',
+            '            quux',
+            'foo bar', 
+            'foo     baz', 
+            'foo         quux', 
+            '    bar baz quux', 
+            'foo bar baz quux',
+            'quux baz bar foo'
+        );
 
     }
 
@@ -98,7 +134,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
         }
         try {
             $test_post = $this->model->save(array(
-                'profile_id' => $this->profile_id,
+                'profile_id' => $this->profile_1['id'],
                 'url'        => 'http://example.com',
                 'title'      => 'Example bookmark'
             ));
@@ -115,7 +151,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
     {
         try {
             $test_post = $this->model->save(array(
-                'profile_id' => $this->profile_id,
+                'profile_id' => $this->profile_1['id'],
                 'url'        => 'http://example.com',
                 'title'      => 'Example bookmark',
                 'user_date'  => 'THIS IS A BOGUS DATE'
@@ -126,7 +162,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
         }
         try {
             $test_post = $this->model->save(array(
-                'profile_id' => $this->profile_id,
+                'profile_id' => $this->profile_1['id'],
                 'url'        => 'http://example.com',
                 'title'      => 'Example bookmark',
                 'user_date'  => '2007-10-24T10:10:24-0500'
@@ -144,7 +180,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
     public function testPostSave()
     {
         $post_data = array(
-            'profile_id' => $this->profile_id,
+            'profile_id' => $this->profile_1['id'],
             'url'        => 'http://example.com',
             'title'      => 'Test bookmark #1',
             'notes'      => 'These are test notes',
@@ -175,7 +211,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
 
         // Fetch the bookmark.
         $fetched_post = $this->model->fetchOneByUrlAndProfile(
-            $post_data['url'], $this->profile_id
+            $post_data['url'], $this->profile_1['id']
         );
         $this->assertTrue(null != $fetched_post);
 
@@ -204,7 +240,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
         for ($i=0; $i<10; $i++) {
 
             $post_data = array(
-                'profile_id' => $this->profile_id,
+                'profile_id' => $this->profile_1['id'],
                 'url'        => 'http://example.com/foobar.html',
                 'title'      => 'Example bookmark',
                 'user_date'  => '2007-10-24T10:10:24-0500'
@@ -212,14 +248,14 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
             $test_post = $this->model->save($post_data);
 
             $fetched_post = $this->model->fetchOneByUrlAndProfile(
-                $post_data['url'], $this->profile_id
+                $post_data['url'], $this->profile_1['id']
             );
             $this->assertEquals($post_data['url'], $fetched_post['url']);
 
             $this->model->deleteById($test_post['id']);
 
             $fetched_post2 = $this->model->fetchOneByUrlAndProfile(
-                $post_data['url'], $this->profile_id
+                $post_data['url'], $this->profile_1['id']
             );
             $this->assertNull($fetched_post2);
 
@@ -235,7 +271,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
         for ($i=0; $i<10; $i++) {
 
             $post_data = array(
-                'profile_id' => $this->profile_id,
+                'profile_id' => $this->profile_1['id'],
                 'url'        => 'http://example.com/foobar.html',
                 'title'      => 'Example bookmark',
                 'user_date'  => '2007-10-24T10:10:24-0500'
@@ -243,7 +279,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
             $test_post = $this->model->save($post_data);
 
             $fetched_post = $this->model->fetchOneByUrlAndProfile(
-                $post_data['url'], $this->profile_id
+                $post_data['url'], $this->profile_1['id']
             );
             $this->assertEquals($post_data['url'], $fetched_post['url']);
             $this->assertEquals($test_post['uuid'], $fetched_post['uuid']);
@@ -256,7 +292,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
             $this->assertNull($fetched_post2);
 
             $fetched_post3 = $this->model->fetchOneByUrlAndProfile(
-                $post_data['url'], $this->profile_id
+                $post_data['url'], $this->profile_1['id']
             );
             $this->assertNull($fetched_post3);
 
@@ -272,7 +308,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
         for ($i=0; $i<10; $i++) {
 
             $post_data = array(
-                'profile_id' => $this->profile_id,
+                'profile_id' => $this->profile_1['id'],
                 'url'        => 'http://example.com/foobar.html',
                 'title'      => 'Example bookmark',
                 'user_date'  => '2007-10-24T10:10:24-0500'
@@ -280,16 +316,16 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
             $test_post = $this->model->save($post_data);
 
             $fetched_post = $this->model->fetchOneByUrlAndProfile(
-                $post_data['url'], $this->profile_id
+                $post_data['url'], $this->profile_1['id']
             );
             $this->assertEquals($post_data['url'], $fetched_post['url']);
 
             $rv = $this->model->deleteByUrlAndProfile(
-                $post_data['url'], $this->profile_id
+                $post_data['url'], $this->profile_1['id']
             );
 
             $fetched_post2 = $this->model->fetchOneByUrlAndProfile(
-                $post_data['url'], $this->profile_id
+                $post_data['url'], $this->profile_1['id']
             );
 
             $this->assertNull($fetched_post2);
@@ -304,7 +340,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
     public function testChangeUrl()
     {
         $post_data = array(
-            'profile_id' => $this->profile_id,
+            'profile_id' => $this->profile_1['id'],
             'url'        => 'http://example.com/foobar.html',
             'title'      => 'Example bookmark',
             'notes'      => 'Notes for the example bookmark',
@@ -324,8 +360,9 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
         $saved_post_2 = $this->model->save($changed_post);
         $this->assertEquals($uuid, $saved_post_2['uuid']);
 
-        $should_be_null_post = 
-            $this->model->fetchOneByUrlAndProfile($url_1, $this->profile_id);
+        $should_be_null_post = $this->model->fetchOneByUrlAndProfile(
+            $url_1, $this->profile_1['id']
+        );
         $this->assertNull($should_be_null_post);
     }
 
@@ -338,7 +375,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
 
         for ($i=0; $i<$test_count; $i++) {
             $this->model->save(array(
-                'profile_id' => $this->profile_id,
+                'profile_id' => $this->profile_1['id'],
                 'url'        => "http://example.com/page$i",
                 'title'      => "Example bookmark #$i",
                 'notes'      => "Notes for example bookmark #$i",
@@ -346,7 +383,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
             ));
         }
 
-        $result_count = $this->model->countByProfile($this->profile_id);
+        $result_count = $this->model->countByProfile($this->profile_1['id']);
         $this->assertEquals($test_count, $result_count);
     }
 
@@ -355,42 +392,12 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
      */
     public function testFetchAndCountByProfileAndTags()
     {
-        $posts_keys = array('url', 'title', 'notes', 'tags');
-        $posts_data = array(
-            array('http://example.com/1','Example 1','These are notes for example 1','foo bar baz quux'),
-            array('http://example.com/2','Example 2','These are notes for example 2','    bar baz quux'),
-            array('http://example.com/3','Example 3','These are notes for example 3','foo     baz quux'),
-            array('http://example.com/4','Example 4','These are notes for example 4','    bar     quux'),
-            array('http://example.com/5','Example 5','These are notes for example 5','foo bar baz     '),
-            array('http://example.com/6','Example 6','These are notes for example 6','        baz quux'),
-            array('http://example.com/7','Example 7','These are notes for example 7','foo bar baz quux'),
-            array('http://example.com/8','Example 8','These are notes for example 8','    bar     quux'),
-            array('http://example.com/9','Example 9','These are notes for example 9','foo     baz quux'),
-            array('http://example.com/a','Example a','These are notes for example a','            quux'),
-            array('http://example.com/b','Example b','These are notes for example b','foo     baz     ')
-        );
-
-        $tag_intersections = array(
-            '',
-            'foo',
-            '    bar',
-            '        baz',
-            '            quux',
-            'foo bar', 
-            'foo     baz', 
-            'foo         quux', 
-            '    bar baz quux', 
-            'foo bar baz quux',
-            'quux baz bar foo'
-        );
-
         $tags_counts = array();
         $tags_posts  = array();
         $url_posts   = array();
 
         // Process all the test posts.
-        foreach ($posts_data as $post_data) {
-            $post_data = array_combine($posts_keys, $post_data);
+        foreach ($this->test_posts as $post_data) {
 
             // Index this post by URL.
             $url = $post_data['url'];
@@ -398,7 +405,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
 
             // Compare tags against intersections.
             $tags = $this->tags_model->parseTags($post_data['tags']);
-            foreach ($tag_intersections as $i) {
+            foreach ($this->tag_intersections as $i) {
                 $i_tags = $this->tags_model->parseTags($i);
                 if (count(array_intersect($tags, $i_tags)) == count($i_tags)) {
 
@@ -421,7 +428,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
 
             // Save this test post.
             $this->model->save(array_merge(
-                $post_data, array('profile_id' => $this->profile_id)
+                $post_data, array('profile_id' => $this->profile_1['id'])
             ));
         }
 
@@ -431,13 +438,13 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
 
             // Ensure the count for this intersection is correct.
             $result_count = 
-                $this->model->countByProfileAndTags($this->profile_id, $tags);
+                $this->model->countByProfileAndTags($this->profile_1['id'], $tags);
             $this->assertEquals($test_count, $result_count);
 
             // Ensure the count for this intersection is correct, by fetching 
             // actual data.
             $result_posts = $this->model->fetchByProfileAndTags(
-                $this->profile_id, $tags, null, null
+                $this->profile_1['id'], $tags, null, null
             );
             $this->assertEquals($test_count, count($result_posts));
 
@@ -472,37 +479,9 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
      */
     public function testFetchAndCountByTags()
     {
-        $posts_keys = array('profile_id', 'url', 'title', 'notes', 'tags');
-        $posts_data = array(
-            array($this->profile_id,   'http://example.com/1','Example 1','These are notes for example 1','foo bar baz quux'),
-            array($this->profile_id_2, 'http://example.com/2','Example 2','These are notes for example 2','    bar baz quux'),
-            array($this->profile_id,   'http://example.com/3','Example 3','These are notes for example 3','foo     baz quux'),
-            array($this->profile_id_2, 'http://example.com/4','Example 4','These are notes for example 4','    bar     quux'),
-            array($this->profile_id,   'http://example.com/5','Example 5','These are notes for example 5','foo bar baz     '),
-            array($this->profile_id_2, 'http://example.com/6','Example 6','These are notes for example 6','        baz quux'),
-            array($this->profile_id,   'http://example.com/7','Example 7','These are notes for example 7','foo bar baz quux'),
-            array($this->profile_id_2, 'http://example.com/8','Example 8','These are notes for example 8','    bar     quux'),
-            array($this->profile_id,   'http://example.com/9','Example 9','These are notes for example 9','foo     baz quux'),
-            array($this->profile_id_2, 'http://example.com/a','Example a','These are notes for example a','            quux'),
-            array($this->profile_id,   'http://example.com/b','Example b','These are notes for example b','foo     baz     ')
-        );
-
         $screen_names = array(
-            $this->profile_id   => 'tester1_screenname',
-            $this->profile_id_2 => 'tester2_screenname'
-        );
-
-        $tag_intersections = array(
-            'foo',
-            '    bar',
-            '        baz',
-            '            quux',
-            'foo bar', 
-            'foo     baz', 
-            'foo         quux', 
-            '    bar baz quux', 
-            'foo bar baz quux',
-            'quux baz bar foo'
+            $this->profile_1['id'] => $this->profile_1['screen_name'],
+            $this->profile_2['id'] => $this->profile_2['screen_name']
         );
 
         $tags_counts = array();
@@ -510,8 +489,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
         $url_posts   = array();
 
         // Process all the test posts.
-        foreach ($posts_data as $post_data) {
-            $post_data = array_combine($posts_keys, $post_data);
+        foreach ($this->test_posts as $post_data) {
 
             // Index this post by URL.
             $url = $post_data['url'];
@@ -519,7 +497,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
 
             // Compare tags against intersections.
             $tags = $this->tags_model->parseTags($post_data['tags']);
-            foreach ($tag_intersections as $i) {
+            foreach ($this->tag_intersections as $i) {
                 $i_tags = $this->tags_model->parseTags($i);
                 if (count(array_intersect($tags, $i_tags)) == count($i_tags)) {
 

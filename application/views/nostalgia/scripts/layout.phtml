@@ -12,6 +12,8 @@
             'post_profile'
         );
     }
+
+    $sidebar_content = $this->placeholder('sidebar');
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml"> 
     <head>  
@@ -20,12 +22,10 @@
         <link href="<?= $this->baseUrl('/css/nostalgia/main.css') ?>" media="screen" rel="stylesheet" type="text/css" />
         <link href="<?= $this->baseUrl('/css/nostalgia/ctrl_' . $controller_name . '.css') ?>" media="screen" rel="stylesheet" type="text/css" />
         <link href="<?= $this->baseUrl('/css/nostalgia/ctrl_' . $controller_name . '_act_' . $action_name . '.css') ?>" media="screen" rel="stylesheet" type="text/css" />
-        <script src="<?= $this->baseUrl('/js/nostalgia/main.js') ?>" type="text/javascript"></script>
-        <script src="<?= $this->baseUrl('/js/nostalgia/ctrl_' . $controller_name . '.js') ?>" type="text/javascript"></script>
-        <script src="<?= $this->baseUrl('/js/nostalgia/ctrl_' . $controller_name . '_act_' . $action_name . '.js') ?>" type="text/javascript"></script>
     </head> 
-    <body class="<?= 'ctrl_' . $controller_name ?> <?= 'act_' . $action_name ?> <?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>">
-        <div id="page">
+    <body id="<?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>" 
+            class="<?= 'ctrl_' . $controller_name ?> <?= 'act_' . $action_name ?> <?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>">
+        <div id="page" class="<?= ($sidebar_content != '') ? 'with_sidebar' : '' ?>">
 
             <div id="header">
 
@@ -67,8 +67,15 @@
                 <?= $this->placeholder('infobar') ?>
             </div>
 
-            <div id="content">
-                <?= $this->layout()->content ?>
+            <div id="middle">
+                <div id="content">
+                    <?= $this->layout()->content ?>
+                </div>
+                <?php if ($sidebar_content): ?>
+                    <div id="sidebar">
+                        <?= $sidebar_content ?>
+                    </div>
+                <?php endif ?>
             </div>
 
             <div id="footer">
@@ -85,5 +92,8 @@
 
         </div>
 
+        <script src="<?= $this->baseUrl('/js/nostalgia/main.js') ?>" type="text/javascript"></script>
+        <script src="<?= $this->baseUrl('/js/nostalgia/ctrl_' . $controller_name . '.js') ?>" type="text/javascript"></script>
+        <script src="<?= $this->baseUrl('/js/nostalgia/ctrl_' . $controller_name . '_act_' . $action_name . '.js') ?>" type="text/javascript"></script>
     </body>
 </html>

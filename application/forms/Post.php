@@ -31,19 +31,13 @@ class Memex_Form_Post extends Zend_Form
             // omit the rest of the form.
             $this->setMethod('get')
                 ->addElement('submit', 'save', array(
-                    'label' => 'Next'
+                    'label' => 'next'
                 ));
 
         } else {
 
             // Once a URL has been supplied, build the rest of the POST form.
             $this->setMethod('post')
-                ->addElement('hash', 'csrf', array(
-                    'salt' => Zend_Registry::get('config')->form->salt,
-                    'decorators' => array( 
-                        array('ViewHelper')
-                    )
-                ))
                 ->addElement('text', 'title', array(
                     'label'      => 'Title',
                     'required'   => true,
@@ -87,6 +81,12 @@ class Memex_Form_Post extends Zend_Form
                     )
                 ));
                  */
+                ->addElement('hash', 'csrf', array(
+                    'salt' => Zend_Registry::get('config')->form->salt,
+                    'decorators' => array( 
+                        array('ViewHelper')
+                    )
+                ))
 
                 ->addElement('submit', 'save', array(
                     'label' => 'save'
@@ -96,6 +96,12 @@ class Memex_Form_Post extends Zend_Form
                 ));
 
         }
+
+        $this->addDisplayGroup(
+            array('url', 'title', 'notes', 'tags', 'private', 'save', 'cancel'), 
+            'post_form',
+            array('legend' => 'Save Post')
+        );
 
         $this
             ->addElement('hidden', 'uuid', array(

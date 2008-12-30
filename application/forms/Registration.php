@@ -97,7 +97,7 @@ class Memex_Form_Registration extends Zend_Form
 
         $this
             ->addElement('captcha', 'captcha', array(
-                'label'      => 'Please enter the 5 letters displayed below:',
+                'label'      => 'Please enter the 5 letters displayed below',
                 'required'   => true,
                 'captcha'    => array(
                     'captcha' => 'Figlet', 'wordLen' => 5, 'timeout' => 300

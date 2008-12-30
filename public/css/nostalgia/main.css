@@ -24,6 +24,43 @@ a:active {
     text-decoration: underline; 
 }
 
+form fieldset dl
+    clear: both;
+}
+form fieldset dl {
+    clear: both;
+}
+form fieldset dl dt {
+    width: 23ex;
+    text-align: right;
+    float: left;
+    height: 3.5em;
+}
+form fieldset dl dt label {
+    display: block;
+    padding: 0.75em 0em;
+}
+form fieldset dl dt label:after {
+    content: ': ';
+}
+form fieldset dl dd {
+    min-height: 3.5em;
+    margin-left: 24ex;
+}
+form fieldset dl dd input.text, 
+form fieldset dl dd input.password {
+    margin: 0.5em 0em;
+    width: 75ex;
+}
+form fieldset dl dd input.submit {
+    margin: 0.5em 0em;
+}
+form fieldset dl dd textarea {
+    font-family: arial, sans-serif;
+    font-size: 100%; 
+    width: 75ex;
+}
+
 #header {
     font-size: 75%;
     margin: 0.5em 1.5em 0.5em 1.5em; 
@@ -108,10 +145,36 @@ a:active {
     border-left: none;
     border-right: none;
 }
+#middle {
+    position: relative;
+}
 #content {
     font-size: 75%;
     margin: 0em 1.5em 0em 1.5em; 
 }
+
+.with_sidebar #content {
+    margin-right: 20.5em;
+}
+.with_sidebar #content .pagination {
+    margin-right: -19em;
+}
+#sidebar {
+    font-size: 75%;
+    position: absolute;
+    top: 0;
+    right: 1.5em;
+    width: 18em;
+}
+#sidebar div {
+    background-color: #eee; 
+    border: 1px solid #ccc; 
+    border-left: none;
+    border-right: none;
+    margin: 0em 1.5em 0em 1.5em; 
+    padding: 0 1em 0 1em;
+}
+
 #footer {
     position: relative;
     font-size: 75%;
@@ -250,7 +313,8 @@ a:active {
     display: inline;
     margin: 0 0.125em 0 0.125em;
 }
-.pagination .pages li.page a, .pagination .pages li.page span.current {
+.pagination .pages li.page a, 
+.pagination .pages li.page span.current {
     border: 1px solid #ccc;
     padding: 0 0.5em 0 0.5em;    
 }
@@ -309,9 +373,55 @@ a:active {
     padding-left: 1.5em;
 }
 
-.ctrl_doc .doc_content {
+#ctrl_doc_act_index .doc_content {
     font-size: 115%;
     padding: 0 85px 0 85px;
     line-height: 1.75em;
+}
+
+#ctrl_post_act_save form {
+    width: 110ex;
+}
+#ctrl_post_act_save form fieldset dl dt {
+    width: 11ex;
+}
+#ctrl_post_act_save form fieldset dl dd {
+    margin-left: 12ex;
+}
+
+#ctrl_auth_act_login form {
+    width: 110ex;
+}
+#ctrl_auth_act_login form fieldset dl dt {
+    width: 12ex;
+}
+#ctrl_auth_act_login form fieldset dl dd {
+    margin-left: 13ex;
+}
+
+#sidebar .top_tags {
+    margin: 0 0 0 0;
+    padding: 1em;
+}
+#sidebar .top_tags h4 {
+    font-size: 120%;
+    margin: 0em 0 0.5em 0;
+    padding: 0 0 0 0;
+}
+#sidebar .top_tags ul {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+#sidebar .top_tags ul li {
+    list-style: none;
+    line-height: 1.5em;
+}
+#sidebar .top_tags ul li .count {
+    float: left;
+    width: 6ex;
+    text-align: right;
+}
+#sidebar .top_tags ul li .tag {
+    padding-left: 0.75em;
 }
 

@@ -113,17 +113,17 @@ class Memex_Model_LoginsTest extends PHPUnit_Framework_TestCase
      */
     public function testShouldNotAllowDuplicateLoginName()
     {
-        $login_id = $this->model->create(array(
+        $login = $this->model->create(array(
             'login_name' => 'tester1',
             'email'      => 'tester1@example.com',
-            'password'   => 'tester_password',
+            'password'   => 'tester_password'
         ));
 
         try {
-            $login_id2 = $this->model->create(array(
+            $login2 = $this->model->create(array(
                 'login_name' => 'tester1',
                 'email'      => 'tester1@example.com',
-                'password'   => 'tester_password',
+                'password'   => 'tester_password'
             ));
             $this->fail('Users with duplicate login names should raise exceptions');
         } catch (Exception $e) {
@@ -137,7 +137,7 @@ class Memex_Model_LoginsTest extends PHPUnit_Framework_TestCase
      */
     public function testRegistrationShouldCreateProfile()
     {
-        $login_id = $this->model->registerWithProfile(array(
+        $login = $this->model->registerWithProfile(array(
             'login_name'  => 'tester1',
             'email'       => 'tester1@example.com',
             'password'    => 'tester_password',
@@ -145,7 +145,7 @@ class Memex_Model_LoginsTest extends PHPUnit_Framework_TestCase
             'full_name'   => 'Tess T. Erone',
             'bio'         => 'I live!'
         ));
-        $this->assertTrue(null !== $login_id);
+        $this->assertTrue(null !== $login);
 
         $profile = $this->profiles_model->fetchByScreenName('tester1_screenname');
 
@@ -155,7 +155,7 @@ class Memex_Model_LoginsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($profile['bio'], 'I live!');
 
         $default_profile = 
-            $this->model->fetchDefaultProfileForLogin($login_id);
+            $this->model->fetchDefaultProfileForLogin($login['id']);
         $this->assertEquals($profile['id'], $default_profile['id']);
     }
 

@@ -26,6 +26,23 @@
     <?php endif ?>
 <?php $this->placeholder('infobar')->captureEnd() ?>
 
+<?php if (!empty($this->tag_counts)): ?>
+    <?php $this->placeholder('sidebar')->captureStart() ?>
+        <div class="top_tags">
+            <h4>top tags</h4>
+            <ul>
+                <?php foreach ($this->tag_counts as $tag_ct): ?>
+                    <li>
+                        <span class="count"><?= $this->escape($tag_ct['count']) ?></span>
+                        <a href="<?= $this->url(array('screen_name'=> $this->screen_name, 
+                            'tags'=>$tag_ct['tag']), 'post_profile_tags') ?>" class="tag"><?= $this->escape($tag_ct['tag']) ?></a>
+                    </li>
+                <?php endforeach ?>
+            </ul>
+        </div>
+    <?php $this->placeholder('sidebar')->captureEnd() ?>
+<?php endif ?>
+
 <?php if (empty($this->posts)): ?>
 
     <div class="message">

@@ -99,6 +99,7 @@ class Memex_Model_Posts extends Memex_Model
         $saved_post = $this->fetchOneById($row->id);
 
         // Update the tags for this post.
+        // TODO: This can be separated out into a deferred queue task
         $tags_model = $this->getModel('Tags');
         $tags_model->updateTagsForPost($saved_post);
 

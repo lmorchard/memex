@@ -25,15 +25,16 @@ class Memex_Model_Profiles extends Memex_Model
 
         $table = $this->getDbTable();
 
-        $id = $table->insert(array(
+        $row = $table->createRow()->setFromArray(array(
             'uuid'        => $this->uuid(),
             'screen_name' => $data['screen_name'],
             'full_name'   => $data['full_name'],
             'bio'         => empty($data['bio']) ? '' : $data['bio'],
             'created'     => date('Y-m-d H:i:s', time())
         ));
+        $row->save();
 
-        return $id;
+        return $row->toArray();
     }
 
     /**

@@ -27,14 +27,15 @@ class Memex_Model_Logins extends Memex_Model
 
         $table = $this->getDbTable();
 
-        $id = $table->insert(array(
+        $row = $table->createRow()->setFromArray(array(
             'login_name' => $data['login_name'],
             'email'      => $data['email'],
             'password'   => md5($data['password']),
             'created'    => date('Y-m-d H:i:s', time())
         ));
+        $row->save();
 
-        return $id;
+        return $row->toArray();
     }
 
     /**
@@ -55,16 +56,17 @@ class Memex_Model_Logins extends Memex_Model
      */
     public function registerWithProfile($data)
     {
-        $new_login_id = $this->create($data);
+        $new_login = $this->create($data);
         try {
-            $new_profile_id = $this->getModel('Profiles')->create($data);
-            $this->addProfileToLogin($new_login_id, $new_profile_id);
+            $new_profile = $this->getModel('Profiles')->create($data);
+            $this->addProfileToLogin($new_login['id'], $new_profile['id']);
         } catch (Exception $e) {
             // If profile creation failed, delete the login.
-            $this->delete($new_login_id);
+            // TODO: Transaction here?
+            $this->delete($new_login['id']);
             throw $e;
         }
-        return $new_login_id;
+        return $new_login;
     }
 
     /**

@@ -35,6 +35,62 @@ class Memex_Model_Tags extends Memex_Model
     }
 
     /**
+     * Count tags by profile ID.
+     *
+     * @param string profile ID
+     * @param integer start index
+     * @param integer result limit
+     * @param integer tag count threshold
+     * @param string order results by "count desc" or "tag asc"
+     * @return array list of tag counts
+     */
+    public function countByProfile($profile_id, $start=0, $count=10, $threshold=null, $order='count desc')
+    {
+        return $this->countBy($profile_id, $start, $count, $threshold, $order);
+    }
+
+    /**
+     * Fetch and count tags by a variety of criteria.
+     *
+     * @param string profile ID
+     * @param integer start index
+     * @param integer result limit
+     * @param integer tag count threshold
+     * @param string order results by "count desc" or "tag asc"
+     * @return array list of tag counts
+     */
+    public function countBy($profile_id=null, $start=0, $count=10, $threshold=null, $order='count desc')
+    {
+        $table = $this->getDbTable();
+        $select = $table->select()
+            ->from($table, array('tag', 'count(id) as count'))
+            ->group('tag');
+
+        if (null !== $profile_id)
+            $select->where('profile_id=?', $profile_id);
+        if (null !== $threshold)
+            $select->where('count>?', $threshold);
+        if ('count desc' == $order)
+            $select->order(array('count desc'));
+        if ('tag' == $order || 'tag asc' == $order)
+            $select->order(array('tag asc'));
+        if (null !== $start && null !== $count)
+            $select->limit($count, $start);
+
+        $rows = $table->fetchAll($select);
+
+        $tag_counts = array();
+        foreach ($rows as $row) {
+            $tag_counts[] = array(
+                'tag'   => $row['"tags"."tag"'],
+                'count' => $row['count']
+            );
+        }
+
+        return $tag_counts;
+    }
+
+    /**
      * Fetch tag records by tag name and profile.
      */
     public function fetchByTagAndProfile($tag_name, $profile_id)

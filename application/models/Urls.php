@@ -77,7 +77,7 @@ class Memex_Model_Urls extends Memex_Model
      * @param string Account ID for first URL save
      * @return array URL data
      */
-    public function fetchOrCreate($url, $account_id)
+    public function fetchOrCreate($url, $profile_id)
     {
         $url   = $this->normalize_url_filter->filter($url);
         $table = $this->getDbTable();
@@ -96,7 +96,7 @@ class Memex_Model_Urls extends Memex_Model
             'url'              => $url,
             'hash'             => md5($url),
             'hostname'         => empty($url_parts['host']) ? '' : $url_parts['host'],
-            'first_profile_id' => $account_id,
+            'first_profile_id' => $profile_id,
             'created'          => date('Y-m-d H:i:s', time())
         ));
         $rows = $table->find($new_id);

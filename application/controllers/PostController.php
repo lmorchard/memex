@@ -37,6 +37,9 @@ class PostController extends Zend_Controller_Action
         $tags = $this->view->tags = 
             $tags_model->parseTags($request->getParam('tags'));
 
+        $tag_counts = $this->view->tag_counts = 
+            $tags_model->countByProfile($profile['id']);
+
         // Set up the count, page size, and page number parameters 
         // for paginator.
         $posts_model = $this->_helper->getModel('Posts');

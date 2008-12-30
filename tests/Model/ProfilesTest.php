@@ -55,27 +55,23 @@ class Memex_Model_ProfilesTest extends PHPUnit_Framework_TestCase
     public function testCreateRequiredFields()
     {
         try {
-            $test_id = $this->model->create(array());
+            $test = $this->model->create(array());
             $this->fail('missing fields should not be allowed');
         } catch (Exception $e) {
             $this->assertContains('required', $e->getMessage());
         }
         try {
-            $test_id = $this->model->create(array(
+            $test = $this->model->create(array(
                 'screen_name' => 'tester1'
             ));
             $this->fail('missing fields should not be allowed');
         } catch (Exception $e) {
             $this->assertContains('required', $e->getMessage());
         }
-        try {
-            $test_id = $this->model->create(array(
-                'screen_name' => 'tester1',
-                'full_name'   => 'Tess T. Erone'
-            ));
-        } catch (Exception $e) {
-            $this->fail('Logins with missing fields should not be allowed');
-        }
+        $test = $this->model->create(array(
+            'screen_name' => 'tester1',
+            'full_name'   => 'Tess T. Erone'
+        ));
     }
 
     /**
@@ -83,7 +79,7 @@ class Memex_Model_ProfilesTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateAndFetch()
     {
-        $profile_id = $this->model->create(array(
+        $profile = $this->model->create(array(
             'screen_name' => 'tester1_screenname',
             'full_name'   => 'Tess T. Erone',
             'bio'         => 'I live!'
@@ -101,14 +97,14 @@ class Memex_Model_ProfilesTest extends PHPUnit_Framework_TestCase
      */
     public function testShouldNotAllowDuplicateName()
     {
-        $profile_id = $this->model->create(array(
+        $profile = $this->model->create(array(
             'screen_name' => 'tester1',
             'full_name'   => 'Tess T. Erone',
             'bio'         => 'I live!'
         ));
 
         try {
-            $profile_id2 = $this->model->create(array(
+            $profile2 = $this->model->create(array(
                 'screen_name' => 'tester1',
                 'full_name'   => 'Tess T. Erone',
                 'bio'         => 'I live!'

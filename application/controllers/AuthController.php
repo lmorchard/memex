@@ -85,15 +85,18 @@ class AuthController extends Zend_Controller_Action
         }
 
         $logins = $this->_helper->getModel('Logins');
-        //try {
-            $new_login_id = $logins->registerWithProfile($form->getValues());
-        //} catch (Exception $e) {
+        try {
+            $new_login = $logins->registerWithProfile($form->getValues());
+        } catch (Exception $e) {
             // TODO: Better error message
-        //    $form->setDescription('Registration failed, please try again.');
-        //    return;
-        //}
+            $form->setDescription('Registration failed, please try again.');
+            return;
+        }
 
-        $this->_helper->redirector('home');
+        // We're authenticated! Redirect to the user page
+        return $this->_helper->redirector->gotoRoute(
+            array(), 'auth_login'
+        );
     }
 
     /**

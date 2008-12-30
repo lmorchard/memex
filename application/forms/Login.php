@@ -13,7 +13,7 @@ class Memex_Form_Login extends Zend_Form
                 array('StringLength', false, array(3, 64))
             ),
             'required'   => true,
-            'label'      => 'Login name:',
+            'label'      => 'Login name',
         ));
 
         $password = $this->addElement('password', 'password', array(
@@ -22,7 +22,7 @@ class Memex_Form_Login extends Zend_Form
                 array('StringLength', false, array(3, 64))
             ),
             'required'   => true,
-            'label'      => 'Password:',
+            'label'      => 'Password',
         ));
 
         $login = $this->addElement('submit', 'login', array(
@@ -30,6 +30,12 @@ class Memex_Form_Login extends Zend_Form
             'ignore'   => true,
             'label'    => 'Login',
         ));
+
+        $this->addDisplayGroup(
+            array('login_name', 'password', 'login'), 
+            'login_group',
+            array('legend' => 'Login')
+        );
 
         // We want to display a 'failed authentication' message if necessary;
         // we'll do that with the form 'description', so we need to add that
