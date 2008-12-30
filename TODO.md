@@ -34,6 +34,7 @@
     * Implement network / subscriptions based on RSS/Atom aggregation to login-less local proxy profiles
     * [FeedSync?](http://dev.live.com/feedsync/spec/spec.aspx)
 * Misc
+    * Rename "posts" to "items"?  Not crucial, but odd.
     * More tests, controller tests, filter tests, validator tests, etc
     * Search
     * Bulk import via file upload
