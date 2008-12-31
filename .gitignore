@@ -5,6 +5,7 @@ Thumbs.db
 *.bak
 *.pyc
 *.swp
+*.swo
 xfers/
 logs/*log
 system/tests/log/report/*

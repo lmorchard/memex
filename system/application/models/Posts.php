@@ -52,13 +52,13 @@ class Memex_Model_Posts extends Memex_Model
 
         // Try looking up an existing post for this URL and profile.
         $row = null;
-        if (!empty($post_data['uuid'])) {
-            $row = $table->fetchRow($table->select()
-                ->where('uuid=?', $post_data['uuid'])
-            );
-        } elseif (!empty($post_data['id'])) {
+        if (!empty($post_data['id'])) {
             $row = $table->fetchRow($table->select()
                 ->where('id=?', $post_data['id'])
+            );
+        } elseif (!empty($post_data['uuid'])) {
+            $row = $table->fetchRow($table->select()
+                ->where('uuid=?', $post_data['uuid'])
             );
         } else {
             $row = $table->fetchRow($table->select()
@@ -299,6 +299,8 @@ class Memex_Model_Posts extends Memex_Model
         $rv = $table->delete(
             $table->getAdapter()->quoteInto('id=?', $post_id)
         );
+        $tags_model = $this->getModel('Tags');
+        $tags_model->deleteTagsForPost($post_id);
         return $rv;
     }
 
@@ -309,10 +311,13 @@ class Memex_Model_Posts extends Memex_Model
      */
     public function deleteByUUID($uuid)
     {
+        $data = $this->fetchOneByUUID($uuid);
         $table = $this->getDbTable();
         $rv = $table->delete(
             $table->getAdapter()->quoteInto('uuid=?', $uuid)
         );
+        $tags_model = $this->getModel('Tags');
+        $tags_model->deleteTagsForPost($data['id']);
         return $rv;
     }
 
@@ -326,6 +331,8 @@ class Memex_Model_Posts extends Memex_Model
     {
         $data = $this->fetchOneByUrlAndProfile($url, $profile_id);
         if (null == $data) return null;
+        $tags_model = $this->getModel('Tags');
+        $tags_model->deleteTagsForPost($data['id']);
         return $this->deleteById($data['id']);
     }
 

@@ -60,18 +60,19 @@ class Memex_Model_TagsTest extends PHPUnit_Framework_TestCase
 
         $posts_keys = array('profile_id', 'url', 'title', 'notes', 'tags');
         $posts_data = array(
-            array($this->profile_1['id'],   'http://example.com/1','Example 1','These are notes for example 1','foo bar baz quux'),
+            array($this->profile_1['id'], 'http://example.com/1','Example 1','These are notes for example 1','foo bar baz quux'),
             array($this->profile_2['id'], 'http://example.com/2','Example 2','These are notes for example 2','    bar baz quux'),
-            array($this->profile_1['id'],   'http://example.com/3','Example 3','These are notes for example 3','foo     baz quux'),
+            array($this->profile_1['id'], 'http://example.com/3','Example 3','These are notes for example 3','foo     baz quux'),
             array($this->profile_2['id'], 'http://example.com/4','Example 4','These are notes for example 4','    bar     quux'),
-            array($this->profile_1['id'],   'http://example.com/5','Example 5','These are notes for example 5','foo bar baz     '),
+            array($this->profile_1['id'], 'http://example.com/5','Example 5','These are notes for example 5','foo bar baz     '),
             array($this->profile_2['id'], 'http://example.com/6','Example 6','These are notes for example 6','        baz quux'),
-            array($this->profile_1['id'],   'http://example.com/7','Example 7','These are notes for example 7','foo bar baz quux'),
+            array($this->profile_1['id'], 'http://example.com/7','Example 7','These are notes for example 7','foo bar baz quux'),
             array($this->profile_2['id'], 'http://example.com/8','Example 8','These are notes for example 8','    bar     quux'),
-            array($this->profile_1['id'],   'http://example.com/9','Example 9','These are notes for example 9','foo     baz quux'),
+            array($this->profile_1['id'], 'http://example.com/9','Example 9','These are notes for example 9','foo     baz quux'),
             array($this->profile_2['id'], 'http://example.com/a','Example a','These are notes for example a','    bar baz     '),
-            array($this->profile_1['id'],   'http://example.com/b','Example b','These are notes for example b','foo bar baz quux'),
-            array($this->profile_2['id'], 'http://example.com/c','Example c','These are notes for example c','            quux')
+            array($this->profile_1['id'], 'http://example.com/b','Example b','These are notes for example b','foo bar baz quux'),
+            array($this->profile_2['id'], 'http://example.com/c','Example c','These are notes for example c','            quux'),
+            array($this->profile_1['id'], 'http://example.com/d','Example c','These are notes for example c','foo         quux')
         );
         $this->test_posts = array();
         foreach ($posts_data as $post_flat) {
@@ -89,30 +90,6 @@ class Memex_Model_TagsTest extends PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-    }
-
-    /**
-     *
-     */
-    public function testTagDeletionOnPostTagChange()
-    {
-        $this->fail('TODO');
-    }
-
-    /**
-     *
-     */
-    public function testTagDeletionOnPostDeletion()
-    {
-        $this->fail('TODO');
-    }
-
-    /**
-     *
-     */
-    public function testTagPositionUpdateOnTagChange()
-    {
-        $this->fail('TODO');
     }
 
     /**
@@ -205,6 +182,261 @@ class Memex_Model_TagsTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($this->profile_1['id'], $tag_data['profile_id']);
             $this->assertTrue(null != $tag_data['id']);
         }
+
+    }
+
+    /**
+     * Ensure that changes in tags on existing posts is reflected in tag 
+     * counts.
+     */
+    public function testTagDeletionOnPostTagChange()
+    {
+        $p1 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange1.html',
+            'title'      => 'Tag Change 1',
+            'tags'       => 'foo bar baz xyzzy'
+        ));
+        $p2 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange2.html',
+            'title'      => 'Tag Change 2',
+            'tags'       => '    bar baz xyzzy'
+        ));
+        $p3 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange3.html',
+            'title'      => 'Tag Change 3',
+            'tags'       => '    bar baz'
+        ));
+        $p4 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange4.html',
+            'title'      => 'Tag Change 4',
+            'tags'       => '        baz'
+        ));
+
+        $test_counts_1 = array(
+            array( 'tag' => 'baz',   'count' => '4'),
+            array( 'tag' => 'bar',   'count' => '3'),
+            array( 'tag' => 'xyzzy', 'count' => '2'),
+            array( 'tag' => 'foo',   'count' => '1')
+        );
+        $result_counts_1 = 
+            $this->model->countByProfile($this->profile_1['id']);
+        $this->assertEquals($test_counts_1, $result_counts_1);
+
+        $p1_new = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange1.html',
+            'title'      => 'Tag Change 1',
+            'tags'       => 'not-foo not-bar baz not-xyzzy'
+        ));
+
+        $test_counts_2 = array(
+            array( 'tag' => 'baz',       'count' => '4'),
+            array( 'tag' => 'bar',       'count' => '2'),
+            array( 'tag' => 'not-bar',   'count' => '1'),
+            array( 'tag' => 'not-foo',   'count' => '1'),
+            array( 'tag' => 'not-xyzzy', 'count' => '1'),
+            array( 'tag' => 'xyzzy',     'count' => '1')
+        );
+        $result_counts_2 = 
+            $this->model->countByProfile($this->profile_1['id']);
+        $this->assertEquals($test_counts_2, $result_counts_2);
+
+        $p2_new = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange2.html',
+            'title'      => 'Tag Change 2',
+            'tags'       => '    not-bar not-baz not-xyzzy'
+        ));
+        
+        $test_counts_3 = array(
+            array( 'tag' => 'baz',       'count' => '3'),
+            array( 'tag' => 'not-bar',   'count' => '2'),
+            array( 'tag' => 'not-xyzzy', 'count' => '2'),
+            array( 'tag' => 'bar',       'count' => '1'),
+            array( 'tag' => 'not-baz',   'count' => '1'),
+            array( 'tag' => 'not-foo',   'count' => '1')
+        );
+        $result_counts_3 = 
+            $this->model->countByProfile($this->profile_1['id']);
+
+        $this->assertEquals($test_counts_3, $result_counts_3);
+
+        $p3_new = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange3.html',
+            'title'      => 'Tag Change 3',
+            'tags'       => '    not-bar not-baz'
+        ));
+
+        $test_counts_4 = array(
+            array( 'tag' => 'not-bar',   'count' => '3'),
+            array( 'tag' => 'baz',       'count' => '2'),
+            array( 'tag' => 'not-baz',   'count' => '2'),
+            array( 'tag' => 'not-xyzzy', 'count' => '2'),
+            array( 'tag' => 'not-foo',   'count' => '1')
+        );
+        $result_counts_4 = 
+            $this->model->countByProfile($this->profile_1['id']);
+
+        $this->assertEquals($test_counts_4, $result_counts_4);
+
+        $p4_new = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange4.html',
+            'title'      => 'Tag Change 4',
+            'tags'       => '        not-baz'
+        ));
+
+        $test_counts_4 = array(
+            array( 'tag' => 'not-bar',   'count' => '3'),
+            array( 'tag' => 'not-baz',   'count' => '3'),
+            array( 'tag' => 'not-xyzzy', 'count' => '2'),
+            array( 'tag' => 'baz',       'count' => '1'),
+            array( 'tag' => 'not-foo',   'count' => '1')
+        );
+        $result_counts_4 = 
+            $this->model->countByProfile($this->profile_1['id']);
+
+        $this->assertEquals($test_counts_4, $result_counts_4);
+
+    }
+
+    /**
+     * Ensure that deleting posts results in decremented tag counts as tag 
+     * usage drops.
+     */
+    public function testTagDeletionOnPostDeletion()
+    {
+        $p1 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange1.html',
+            'title'      => 'Tag Change 1',
+            'tags'       => 'foo bar baz xyzzy'
+        ));
+        $p2 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange2.html',
+            'title'      => 'Tag Change 2',
+            'tags'       => '    bar baz xyzzy'
+        ));
+        $p3 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange3.html',
+            'title'      => 'Tag Change 3',
+            'tags'       => '    bar baz'
+        ));
+        $p4 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange4.html',
+            'title'      => 'Tag Change 4',
+            'tags'       => '        baz'
+        ));
+
+        $test_counts_1 = array(
+            array( 'tag' => 'baz',   'count' => '4'),
+            array( 'tag' => 'bar',   'count' => '3'),
+            array( 'tag' => 'xyzzy', 'count' => '2'),
+            array( 'tag' => 'foo',   'count' => '1')
+        );
+        $result_counts_1 = 
+            $this->model->countByProfile($this->profile_1['id']);
+        $this->assertEquals($test_counts_1, $result_counts_1);
+
+        $this->posts_model->deleteById($p1['id']);
+
+        $test_counts_2 = array(
+            array( 'tag' => 'baz',   'count' => '3'),
+            array( 'tag' => 'bar',   'count' => '2'),
+            array( 'tag' => 'xyzzy', 'count' => '1')
+        );
+        $result_counts_2 = 
+            $this->model->countByProfile($this->profile_1['id']);
+        $this->assertEquals($test_counts_2, $result_counts_2);
+
+        $this->posts_model->deleteById($p2['id']);
+
+        $test_counts_3 = array(
+            array( 'tag' => 'baz',   'count' => '2'),
+            array( 'tag' => 'bar',   'count' => '1')
+        );
+        $result_counts_3 = 
+            $this->model->countByProfile($this->profile_1['id']);
+        $this->assertEquals($test_counts_3, $result_counts_3);
+
+        $this->posts_model->deleteById($p3['id']);
+
+        $test_counts_3 = array(
+            array( 'tag' => 'baz',   'count' => '1')
+        );
+        $result_counts_3 = 
+            $this->model->countByProfile($this->profile_1['id']);
+        $this->assertEquals($test_counts_3, $result_counts_3);
+
+        $this->posts_model->deleteById($p4['id']);
+
+        $test_counts_4 = array(
+        );
+        $result_counts_4 = 
+            $this->model->countByProfile($this->profile_1['id']);
+        $this->assertEquals($test_counts_4, $result_counts_4);
+    }
+
+    /**
+     *
+     */
+    public function testTagPositionUpdateOnTagChange()
+    {
+        $p1 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange1.html',
+            'title'      => 'Tag Change 1',
+            'tags'       => 'foo bar baz xyzzy'
+        ));
+    
+        $test_tags_1 = array('foo', 'bar', 'baz', 'xyzzy');
+        $result_tags_data_1 = $this->model->fetchByPost($p1['id']);
+        $result_tags_1 = array();
+        foreach ($result_tags_data_1 as $tags_data) {
+            $this->assertEquals($tags_data['post_id'], $p1['id']);
+            $result_tags_1[] = $tags_data['tag'];
+        }
+        $this->assertEquals($test_tags_1, $result_tags_1);
+
+        $p1_new1 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange1.html',
+            'title'      => 'Tag Change 1',
+            'tags'       => 'xyzzy foo bar baz'
+        ));
+    
+        $test_tags_2 = array('xyzzy', 'foo', 'bar', 'baz');
+        $result_tags_data_2 = $this->model->fetchByPost($p1_new1['id']);
+        $result_tags_2 = array();
+        foreach ($result_tags_data_2 as $tags_data) {
+            $this->assertEquals($tags_data['post_id'], $p1_new1['id']);
+            $result_tags_2[] = $tags_data['tag'];
+        }
+        $this->assertEquals($test_tags_2, $result_tags_2);
+
+        $p1_new2 = $this->posts_model->save(array(
+            'profile_id' => $this->profile_1['id'],
+            'url'        => 'http://example.com/tagchange1.html',
+            'title'      => 'Tag Change 1',
+            'tags'       => 'xyzzy bar foo baz'
+        ));
+    
+        $test_tags_3 = array('xyzzy', 'bar', 'foo', 'baz');
+        $result_tags_data_3 = $this->model->fetchByPost($p1_new2['id']);
+        $result_tags_3 = array();
+        foreach ($result_tags_data_3 as $tags_data) {
+            $this->assertEquals($tags_data['post_id'], $p1_new2['id']);
+            $result_tags_3[] = $tags_data['tag'];
+        }
+        $this->assertEquals($test_tags_3, $result_tags_3);
 
     }
 

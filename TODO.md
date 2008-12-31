@@ -1,14 +1,14 @@
 # TODO
 
+* Installation
+    * Make *-dist versions of config files, delete originals
+    * Implement an installer that can produce local configs
 * Basic stuff
     * All tags per profile
     * Top tags site-wide
     * Tag suggestions on save form
     * Items per page pagination control
     * Related tags?
-* Installation
-    * Make *-dist versions of config files, delete originals
-    * Implement an installer that can produce local configs
 * Documentation
     * Write more docs and help files
     * Bookmarklets

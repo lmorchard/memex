@@ -229,6 +229,25 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
                 $name.'='.$saved_post[$name]
             );
         }
+
+        // Fetch the bookmark by UUID.
+        $fetched_post = $this->model->fetchOneByUUID($saved_post['uuid']);
+        $this->assertTrue(null != $fetched_post);
+
+        // Assert that the input and fetched post contents match.
+        $this->assertEquals($normalized_url, $fetched_post['url']);
+        foreach (array('profile_id', 'title', 'notes', 'tags') as $name)
+            $this->assertEquals($post_data[$name], $fetched_post[$name]);
+
+        $this->assertEquals($fetched_post['screen_name'], 'tester1_screenname');
+
+        // Assert that the saved and fetched post contents match.
+        foreach (array('url','title','notes','tags','profile_id') as $name) {
+            $this->assertEquals(
+                $name.'='.$fetched_post[$name],
+                $name.'='.$saved_post[$name]
+            );
+        }
     }
 
     /**

@@ -63,7 +63,7 @@ class Memex_Model_Tags extends Memex_Model
     {
         $table = $this->getDbTable();
         $select = $table->select()
-            ->from($table, array('tag', 'count(id) as count'))
+            ->from($table, array('(tag) as tag', 'count(id) as count'))
             ->group('tag');
 
         if (null !== $profile_id)
@@ -72,18 +72,14 @@ class Memex_Model_Tags extends Memex_Model
             $select->where('count>?', $threshold);
         if ('count desc' == $order)
             $select->order(array('count desc'));
-        if ('tag' == $order || 'tag asc' == $order)
-            $select->order(array('tag asc'));
+
+        $select->order(array('tag asc'));
+        
         if (null !== $start && null !== $count)
             $select->limit($count, $start);
 
         $rows = $table->fetchAll($select);
-
-        $tag_counts = array();
-        foreach ($rows as $row) {
-            $tag_counts[] = $row->toArray();
-        }
-        return $tag_counts;
+        return $rows->toArray();
     }
 
     /**
@@ -97,6 +93,33 @@ class Memex_Model_Tags extends Memex_Model
             ->where('profile_id=?', $profile_id)
         );
         return (null == $row) ? null : $row->toArray();
+    }
+
+    /**
+     * Fetch tag records for a given post, in position order.
+     */
+    public function fetchByPost($post_id)
+    {
+        $table = $this->getDbTable();
+        $select = $table->select()
+            ->where('post_id=?', $post_id)
+            ->order('position');
+        $rows = $table->fetchAll($select);
+        return $rows->toArray();
+    }
+
+    /**
+     * Delete tags for a given post.
+     *
+     * @param string post ID
+     */
+    public function deleteTagsForPost($post_id)
+    {
+        $table    = $this->getDbTable();
+        $db       = $table->getAdapter();
+        $table->delete(array(
+            $db->quoteInto('post_id=?', $post_id),
+        ));
     }
 
     /**
