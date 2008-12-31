@@ -293,10 +293,12 @@ class PostController extends Zend_Controller_Action
 
             // jump=doclose or jump=close should close the window after 
             // posting.
-            return $this->_helper->redirector->gotoRoute(
-                array('controller'=>'post', 'action'=>'doclose'), 
-                'post_doclose'
-            );
+            return $this->renderScript('post/save_doclose.phtml');
+
+        } elseif ($jump == 'yes' && $url) {
+            
+            // If there's a URL and ?jump=yes, then hop on over to the original URL.
+            return $this->_helper->redirector->gotoUrl($url);
 
         } elseif (strpos($jump, '/') === 0) {
             
