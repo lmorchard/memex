@@ -3,7 +3,9 @@
 ## Overview
 
 This hopes one day to grow up to be an Open Source social bookmarking web
-application.
+application.  
+
+Or, at least, it will help me learn the Zend Framework.
 
 ## Installation
 
@@ -18,11 +20,13 @@ application.
 
 * Leslie Michael Orchard - <http://decafbad.com/> - <mailto:l.m.orchard@pobox.com>
 * Liberal portions stolen from <http://github.com/weierophinney/bugapp/tree/master>
+* Using [Zend Framework][zf] v1.7.1
 * Using [Dojo Toolkit][dojo] [v1.2.3][dojodl]
 * Using [Markdown PHP][markdown] for documentation.
 * Using [UUID implementation][uuid] from OmniTI 
 * "nostalgia" theme inspired by [del.icio.us][del], circa 2005
 
+[zf]: http://framework.zend.com/
 [dojo]: http://dojotoolkit.org/
 [dojodl]: http://download.dojotoolkit.org/release-1.2.3/
 [del]: http://del.icio.us/
