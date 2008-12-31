@@ -67,6 +67,13 @@ class AuthController extends Zend_Controller_Action
         $identity = Zend_Auth::getInstance()->getIdentity();
         $profile  = $logins->fetchDefaultProfileForLogin($identity->id);
 
+        if (empty($profile['screen_name'])) {
+            return $this->_helper->redirector->gotoRoute(
+                array('screen_name' => $profile['screen_name']),
+                'auth_logout'
+            );
+        }
+
         return $this->_helper->redirector->gotoRoute(
             array('screen_name' => $profile['screen_name']),
             'post_profile'
