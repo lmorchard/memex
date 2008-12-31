@@ -386,7 +386,8 @@ class Memex_Model_TagsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * Ensure that tag position in individual records changes when tags are 
+     * changed on a single post.
      */
     public function testTagPositionUpdateOnTagChange()
     {
