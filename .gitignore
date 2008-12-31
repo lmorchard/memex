@@ -7,6 +7,6 @@ Thumbs.db
 *.swp
 xfers/
 logs/*log
-tests/log/report/*
-data/db/*.db*
+system/tests/log/report/*
+system/data/db/*.db*
 httpd.conf

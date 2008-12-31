@@ -1,10 +1,8 @@
 <?php
-// define('APPLICATION_ENVIRONMENT', 'development');
 define('APPLICATION_ENVIRONMENT', 'development_mysql');
-// define('APPLICATION_ENVIRONMENT', 'production');
 
 try {
-    require '../application/bootstrap.php';
+    require 'system/application/bootstrap.php';
 } catch (Exception $exception) {
     echo '<html><body><center>'
        . 'An exception occured while bootstrapping the application.';

@@ -9,6 +9,8 @@ application.
 
 * Get a copy or a link of the latest [Zend Framework][zf] into the `library/` directory.
 * Try using `scripts/load.sqlite.php` to create the database.
+* Make sure the `system` directory is not web readable.  
+** Modify `index.php` to point to new path, if you move `system`.
 
 [zf]: http://framework.zend.com/download/latest
 
