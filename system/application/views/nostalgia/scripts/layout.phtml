@@ -20,10 +20,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
         <title>memex</title>
         <link href="<?= $this->baseUrl('/css/nostalgia/main.css') ?>" media="screen" rel="stylesheet" type="text/css" />
-        <!--
-        <link href="<?= $this->baseUrl('/css/nostalgia/ctrl_' . $controller_name . '.css') ?>" media="screen" rel="stylesheet" type="text/css" />
-        <link href="<?= $this->baseUrl('/css/nostalgia/ctrl_' . $controller_name . '_act_' . $action_name . '.css') ?>" media="screen" rel="stylesheet" type="text/css" />
-        -->
+        <link href="<?= $this->baseUrl('/css/nostalgia/' . $controller_name . '.css') ?>" media="screen" rel="stylesheet" type="text/css" />
     </head> 
     <body id="<?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>" 
             class="<?= 'ctrl_' . $controller_name ?> <?= 'act_' . $action_name ?> <?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>">
@@ -101,10 +98,9 @@
             }
         </script>
         <script src="<?= $this->baseUrl('/js/dojo/dojo.js') ?>" type="text/javascript"></script>
-        <script src="<?= $this->baseUrl('/js/memex/nostalgia/main.js') ?>" type="text/javascript"></script>
-        <!--
-        <script src="<?= $this->baseUrl('/js/nostalgia/ctrl_' . $controller_name . '.js') ?>" type="text/javascript"></script>
-        <script src="<?= $this->baseUrl('/js/nostalgia/ctrl_' . $controller_name . '_act_' . $action_name . '.js') ?>" type="text/javascript"></script>
-        -->
+        <script type="text/javascript">
+            dojo.require('memex.nostalgia.main');
+            dojo.require('memex.nostalgia.<?= $controller_name ?>');
+        </script>
     </body>
 </html>
