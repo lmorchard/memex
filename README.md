@@ -10,18 +10,21 @@ application.
 * Get a copy or a link of the latest [Zend Framework][zf] into the `library/` directory.
 * Try using `scripts/load.sqlite.php` to create the database.
 * Make sure the `system` directory is not web readable.  
-** Modify `index.php` to point to new path, if you move `system`.
+    * Modify `index.php` to point to new path, if you move `system`.
 
 [zf]: http://framework.zend.com/download/latest
 
-## Credits
+## Credits / Colophon
 
 * Leslie Michael Orchard - <http://decafbad.com/> - <mailto:l.m.orchard@pobox.com>
 * Liberal portions stolen from <http://github.com/weierophinney/bugapp/tree/master>
+* Using [Dojo Toolkit][dojo] [v1.2.3][dojodl]
 * Using [Markdown PHP][markdown] for documentation.
 * Using [UUID implementation][uuid] from OmniTI 
 * "nostalgia" theme inspired by [del.icio.us][del], circa 2005
 
+[dojo]: http://dojotoolkit.org/
+[dojodl]: http://download.dojotoolkit.org/release-1.2.3/
 [del]: http://del.icio.us/
 [markdown]: http://michelf.com/projects/php-markdown/
 [uuid]: https://labs.omniti.com/trac/alexandria/browser/trunk/OmniTI/UUID.php?rev=7
