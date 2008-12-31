@@ -6,7 +6,7 @@ class Memex_Form_PostDelete extends Zend_Form
 {
     public function init()
     {
-        $this
+        $this->setAttrib('id', 'post_delete')
             ->addElementPrefixPath(
                 'Memex_Validate', APPLICATION_PATH . '/models/Validate/', 
                 'validate'

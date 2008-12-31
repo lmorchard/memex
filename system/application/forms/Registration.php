@@ -8,7 +8,8 @@ class Memex_Form_Registration extends Zend_Form
     {
         $helper = Zend_Controller_Action_HelperBroker::getStaticHelper('getModel');
 
-        $this->setMethod('post')
+        $this->setAttrib('id', 'registration')
+            ->setMethod('post')
             ->addElementPrefixPath(
                 'Memex_Validate', APPLICATION_PATH . '/models/Validate/', 
                 'validate'

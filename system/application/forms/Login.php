@@ -6,6 +6,8 @@ class Memex_Form_Login extends Zend_Form
 {
     public function init()
     {
+        $this->setAttrib('id', 'login');
+
         $username = $this->addElement('text', 'login_name', array(
             'filters'    => array('StringTrim', 'StringToLower'),
             'validators' => array(
