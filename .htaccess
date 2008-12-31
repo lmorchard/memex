@@ -29,9 +29,6 @@ php_value display_errors "1"
 # regardless of the servers php.ini values, we can be assured that
 # our application will have these set values set on every request.
 
-
-
-
 # The rules below basically say that if the file exists in the tree, just
 # serve it; otherwise, go to index.php. This is more future-proof for your
 # site, because if you start adding more and more content types, you don't
