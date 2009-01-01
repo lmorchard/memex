@@ -18,9 +18,6 @@ require_once "Zend/Loader.php";
 Zend_Loader::registerAutoload();
 
 // Fire up the initialization plugin with the front controller.
-require_once APPLICATION_PATH . '/plugins/Initialize.php';
-$init = new Memex_Plugin_Initialize(
-    APPLICATION_ENVIRONMENT, 
-    APPLICATION_PATH
-);
-Zend_Controller_Front::getInstance()->registerPlugin($init);
+require_once APPLICATION_PATH . '/library/Memex/Initialize.php';
+$init = new Memex_Initialize(APPLICATION_ENVIRONMENT, APPLICATION_PATH);
+$init->init();

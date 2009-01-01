@@ -2,7 +2,7 @@
 /**
  * Application initialization plugin.
  */
-class Memex_Plugin_Initialize extends Zend_Controller_Plugin_Abstract
+class Memex_Initialize
 {
     /**
      * @var Zend_Config
@@ -61,11 +61,11 @@ class Memex_Plugin_Initialize extends Zend_Controller_Plugin_Abstract
      * 
      * @param  Zend_Controller_Request_Abstract $request
      * @return void
-     */
     public function routeStartup(Zend_Controller_Request_Abstract $request)
     {
         $this->init();
     }
+     */
 
     /**
      * Perform app initialization.

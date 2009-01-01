@@ -20,7 +20,6 @@ define('APPLICATION_ENVIRONMENT', 'testing_sqlite');
 define('APPLICATION_PATH', $root.'/application');
 
 include_once $root . '/application/bootstrap.php';
-$init->init();
 
 /*
  * Prepend the library/, tests/, and models/ directories to the

@@ -8,7 +8,6 @@
 define('BOOTSTRAP', true);
 define('APPLICATION_ENVIRONMENT', 'development_mysql');
 include_once dirname(__FILE__) . '/../application/bootstrap.php';
-$init->init();
 
 // if any parameter is passed after the script name (like 1 or --withdata)
 // load the data file after the schema has loaded.
