@@ -75,6 +75,7 @@ class Memex_Plugin_Initialize extends Zend_Controller_Plugin_Abstract
         // $this->initPathCache()
         $this->initLogger()
              ->initDb()
+             ->initMessaging()
              ->initHelpers()
              ->initView()
              ->initPlugins()
@@ -161,6 +162,23 @@ class Memex_Plugin_Initialize extends Zend_Controller_Plugin_Abstract
 
         Zend_Db_Table_Abstract::setDefaultAdapter($db);
         Zend_Registry::set('db', $db);
+        return $this;
+    }
+
+    /**
+     *
+     */
+    public function initMessaging()
+    {
+        $config = $this->_getConfig();
+
+        $nc = Memex_NotificationCenter::getInstance();
+        $nc->subscribe(array(
+            array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Model_Tags', 'handlePostUpdated'),
+            array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Model_Tags', 'handlePostDeleted')
+        ));
+
+        Zend_Registry::set('notification_center', $nc);
         return $this;
     }
 

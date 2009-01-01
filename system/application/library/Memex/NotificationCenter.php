@@ -34,14 +34,31 @@ class Memex_NotificationCenter
     /**
      * Subscribe to a message topic
      *
-     * @param string message topic
+     * @param string|array message topic, or array of arrays listing arguments to this method.
      * @param string|object name of a class to instantiate, or an object instance
      * @param string method to invoke on the instance
      * @param mixed context data passed as second parameter to instance method
      * @return mixed Opaque subscription handle, for use with unsubscribe
      */
-    public function subscribe($topic, $obj_or_class_name, $method_name='handleMessage', $context=null) 
+    public function subscribe($topic, $obj_or_class_name=null, $method_name='handleMessage', $context=null) 
     {
+        // HACK: If the second parameter is null, accept an array or arrays as 
+        // the first parameter.
+        if (null==$obj_or_class_name) {
+            if (!is_array($topic)) {
+                throw new Exception('Object or class name required');
+            } else {
+                $arg_list = $topic;
+                $subs = array();
+                foreach ($arg_list as $args) {
+                    list($topic, $oc, $method_name, $context) = 
+                        array_pad($args, 4, null);
+                    $subs[] = $this->subscribe($topic, $oc, $method_name, $context);
+                }
+                return $subs;
+            }
+        }
+
         // Create an array for this topic, if none exists
         if (!isset($this->_subscriptions[$topic]))
             $this->_subscriptions[$topic] = array();
@@ -74,8 +91,23 @@ class Memex_NotificationCenter
      * @param mixed message data
      */
     public function publish($topic, $data=null) {
+
+        Zend_Registry::get('logger')->debug("publish $topic");
+
+        // HACK: If the second parameter is null, accept an array or arrays as 
+        // the first parameter.
+        if (null==$data && is_array($topic)) {
+            $arg_list = $topic;
+            foreach ($arg_list as $args) {
+                list($topic, $data) = array_pad($args, 2, null);
+                $this->publish($topic, $data);
+            }
+            return;
+        }
+
         if (isset($this->_subscriptions[$topic])) {
             foreach ($this->_subscriptions[$topic] as $subscription) {
+                Zend_Registry::get('logger')->debug("bleurgh");
 
                 // Skip cancelled subscriptions
                 if (null == $subscription) continue;
@@ -100,7 +132,7 @@ class Memex_NotificationCenter
                     $obj = $this->_objs[$obj_or_class_name];
                 }
 
-                if ($method_name == 'handleMessage') {
+                if (NULL == $method_name || $method_name == 'handleMessage') {
                     // If using the default message handler, call it directly
                     $obj->handleMessage($topic, $data, $context);
                 } else {

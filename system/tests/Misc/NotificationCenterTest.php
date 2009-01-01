@@ -49,7 +49,8 @@ class Memex_NotificationCenterTest extends PHPUnit_Framework_TestCase
      */
     public function testSubscribeUnsubscribePublish()
     {
-        $nc  = Memex_NotificationCenter::getInstance();
+        $nc = Memex_NotificationCenter::getInstance();
+
         $log = Memex_NotificationCenterTest_LogCollector::getInstance();
 
         $l1 = new Memex_NotificationCenterTest_Listener('l1');
@@ -121,6 +122,101 @@ class Memex_NotificationCenterTest extends PHPUnit_Framework_TestCase
         $nc->publish('t3', 'd3'); 
         $nc->publish('t4', 'd4'); 
         $nc->publish('t5', 'd5'); 
+
+        $this->assertEquals(
+            array(
+            ),
+            $log->log
+        );
+
+    }
+    
+    /**
+     * Exercise subscribe, unsubscribe, and publish
+     */
+    public function testSubscribeUnsubscribeWithArrays()
+    {
+        $nc = Memex_NotificationCenter::getInstance();
+
+        $log = Memex_NotificationCenterTest_LogCollector::getInstance();
+
+        $l1 = new Memex_NotificationCenterTest_Listener('l1');
+        $l2 = new Memex_NotificationCenterTest_Listener('l2');
+        $l3 = new Memex_NotificationCenterTest_Listener('l3');
+        $l4 = new Memex_NotificationCenterTest_Listener('l4');
+        
+        $s_list = $nc->subscribe(array(
+            array('t1', $l1),
+            array('t2', $l2, 'h1'),
+            array('t2', 'Memex_NotificationCenterTest_Listener', 'h3', 'c3'),
+            array('t3', $l3, 'h2', 'c1'),
+            array('t3', 'Memex_NotificationCenterTest_Listener', 'h2', 'c1'),
+            array('t4', $l4, 'h3', 'c2'),
+            array('t5', 'Memex_NotificationCenterTest_Listener')
+        ));
+
+        $nc->publish(array(
+            array('t1'),
+            array('t1', 'd1'), 
+            array('t2', 'd2'), 
+            array('t3', 'd3'), 
+            array('t4', 'd4'), 
+            array('t5', 'd5')
+        ));
+
+        $this->assertEquals(
+            array(
+                'l1 h0 t1 NU NU',
+                'l1 h0 t1 d1 NU',
+                'l2 h1 t2 d2 NU',
+                'l0 h3 t2 d2 c3',
+                'l3 h2 t3 d3 c1',
+                'l0 h2 t3 d3 c1',
+                'l4 h3 t4 d4 c2',
+                'l0 h0 t5 d5 NU'
+            ),
+            $log->log
+        );
+
+        $log->reset();
+
+        $nc->unsubscribe($s_list[0]);
+        $nc->unsubscribe($s_list[2]);
+        $nc->unsubscribe($s_list[3]);
+        $nc->unsubscribe($s_list[5]);
+
+        $nc->publish(array(
+            array('t1'),
+            array('t1', 'd1'), 
+            array('t2', 'd2'), 
+            array('t3', 'd3'), 
+            array('t4', 'd4'), 
+            array('t5', 'd5')
+        ));
+
+        $this->assertEquals(
+            array(
+                'l2 h1 t2 d2 NU',
+                'l0 h2 t3 d3 c1',
+                'l0 h0 t5 d5 NU'
+            ),
+            $log->log
+        );
+
+        $log->reset();
+
+        $nc->unsubscribe($s_list[1]);
+        $nc->unsubscribe($s_list[4]);
+        $nc->unsubscribe($s_list[6]);
+
+        $nc->publish(array(
+            array('t1'),
+            array('t1', 'd1'), 
+            array('t2', 'd2'), 
+            array('t3', 'd3'), 
+            array('t4', 'd4'), 
+            array('t5', 'd5')
+        ));
 
         $this->assertEquals(
             array(

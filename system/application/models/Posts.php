@@ -98,10 +98,10 @@ class Memex_Model_Posts extends Memex_Model
         // probably needs some work to avoid cache issues later on.
         $saved_post = $this->fetchOneById($row->id);
 
-        // Update the tags for this post.
-        // TODO: This can be separated out into a deferred queue task
-        $tags_model = $this->getModel('Tags');
-        $tags_model->updateTagsForPost($saved_post);
+        // Send out message that a post has been updated
+        Memex_NotificationCenter::getInstance()->publish(
+            Memex_Constants::TOPIC_POST_UPDATED, $saved_post
+        );
 
         // Return the results of the save.
         return $saved_post;
@@ -295,12 +295,16 @@ class Memex_Model_Posts extends Memex_Model
      */
     public function deleteById($post_id)
     {
+        // Send out message that a post has been deleted
+        $data = $this->fetchOneById($post_id);
+        Memex_NotificationCenter::getInstance()->publish(
+            Memex_Constants::TOPIC_POST_DELETED, $data
+        );
+
         $table = $this->getDbTable();
         $rv = $table->delete(
             $table->getAdapter()->quoteInto('id=?', $post_id)
         );
-        $tags_model = $this->getModel('Tags');
-        $tags_model->deleteTagsForPost($post_id);
         return $rv;
     }
 
@@ -312,12 +316,14 @@ class Memex_Model_Posts extends Memex_Model
     public function deleteByUUID($uuid)
     {
         $data = $this->fetchOneByUUID($uuid);
+        Memex_NotificationCenter::getInstance()->publish(
+            Memex_Constants::TOPIC_POST_DELETED, $data
+        );
+
         $table = $this->getDbTable();
         $rv = $table->delete(
             $table->getAdapter()->quoteInto('uuid=?', $uuid)
         );
-        $tags_model = $this->getModel('Tags');
-        $tags_model->deleteTagsForPost($data['id']);
         return $rv;
     }
 

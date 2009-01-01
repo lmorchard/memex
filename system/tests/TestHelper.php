@@ -12,6 +12,7 @@ date_default_timezone_set('GMT');
 $root        = realpath(dirname(__FILE__) . '/../');
 $library     = $root . '/library';
 $tests       = $root . '/tests';
+$app_library = $root . '/application/library';
 $models      = $root . '/application/models';
 $controllers = $root . '/application/controllers';
 
@@ -28,6 +29,7 @@ $init->init();
 $path = array(
     $models,
     $library,
+    $app_library,
     $tests,
     get_include_path()
 );
@@ -42,6 +44,7 @@ set_include_path(implode(PATH_SEPARATOR, $path));
 if (defined('TESTS_GENERATE_REPORT') && TESTS_GENERATE_REPORT === true &&
     version_compare(PHPUnit_Runner_Version::id(), '3.1.6', '>=')) {
     PHPUnit_Util_Filter::addDirectoryToWhitelist($library);
+    PHPUnit_Util_Filter::addDirectoryToWhitelist($app_library);
     PHPUnit_Util_Filter::addDirectoryToWhitelist($models);
     PHPUnit_Util_Filter::addDirectoryToWhitelist($controllers);
 }
