@@ -11,10 +11,12 @@ memex.nostalgia.main = function() {
         },
 
         onLoad: function() {
+
             // see: http://www.dustindiaz.com/input-element-css-woes-are-over/
             dojo.query('input[type]').forEach(function(el) {
                 dojo.addClass(el, dojo.attr(el, 'type'));
             }, this);
+
         },
 
         EOF: null

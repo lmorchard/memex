@@ -21,4 +21,3 @@ memex.nostalgia.post = function() {
         EOF: null
     };
 }().init();
-
