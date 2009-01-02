@@ -260,8 +260,7 @@ class PostController extends Zend_Controller_Action
             }
 
             $form = $this->view->post_form = $this->_helper->getForm(
-                'post',
-                array(
+                'post', array(
                     'action'  => $this->view->url(),
                     'have_url' => $have_url
                 )
@@ -270,7 +269,7 @@ class PostController extends Zend_Controller_Action
             // Allow pre-population from query string
             if (!$this->getRequest()->isPost()) {
                 $new_post_data = array_merge($existing_post, $get_data);
-                $form->isValid($new_post_data);
+                $form->populate($new_post_data);
                 return;
             }
 

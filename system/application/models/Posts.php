@@ -295,16 +295,17 @@ class Memex_Model_Posts extends Memex_Model
      */
     public function deleteById($post_id)
     {
-        // Send out message that a post has been deleted
         $data = $this->fetchOneById($post_id);
-        Memex_NotificationCenter::getInstance()->publish(
-            Memex_Constants::TOPIC_POST_DELETED, $data
-        );
 
         $table = $this->getDbTable();
         $rv = $table->delete(
             $table->getAdapter()->quoteInto('id=?', $post_id)
         );
+
+        Memex_NotificationCenter::getInstance()->publish(
+            Memex_Constants::TOPIC_POST_DELETED, $data
+        );
+
         return $rv;
     }
 
@@ -316,14 +317,15 @@ class Memex_Model_Posts extends Memex_Model
     public function deleteByUUID($uuid)
     {
         $data = $this->fetchOneByUUID($uuid);
-        Memex_NotificationCenter::getInstance()->publish(
-            Memex_Constants::TOPIC_POST_DELETED, $data
-        );
-
         $table = $this->getDbTable();
         $rv = $table->delete(
             $table->getAdapter()->quoteInto('uuid=?', $uuid)
         );
+
+        Memex_NotificationCenter::getInstance()->publish(
+            Memex_Constants::TOPIC_POST_DELETED, $data
+        );
+
         return $rv;
     }
 
