@@ -2,7 +2,11 @@
     / <a href="<?= $this->url(array(), 'profile_settings') ?>">settings</a> / <a href="<?= $this->url(array(), 'profile_settings_delicious') ?>">delicious</a>
 <?php $this->placeholder('crumbs')->captureEnd() ?>
 
-<h2>account sync</h2>
+<h2>activity replication</h2>
+<p>
+When enabled, this feature will copy your item updates and deletions to
+an account at delicious.com
+</p>
 <?= $this->form ?>
 
 <h2>bookmark import</h2>

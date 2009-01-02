@@ -81,7 +81,7 @@ class ProfileController extends Zend_Controller_Action
             ->addDisplayGroup(
                 array('enabled', 'user_name', 'password', 'save'), 
                 'delicious_account',
-                array('legend' => 'Login details')
+                array('legend' => 'delicious login details')
             )
             ->setDecorators(array(
                 'FormElements',

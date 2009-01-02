@@ -6,10 +6,14 @@
 
 ## Profile
 
-* [Edit profile details][ed_prof]
-* [Change current login password][ch_pass]
-* [Manage profile logins][manage_logins]
-* [Delete profile][delete_prof]
+* [Edit profile details][ed_prof] 
+    * change screen name, bio, etc.
+* [Change login password][ch_pass] 
+    * change current login password
+* [Manage profile logins][manage_logins] 
+    * create and remove logins for this profile
+* [Delete profile][delete_prof] 
+    * delete this profile altogether
 
 [ed_prof]: <?= $this->url(array(), 'profile_settings') ?> "Edit profile"
 [delete_prof]: <?= $this->url(array(), 'profile_settings') ?> "Delete profile"
@@ -18,7 +22,10 @@
 
 ## Services
 
-* [delicious.com import / sync][delicious]
+* [delicious.com item import][delicious]
+    * import items from a delicious.com account
+* [delicious.com activity replication][delicious]
+    * copy item updates and deletions to a delicious.com account
 
 [delicious]: <?= $this->url(array(), 'profile_settings_delicious') ?> "delicious.com account integration"
 
