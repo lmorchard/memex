@@ -166,7 +166,7 @@ class Memex_Initialize
     }
 
     /**
-     *
+     * Initialize messaging and subscriptions
      */
     public function initMessaging()
     {
@@ -175,7 +175,10 @@ class Memex_Initialize
         $nc = Memex_NotificationCenter::getInstance();
         $nc->subscribe(array(
             array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Model_Tags', 'handlePostUpdated'),
-            array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Model_Tags', 'handlePostDeleted')
+            array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Model_Tags', 'handlePostDeleted'),
+
+            // array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Plugin_Delicious', 'handlePostUpdated'),
+            // array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Plugin_Delicious', 'handlePostDeleted'),
         ));
 
         Zend_Registry::set('notification_center', $nc);
@@ -206,12 +209,13 @@ class Memex_Initialize
 
         $view = new Zend_View();
 
+        // Set default base path for view.
+        $view->addBasePath($this->_appPath . '/views/base', 'Memex_View_');
+
         if ($config->view->theme) {
-            // Set first path for resource search as the theme named in config.
+            // Set next path for resource search as the theme named in config.
             $view->addBasePath($this->_appPath . '/views/' . $config->view->theme, 'Memex_View_');
         }
-        // Next and default path in resource search is shared base path.
-        $view->addBasePath($this->_appPath . '/views/base', 'Memex_View_');
 
         // Set view in ViewRenderer
         $viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
