@@ -17,6 +17,14 @@ memex.nostalgia.main = function() {
                 dojo.addClass(el, dojo.attr(el, 'type'));
             }, this);
 
+            dojo.query('p.hint').forEach(function(el) {
+                dojo.animateProperty({
+                    node: el, duration: 1000, properties: {
+                        backgroundColor: { start: '#ff8', end: '#fff' }
+                    }
+                }).play();
+            }, this);
+
         },
 
         EOF: null
