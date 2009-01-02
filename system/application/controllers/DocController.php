@@ -18,7 +18,7 @@ class DocController extends Zend_Controller_Action
         if (in_array($doc_path, $root_docs)) {
             $path = dirname(dirname(APPLICATION_PATH)) . '/' . $doc_path . '.md';
         } else {
-            $path = dirname(APPLICATION_PATH) . '/docs/' . $doc_path . '.md';
+            $path = dirname(dirname(APPLICATION_PATH)) . '/docs/' . $doc_path . '.md';
         }
 
         if (!is_file($path))

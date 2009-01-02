@@ -2,4 +2,6 @@
     / docs / <a href="<?= $this->url() ?>"><?= $this->doc_path ?></a>
 <?php $this->placeholder('crumbs')->captureEnd() ?>
 
-<div class="doc_content"><?= $this->doc_content ?></div>
+<?php $this->placeholder('doc_content')->captureStart() ?>
+<?= $this->doc_content ?>
+<?php $this->placeholder('doc_content')->captureEnd() ?>

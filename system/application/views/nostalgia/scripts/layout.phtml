@@ -53,6 +53,7 @@
                                 <li><a href="<?= $this->url(array(), 'auth_register', true) ?>">register</a></li>
                             <?php else: ?>
                                 <li class="first">logged in as <a href="<?= $profile_home_url ?>"><?= $this->escape($this->auth_profile['screen_name']) ?></a></li>
+                                <li><a href="<?= $this->url(array(), 'profile_settings', true) ?>">settings</a></li>
                                 <li><a href="<?= $this->url(array(), 'auth_logout', true) ?>">logout</a></li>
                             <?php endif; ?>
                         </ul>
@@ -69,6 +70,15 @@
             <div id="middle">
                 <div id="content">
                     <?= $this->layout()->content ?>
+                    <div class="doc_content">
+                    <?php
+                        $md_content = $this->placeholder('doc_content');
+                        if ($md_content) {
+                            require_once 'Markdown.php';
+                            echo Markdown($md_content);
+                        }
+                    ?>
+                    </div>
                 </div>
                 <?php if ($sidebar_content): ?>
                     <div id="sidebar">
@@ -82,6 +92,7 @@
                     <li class="first"><a href="<?= $this->url(array(), 'post_tag_recent') ?>">memex</a></li>
                     <li><a href="<?= $this->url(array('path'=>'README'), 'doc_index') ?>">about</a></li>
                     <li><a href="<?= $this->url(array('path'=>'TODO'), 'doc_index') ?>">todo</a></li>
+                    <li><a href="<?= $this->url(array('path'=>'FAQ'), 'doc_index') ?>">faq</a></li>
                     <?= $this->placeholder('footer_nav') ?>
                 </ul>
 
