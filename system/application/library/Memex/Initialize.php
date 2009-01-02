@@ -173,13 +173,20 @@ class Memex_Initialize
         $config = $this->_getConfig();
 
         $nc = Memex_NotificationCenter::getInstance();
-        $nc->subscribe(array(
+
+        $subs = array(
+
             array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Model_Tags', 'handlePostUpdated'),
             array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Model_Tags', 'handlePostDeleted'),
 
             array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Plugin_Delicious', 'handlePostUpdated'),
             array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Plugin_Delicious', 'handlePostDeleted'),
-        ));
+
+        );
+        foreach ($subs as $sub) {
+            list($topic, $class, $method) = $sub;
+            $nc->subscribe($topic, $class, $method);
+        }
 
         Zend_Registry::set('notification_center', $nc);
         return $this;
