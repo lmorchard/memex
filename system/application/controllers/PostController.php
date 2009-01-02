@@ -8,11 +8,19 @@ class PostController extends Zend_Controller_Action
     public function preDispatch()
     {
         $request = $this->getRequest();
+        $get_data = $request->getQuery();
+
+        // Accept parameter to set pagination page size.
+        if (isset($get_data['set_page_size']) && is_numeric($get_data['set_page_size'])) {
+            $_COOKIE['page_size'] = (int)$get_data['set_page_size'];
+            setcookie('page_size',  $_COOKIE['page_size'], time()+60*60*24*365*5);
+        }
+
         if (Zend_Auth::getInstance()->hasIdentity()) {
         } else {
             if (in_array($request->getActionName(), array('save', 'delete'))) {
                 $orig_url = $request->getRequestUri();
-                $this->_helper->redirector->gotoUrl(
+                return $this->_helper->redirector->gotoUrl(
                     $this->view->url(array(), 'auth_login') .
                     '?jump=' . rawurlencode( $orig_url )
                 );
@@ -50,9 +58,10 @@ class PostController extends Zend_Controller_Action
         $posts_model = $this->_helper->getModel('Posts');
         $posts_count = $this->view->posts_count =
             $posts_model->countByProfileAndTags($profile['id'], $tags);
-        $page_size   = 25;
-        $page_number = $request->getQuery('page');
-        if (!$page_number) $page_number = 1;
+        $page_size   = $this->view->page_size = 
+            $request->getCookie('page_size', 10);
+        $page_number = $this->view->page_number =
+            $request->getQuery('page', 1);
 
         // Build the paginator for the view.
         $paginator = new Zend_Paginator(
@@ -87,9 +96,10 @@ class PostController extends Zend_Controller_Action
         $posts_model = $this->_helper->getModel('Posts');
         $posts_count = $this->view->posts_count =
             $posts_model->countByTags($tags);
-        $page_size   = 25;
-        $page_number = $request->getQuery('page');
-        if (!$page_number) $page_number = 1;
+        $page_size   = $this->view->page_size = 
+            $request->getCookie('page_size', 10);
+        $page_number = $this->view->page_number =
+            $request->getQuery('page', 1);
 
         // Build the paginator for the view.
         $paginator = new Zend_Paginator(
@@ -261,6 +271,7 @@ class PostController extends Zend_Controller_Action
                     // match, then this is a cross-profile copy and the UUID 
                     // should be nuked to force a copy instead of update.
                     unset($existing_post['uuid']);
+                    unset($existing_post['id']);
                 }
             }
 

@@ -1,10 +1,9 @@
 ## TODO
 
 * Basic stuff
+    * Tag suggestions on save form
     * All tags per profile
     * Top tags site-wide
-    * Tag suggestions on save form
-    * Items per page pagination control
     * Related tags?
 * Installation
     * Make *-dist versions of config files, delete originals

@@ -41,4 +41,29 @@
         of <?= $this->totalItemCount; ?>
     </div>
 
+    <div class="page_size">
+        show
+        <ul class="page_size_choices">
+            <?php
+                $sizes = array(5, 10, 25, 50, 100, 200);
+                $first = true;
+                foreach ($sizes as $size) {
+                    ?>
+                        <?php if ($size == $this->itemCountPerPage): ?>
+                            <li class="selected <?= ($first) ? 'first' : '' ?>">
+                                <span><?= $size ?></span>
+                            </li>
+                        <?php else: ?>
+                            <li class="<?= ($first) ? 'first' : '' ?>">
+                                <a href="<?= $this->queryUrl(array('set_page_size' => $size)) ?>"><?= $size ?></a>
+                            </li>
+                        <?php endif ?>
+                    <?php
+                    $first = false;        
+                } 
+            ?>
+        </ul>
+        items per page
+    </div>
+
 </div>

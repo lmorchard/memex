@@ -349,6 +349,31 @@ form fieldset dl dd textarea {
 .pagination .page_position {
     /* background: #fff; */
 }
+.pagination .page_size {
+    margin-top: 1.0em;
+}
+.pagination .page_size .page_size_choices {
+    list-style: none;
+    display: inline;
+    margin: 0;
+    padding: 0 0.5em 0 0.5em;
+}
+.pagination .page_size .page_size_choices li:before {
+    content: ', ';
+}
+.pagination .page_size .page_size_choices li.first:before {
+    content: "";
+}
+.pagination .page_size .page_size_choices li {
+    margin: 0; padding: 0;
+    display: inline;
+}
+.pagination .page_size .page_size_choices li.selected {
+}
+.pagination .page_size .page_size_choices li.selected span {
+    font-weight: bold;
+}
+
 .pagination_mini {
     margin: 0 0em 1.5em 0em; 
     padding: 0 0 0 0;
