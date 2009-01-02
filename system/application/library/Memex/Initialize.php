@@ -177,8 +177,8 @@ class Memex_Initialize
             array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Model_Tags', 'handlePostUpdated'),
             array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Model_Tags', 'handlePostDeleted'),
 
-            // array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Plugin_Delicious', 'handlePostUpdated'),
-            // array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Plugin_Delicious', 'handlePostDeleted'),
+            array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Plugin_Delicious', 'handlePostUpdated'),
+            array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Plugin_Delicious', 'handlePostDeleted'),
         ));
 
         Zend_Registry::set('notification_center', $nc);

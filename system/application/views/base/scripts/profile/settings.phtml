@@ -1,0 +1,25 @@
+<?php $this->placeholder('crumbs')->captureStart() ?>
+    / <a href="<?= $this->url(array(), 'profile_settings') ?>">settings</a>
+<?php $this->placeholder('crumbs')->captureEnd() ?>
+
+<?php $this->placeholder('doc_content')->captureStart() ?>
+
+## Profile
+
+* [Edit profile details][ed_prof]
+* [Change current login password][ch_pass]
+* [Manage profile logins][manage_logins]
+* [Delete profile][delete_prof]
+
+[ed_prof]: <?= $this->url(array(), 'profile_settings') ?> "Edit profile"
+[delete_prof]: <?= $this->url(array(), 'profile_settings') ?> "Delete profile"
+[ch_pass]: <?= $this->url(array(), 'profile_settings') ?> "Change password"
+[manage_logins]: <?= $this->url(array(), 'profile_settings') ?> "Change password"
+
+## Services
+
+* [delicious.com import / sync][delicious]
+
+[delicious]: <?= $this->url(array(), 'profile_settings_delicious') ?> "delicious.com account integration"
+
+<?php $this->placeholder('doc_content')->captureEnd() ?>

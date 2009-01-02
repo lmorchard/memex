@@ -40,6 +40,7 @@ class ProfileController extends Zend_Controller_Action
 
     /**
      * Delicious account settings.
+     * @TODO: See if there's some way to make this a part of Memex_Plugin_Delicious
      */
     public function settingsDeliciousAction()
     {
@@ -92,39 +93,63 @@ class ProfileController extends Zend_Controller_Action
         $profiles_model = $this->_helper->getModel('Profiles');
 
         if (!$this->getRequest()->isPost()) {
+            // For a GET request, try pre-populating the form with the existing 
+            // profile settings.
             $existing = $profiles_model->getAttributes($profile_id, array(
                 Memex_Constants::ATTRIB_DELICIOUS_ENABLED,
                 Memex_Constants::ATTRIB_DELICIOUS_USER_NAME,
                 Memex_Constants::ATTRIB_DELICIOUS_PASSWORD
             ));
-            $form->isValid(array(
+            $form->populate(array(
                 'enabled' => 
-                    $existing[Memex_Constants::ATTRIB_DELICIOUS_ENABLED],
-                'user_name' =>
-                    $existing[Memex_Constants::ATTRIB_DELICIOUS_USER_NAME],
+                    @$existing[Memex_Constants::ATTRIB_DELICIOUS_ENABLED],
+                'user_name' => 
+                    @$existing[Memex_Constants::ATTRIB_DELICIOUS_USER_NAME],
                 'password' =>
-                    $existing[Memex_Constants::ATTRIB_DELICIOUS_PASSWORD]
+                    @$existing[Memex_Constants::ATTRIB_DELICIOUS_PASSWORD]
             ));
             return;
         }
 
         $post_data = $request->getPost();
-        
         if (!$form->isValid($post_data)) {
+            // If the form validation fails, just punt.
             return;
         }
 
+        // Attempt making an authenticated fetch against v1 del API
+        $ch = curl_init('https://api.del.icio.us/v1/posts/update');
+        curl_setopt_array($ch, array(
+            CURLOPT_USERAGENT      => 'Memex/0.1',
+            CURLOPT_FAILONERROR    => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_USERPWD => 
+                $post_data['user_name'] . ':' . $post_data['password']
+        ));
+        $resp = curl_exec($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+
+        // If the fetch wasn't successful, assume the username/password 
+        // was wrong.
+        if (200 != $info['http_code']) {
+            $form->setDescription('User name and password invalid for delicious.com');
+            return;
+        } 
+
+        // Update the profile settings.
         $profiles_model->setAttributes($profile_id, array(
             Memex_Constants::ATTRIB_DELICIOUS_ENABLED => 
                 !!$post_data['enabled'],
-            Memex_Constants::ATTRIB_DELICIOUS_USER_NAME 
-                => $post_data['user_name'],
-            Memex_Constants::ATTRIB_DELICIOUS_PASSWORD
-                => $post_data['password']
+            Memex_Constants::ATTRIB_DELICIOUS_USER_NAME => 
+                $post_data['user_name'],
+            Memex_Constants::ATTRIB_DELICIOUS_PASSWORD => 
+                $post_data['password']
         ));
 
-        $form->setDescription('Settings updated.');
-
+        $form->setDescription('Settings updated, user name and password '.
+            'accepted at delicious.com');
     }
 
 } 

@@ -9,6 +9,7 @@ defined('APPLICATION_PATH')
 set_include_path(join(PATH_SEPARATOR, array(
     APPLICATION_PATH . '/../library',
     APPLICATION_PATH . '/library', 
+    APPLICATION_PATH . '/plugins', 
     APPLICATION_PATH . '/vendor',
     get_include_path()
 )));
