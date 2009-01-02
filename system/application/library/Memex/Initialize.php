@@ -288,7 +288,7 @@ class Memex_Initialize
                 'routes.php'
             );
             $ini_files = array( 
-                'app.ini' 
+                'app.ini'
             );
 
             self::$_config = new Zend_Config(array(
@@ -303,11 +303,18 @@ class Memex_Initialize
             }
 
             foreach ($ini_files as $fn) {
-                self::$_config->merge(new Zend_Config_Ini(
-                    $this->_appPath . '/config/' . $fn,
-                    $this->_env,
-                    true
-                ));
+                $path = $this->_appPath . '/config/' . $fn;
+                if (is_file($path)) {
+                    self::$_config->merge(new Zend_Config_Ini(
+                        $path, $this->_env, true
+                    ));
+                }
+            }
+
+            // If found, merge in local config file.
+            $local_path = $this->_appPath . '/../config/local.php';
+            if (is_file($local_path)) {
+                self::$_config->merge(new Zend_Config(require $local_path));
             }
 
             $this->_registry->config = self::$_config;
