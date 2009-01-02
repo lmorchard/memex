@@ -122,6 +122,22 @@ return array(
         ),
          */
 
+        'profile_settings' => array(
+            'type'  => 'Zend_Controller_Router_Route',
+            'route' => 'settings',
+            'defaults' => array(
+                'controller' => 'profile', 'action' => 'settings'
+            )
+        ),
+
+        'profile_settings_delicious' => array(
+            'type'  => 'Zend_Controller_Router_Route',
+            'route' => 'settings/delicious',
+            'defaults' => array(
+                'controller' => 'profile', 'action' => 'settings-delicious'
+            )
+        ),
+
         'profile_index' => array(
             'type'  => 'Zend_Controller_Router_Route_Static',
             'route' => 'people',

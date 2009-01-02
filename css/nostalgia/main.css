@@ -24,7 +24,15 @@ a:active {
     text-decoration: underline; 
 }
 
-form fieldset dl
+form p.hint {
+    margin: 0;
+    padding: 0.25em 1em;
+    font-weight: bold;
+}
+form dl {
+    margin: 0; padding: 0;
+}
+form fieldset dl {
     clear: both;
 }
 form fieldset dl {
@@ -373,7 +381,7 @@ form fieldset dl dd textarea {
     padding-left: 1.5em;
 }
 
-#ctrl_doc_act_index .doc_content {
+.doc_content {
     font-size: 115%;
     padding: 0 85px 0 85px;
     line-height: 1.75em;
@@ -397,6 +405,10 @@ form fieldset dl dd textarea {
 }
 #ctrl_auth_act_login form fieldset dl dd {
     margin-left: 13ex;
+}
+
+.ctrl_profile form {
+    width: 110ex;
 }
 
 #sidebar .top_tags {

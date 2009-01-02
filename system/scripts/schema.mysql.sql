@@ -25,6 +25,16 @@ CREATE TABLE profiles (
     UNIQUE KEY screen_name (screen_name)
 );
 
+DROP TABLE IF EXISTS profile_attribs;
+CREATE TABLE profile_attribs (
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    profile_id INTEGER NOT NULL,
+    name VARCHAR(255),
+    value TEXT,
+    PRIMARY KEY (id),
+    UNIQUE KEY profile_id_name (profile_id, name)
+);
+
 DROP TABLE IF EXISTS logins_profiles;
 CREATE TABLE logins_profiles (
     id INTEGER NOT NULL AUTO_INCREMENT,

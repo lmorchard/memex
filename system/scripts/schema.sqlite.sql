@@ -19,6 +19,14 @@ CREATE TABLE profiles (
     last_login DATETIME
 );
 
+DROP TABLE IF EXISTS profile_attribs;
+CREATE TABLE profile_attribs (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER NOT NULL,
+    name VARCHAR(255),
+    value TEXT
+);
+
 DROP TABLE IF EXISTS logins_profiles;
 CREATE TABLE logins_profiles (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

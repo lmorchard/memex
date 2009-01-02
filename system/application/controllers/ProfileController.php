@@ -5,6 +5,17 @@
  */
 class ProfileController extends Zend_Controller_Action  
 { 
+
+    public function preDispatch()
+    {
+        if (Zend_Auth::getInstance()->hasIdentity()) {
+        } else {
+            if (!in_array($this->getRequest()->getActionName(), array('index'))) {
+                $this->_helper->redirector->gotoRoute(array(), 'auth_login');
+            }
+        }
+    }
+
     /**
      * Initialize the controller.
      */
@@ -19,5 +30,101 @@ class ProfileController extends Zend_Controller_Action
     public function indexAction() 
     { 
     } 
+
+    /**
+     * Profiles settings.
+     */
+    public function settingsAction()
+    {
+    }
+
+    /**
+     * Delicious account settings.
+     */
+    public function settingsDeliciousAction()
+    {
+        $identity   = Zend_Auth::getInstance()->getIdentity();
+        $profile_id = $identity->default_profile['id'];
+        $request    = $this->getRequest();
+
+        $this->view->form = $form = new Zend_Form();
+        $form
+            ->setAttrib('id', 'delicious_account')
+            ->setMethod('post')
+            ->addElementPrefixPath(
+                'Memex_Validate', APPLICATION_PATH . '/models/Validate/', 
+                'validate'
+            )
+            ->addElement('checkbox', 'enabled', array(
+                'label'      => 'Enabled'
+            ))
+            ->addElement('text', 'user_name', array(
+                'label'      => 'Login name',
+                'required'   => true,
+                'filters'    => array('StringTrim'),
+                'validators' => array(
+                    array('StringLength', false, array(1, 64))
+                )
+            ))
+            ->addElement('password', 'password', array(
+                'label'      => 'Password',
+                'required'   => true,
+                'filters'    => array('StringTrim'),
+                'validators' => array(
+                    array('StringLength', false, array(1, 255))
+                )
+            ))
+            ->addElement('submit', 'save', array(
+                'label' => 'save'
+            ))
+            ->addDisplayGroup(
+                array('enabled', 'user_name', 'password', 'save'), 
+                'delicious_account',
+                array('legend' => 'Login details')
+            )
+            ->setDecorators(array(
+                'FormElements',
+                array('HtmlTag', array('tag' => 'dl', 'class' => 'zend_form')),
+                array('Description', array('placement' => 'prepend')),
+                'Form'
+            ));
+
+        $profiles_model = $this->_helper->getModel('Profiles');
+
+        if (!$this->getRequest()->isPost()) {
+            $existing = $profiles_model->getAttributes($profile_id, array(
+                Memex_Constants::ATTRIB_DELICIOUS_ENABLED,
+                Memex_Constants::ATTRIB_DELICIOUS_USER_NAME,
+                Memex_Constants::ATTRIB_DELICIOUS_PASSWORD
+            ));
+            $form->isValid(array(
+                'enabled' => 
+                    $existing[Memex_Constants::ATTRIB_DELICIOUS_ENABLED],
+                'user_name' =>
+                    $existing[Memex_Constants::ATTRIB_DELICIOUS_USER_NAME],
+                'password' =>
+                    $existing[Memex_Constants::ATTRIB_DELICIOUS_PASSWORD]
+            ));
+            return;
+        }
+
+        $post_data = $request->getPost();
+        
+        if (!$form->isValid($post_data)) {
+            return;
+        }
+
+        $profiles_model->setAttributes($profile_id, array(
+            Memex_Constants::ATTRIB_DELICIOUS_ENABLED => 
+                !!$post_data['enabled'],
+            Memex_Constants::ATTRIB_DELICIOUS_USER_NAME 
+                => $post_data['user_name'],
+            Memex_Constants::ATTRIB_DELICIOUS_PASSWORD
+                => $post_data['password']
+        ));
+
+        $form->setDescription('Settings updated.');
+
+    }
 
 } 
