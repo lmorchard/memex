@@ -85,13 +85,15 @@ class AuthController extends Zend_Controller_Action
      */
     function registerAction()
     {
+        $form = $this->view->registration_form;
+
         $request = $this->getRequest();
         if (!$this->getRequest()->isPost()) {
             return;
         }
 
-        $form = $this->view->registration_form;
-        if (!$form->isValid($request->getPost())) {
+        $post_data = $request->getPost();
+        if (!$form->isValid($post_data)) {
             return;
         }
 
@@ -115,13 +117,19 @@ class AuthController extends Zend_Controller_Action
      */
     public function loginAction()
     {
+        $form = $this->view->login_form;
+
         $request = $this->getRequest();
         if (!$request->isPost()) {
+            $get_data = $request->getQuery();
+            $form->populate(array(
+                'jump' => $get_data['jump']
+            ));
             return;
         }
 
-        $form = $this->view->login_form;
-        if (!$form->isValid($request->getPost())) {
+        $post_data = $request->getPost();
+        if (!$form->isValid($post_data)) {
             return;
         }
 
@@ -143,10 +151,19 @@ class AuthController extends Zend_Controller_Action
             $logins_model->fetchDefaultProfileForLogin($identity->id);
         $auth->getStorage()->write($identity);
 
-        // We're authenticated! Redirect to the user page
-        return $this->_helper->redirector->gotoRoute(
-            array(), 'auth_home'
-        );
+        // We're authenticated!
+        if (isset($post_data['jump']) && substr($post_data['jump'], 0, 1) == '/') {
+            // Jump to the site-relative URL retained before login (ie. a 
+            // populated bookmark form)
+            return $this->_helper->redirector->gotoUrl(
+                $post_data['jump'], array('prependBase' => true)
+            );
+        } else {
+            // Jump to the profile home page.
+            return $this->_helper->redirector->gotoRoute(
+                array(), 'auth_home'
+            );
+        }
     }
 
     /**

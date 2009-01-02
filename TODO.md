@@ -1,8 +1,6 @@
 ## TODO
 
 * Basic stuff
-    * Posting
-        * post-login form preservation
     * All tags per profile
     * Top tags site-wide
     * Tag suggestions on save form
@@ -35,7 +33,7 @@
     * {Atom,RSS,JSON} feeds
     * Widgets and whatnot
 * Federation
-    * Carbon-copy posts to other services (eg. delicious, magnolia, twitter, friendfeed)
+    * Carbon-copy posts to other services (eg. magnolia, twitter, friendfeed)
     * Import from other services
     * Implement network / subscriptions based on RSS/Atom aggregation to login-less local proxy profiles
     * [FeedSync?](http://dev.live.com/feedsync/spec/spec.aspx)

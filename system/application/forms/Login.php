@@ -39,6 +39,10 @@ class Memex_Form_Login extends Zend_Form
             array('legend' => 'Login')
         );
 
+        $this->addElement('hidden', 'jump', array(
+            'decorators' => array('ViewHelper')
+        ));
+
         // We want to display a 'failed authentication' message if necessary;
         // we'll do that with the form 'description', so we need to add that
         // decorator.

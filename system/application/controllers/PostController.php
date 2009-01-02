@@ -7,10 +7,15 @@ class PostController extends Zend_Controller_Action
 
     public function preDispatch()
     {
+        $request = $this->getRequest();
         if (Zend_Auth::getInstance()->hasIdentity()) {
         } else {
-            if (in_array($this->getRequest()->getActionName(), array('save', 'delete'))) {
-                $this->_helper->redirector->gotoRoute(array(), 'auth_login');
+            if (in_array($request->getActionName(), array('save', 'delete'))) {
+                $orig_url = $request->getRequestUri();
+                $this->_helper->redirector->gotoUrl(
+                    $this->view->url(array(), 'auth_login') .
+                    '?jump=' . rawurlencode( $orig_url )
+                );
             }
         }
     }
