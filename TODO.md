@@ -1,4 +1,4 @@
-# TODO
+## TODO
 
 * Basic stuff
     * Posting
@@ -22,6 +22,7 @@
     * Tag management
     * Tag bundles
     * Item privacy / visibility
+    * [oohembed][oembed] for tumble-log-like media integration?
 * Logins / Profiles
     * Email password recovery
     * Prefs, login password change, screen name, bio, etc.
@@ -48,5 +49,6 @@
     * [Message / work queues and deferred processing][queues]
     * Make it scale
 
+[oembed]: http://oohembed.com/
 [v1api]: http://delicious.com/help/api
 [queues]: http://decafbad.com/blog/2008/07/04/queue-everything-and-delight-everyone
