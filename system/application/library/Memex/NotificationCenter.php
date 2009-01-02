@@ -92,8 +92,6 @@ class Memex_NotificationCenter
      */
     public function publish($topic, $data=null) {
 
-        Zend_Registry::get('logger')->debug("publish $topic");
-
         // HACK: If the second parameter is null, accept an array or arrays as 
         // the first parameter.
         if (null==$data && is_array($topic)) {
@@ -107,7 +105,6 @@ class Memex_NotificationCenter
 
         if (isset($this->_subscriptions[$topic])) {
             foreach ($this->_subscriptions[$topic] as $subscription) {
-                Zend_Registry::get('logger')->debug("bleurgh");
 
                 // Skip cancelled subscriptions
                 if (null == $subscription) continue;
