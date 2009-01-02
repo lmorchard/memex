@@ -74,7 +74,7 @@
                     <?php
                         $md_content = $this->placeholder('doc_content');
                         if ($md_content) {
-                            require_once 'Markdown.php';
+                            require_once 'markdown.php';
                             echo Markdown($md_content);
                         }
                     ?>
