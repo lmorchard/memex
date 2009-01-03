@@ -1,5 +1,5 @@
 <?php
-define('APPLICATION_ENVIRONMENT', 'development_mysql');
+define('APPLICATION_ENVIRONMENT', 'production');
 
 try {
     require 'system/application/bootstrap.php';
