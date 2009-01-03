@@ -1,14 +1,16 @@
 <?php return array(
 
-'database' => array(
-    'adapter' => 'PDO_MYSQL',
-    'params'  => array(
-        'host'     => '127.0.0.1',
-        'dbname'   => 'memex',
-        'username' => 'memex',
-        'password' => 'memex'
+    'database' => array(
+        'adapter' => 'PDO_MYSQL',
+        'params'  => array(
+            'host'     => '127.0.0.1',
+            'dbname'   => 'memex',
+            'username' => 'memex',
+            'password' => 'memex'
+        ),
+        'profile' => false
     ),
-    'profile' => false
-)
+
+    'needs_installation' => false
 
 );

@@ -16,10 +16,13 @@ $app_library = $root . '/application/library';
 $models      = $root . '/application/models';
 $controllers = $root . '/application/controllers';
 
-define('APPLICATION_ENVIRONMENT', 'testing_sqlite');
+define('APPLICATION_ENVIRONMENT', 'testing_mysql');
+// define('APPLICATION_ENVIRONMENT', 'testing_sqlite');
 define('APPLICATION_PATH', $root.'/application');
 
 include_once $root . '/application/bootstrap.php';
+
+$config = Zend_Registry::get('config');
 
 /*
  * Prepend the library/, tests/, and models/ directories to the
@@ -51,9 +54,23 @@ if (defined('TESTS_GENERATE_REPORT') && TESTS_GENERATE_REPORT === true &&
 /*
  * Setup default DB adapter
  */
+$schema_fn = $config->database->schema;
 $db = Zend_Db_Table_Abstract::getDefaultAdapter();
-$schema_sql = file_get_contents($root.'/scripts/schema.sqlite.sql');
-$db->getConnection()->exec($schema_sql);
+$schema_sql = file_get_contents($root.'/application/schema/'.$schema_fn);
+
+// Break the schema SQL up into separate statements, to prevent a buffered 
+// query issue qith MySQL
+$schema_sql_parts = explode(';', $schema_sql);
+foreach ($schema_sql_parts as $part) {
+    $part = trim($part);
+    if (!$part) continue;
+    try {
+        $db->getConnection()->exec($part.';');
+    } catch (Exception $e) {
+        echo "$part\n";
+        throw $e;
+    }
+}
 
 /*
  * Unset global variables that are no longer needed.

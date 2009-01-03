@@ -10,6 +10,8 @@ Or, at least, it will help me learn the Zend Framework.
 ### Installation
 
 * Get a copy or a link of the latest [Zend Framework][zf] into the `system/library/` directory.
+* Edit `system/config/local.php` to reflect your local installation environment. (eg. mysql details)
+    * There is an example `system/config/local.php-dist` you can use as a starting point.
 * Try using `system/scripts/load.sqlite.php` to create the database.
 * Make sure the `system` directory is not web readable.  
 * Modify `index.php` to point to new path, if you move `system`.

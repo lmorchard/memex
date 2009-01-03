@@ -69,16 +69,16 @@
 
             <div id="middle">
                 <div id="content">
-                    <?= $this->layout()->content ?>
-                    <div class="doc_content">
                     <?php
                         $md_content = $this->placeholder('doc_content');
                         if ($md_content) {
                             require_once 'markdown.php';
+                            echo '<div class="doc_content">';
                             echo Markdown($md_content);
+                            echo '</div>';
                         }
                     ?>
-                    </div>
+                    <?= $this->layout()->content ?>
                 </div>
                 <?php if ($sidebar_content): ?>
                     <div id="sidebar">
@@ -89,7 +89,7 @@
 
             <div id="footer">
                 <ul class="nav">
-                    <li class="first"><a href="<?= $this->url(array(), 'post_tag_recent') ?>">memex</a></li>
+                    <li class="first"><a href="/">memex</a></li>
                     <li><a href="<?= $this->url(array('path'=>'README'), 'doc_index') ?>">about</a></li>
                     <li><a href="<?= $this->url(array('path'=>'TODO'), 'doc_index') ?>">todo</a></li>
                     <li><a href="<?= $this->url(array('path'=>'FAQ'), 'doc_index') ?>">faq</a></li>

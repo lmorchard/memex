@@ -37,7 +37,7 @@
     * Implement network / subscriptions based on RSS/Atom aggregation to login-less local proxy profiles
     * [FeedSync?](http://dev.live.com/feedsync/spec/spec.aspx)
 * Misc
-    * Add indexes to tables in mysql and sqlite
+    * DB prefixes for MySQL?
     * Rename "posts" to "items"?  Not crucial, but odd.
     * More tests, controller tests, filter tests, validator tests, etc
     * Search

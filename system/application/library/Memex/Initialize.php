@@ -230,6 +230,12 @@ class Memex_Initialize
 
         // Initialize layouts
         Zend_Layout::startMvc();
+        $layout = Zend_Layout::getMvcInstance();
+        if ($config->needs_installation !== false) {
+            $layout->setLayout('layout-install');
+        } else {
+            $layout->setLayout('layout');
+        }
 
         return $this;
     }
@@ -259,7 +265,11 @@ class Memex_Initialize
         $config = $this->_getConfig();
         $router = $this->_front->getRouter();
 
-        $router->addConfig($config, 'routes');
+        if ($config->needs_installation !== false) {
+            $router->addConfig($config, 'routes_install');
+        } else {
+            $router->addConfig($config, 'routes');
+        }
 
         return $this;
     }
@@ -284,6 +294,11 @@ class Memex_Initialize
     {
         if (null === self::$_config) {
 
+            self::$_config = new Zend_Config(array(
+                'root'        => $this->_appPath,
+                'environment' => $this->_env
+            ), true);
+            
             $php_files = array(
                 'routes.php'
             );
@@ -291,11 +306,6 @@ class Memex_Initialize
                 'app.ini'
             );
 
-            self::$_config = new Zend_Config(array(
-                'root'        => $this->_appPath,
-                'environment' => $this->_env
-            ), true);
-            
             foreach ($php_files as $fn) {
                 self::$_config->merge(new Zend_Config(
                     require $this->_appPath . '/config/' . $fn
@@ -311,10 +321,12 @@ class Memex_Initialize
                 }
             }
 
-            // If found, merge in local config file.
-            $local_path = $this->_appPath . '/../config/local.php';
-            if (is_file($local_path)) {
-                self::$_config->merge(new Zend_Config(require $local_path));
+            // If enabled, and exists, load the local config overrides.
+            if (self::$_config->config->load_local != false) {
+                $path = $this->_appPath . '/../config/local.php';
+                if (is_file($path)) {
+                    self::$_config->merge(new Zend_Config(require $path));
+                }
             }
 
             $this->_registry->config = self::$_config;

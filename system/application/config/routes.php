@@ -1,5 +1,16 @@
 <?php
 return array(
+    'routes_install' => array(
+
+        'install_index' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => '',
+            'defaults' => array(
+                'controller' => 'install', 'action' => 'index'
+            )
+        ),
+
+    ),
     'routes' => array(
 
         'post_profile_tags' => array(
