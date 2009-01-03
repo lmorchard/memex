@@ -462,3 +462,6 @@ form fieldset dl dd textarea {
     padding-left: 0.75em;
 }
 
+#ctrl_install_act_index #config_src {
+    padding: 0em 1em 0em 2em;
+}

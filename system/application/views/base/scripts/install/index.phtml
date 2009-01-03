@@ -1,20 +1,58 @@
+<?php if ($this->install_step == 1): ?>
+
 <?php $this->placeholder('doc_content')->captureStart() ?>
 
-## First Time Installation
+## Installation, Step 1
 
-This Memex site has not yet been configured to run.  You can manually configure
-Memex by editing the file `system/config/local.php`
+This Memex site has not yet been configured.  
 
-On the other hand, you can use this installer to help guide you through the
-process, assuming you have a MySQL database available.
+You can manually configure Memex by editing the file `system/config/local.php`
 
-If the database named below does not yet exist, the installer will attempt
-to create the database before constructing tables.  This will fail if the
-given user name and password do not have access to create a database.
-If the database itself exists, tables and data will be created from the
-application schema.  This will also fail unless the supplied user name
-and password have access to do so.
+You can also use this installer to help guide you through the process.  
+
+This requires an existing MySQL database, along with a user name and
+password with permission to create tables in that database.  You should be able
+to create these using your web site's control panel or with command-line tools.
+
+**Note that any existing data in the named database will be erased!**
 
 <?php $this->placeholder('doc_content')->captureEnd() ?>
 
 <?= $this->form ?>
+
+<?php elseif ($this->install_step == 2): ?>
+
+<div class="doc_content">
+
+    <h2>Installation, Step 2</h2>
+
+    <ul>
+        <li><p>Successfully executed <?= $this->stmt_cnt ?> SQL statements from schema.</p></li>
+        <?php if ($this->config_writable): ?>
+            <li>
+                <p>Successfully wrote configuration to `system/config/local.php`</p>
+            </li>
+            <li>
+                <p>You should now be able to <a href="<?= $this->base_url ?>">start using 
+                    this Memex installation</a>.
+            </li>
+        <?php else: ?>
+            <li>
+                <p>Configuration is not writable.  So, the following must be
+                    copied manually into <code>system/config/local.php</code>:</p>
+                <form id="config_src">
+                    <textarea cols="50" rows="17"><?= $this->escape($this->config_src) ?></textarea>
+                </form>
+            </li>
+            <li>
+                <p>Once you've created <code>system/config/local.php</code>,
+                    you should be able to <a href="<?= $this->base_url ?>">start
+                    using this Memex installation</a>.
+            </li>
+        <?php endif ?>
+
+    </ul>
+
+<div>
+
+<?php endif ?>

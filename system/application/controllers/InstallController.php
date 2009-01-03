@@ -26,22 +26,59 @@ class InstallController extends Zend_Controller_Action
     {
         $request = $this->getRequest();
 
-        $this->view->form = $form = $this->_getForm();
+        // STEP 1: Create the database.
+        $this->view->install_step = 1;
 
+        // Throw the form into the view and try getting valid data.
+        $this->view->form = $form = $this->_getForm();
         if (!$this->getRequest()->isPost()) {
             return;
         }
-
         $post_data = $request->getPost();
         if (!$form->isValid($post_data)) {
             return;
         }
-
         $data = $form->getValues();
 
-        $db = $this->createDatabase($data, $form);
+        // With valid data in hand, try creating the database.
+        $create_result = $this->createDatabase($data, $form);
+        if (!$create_result) return;
 
-        var_dump($data); die;
+        // STEP 2: Create the config.
+        $this->view->install_step = 2;
+
+        list($db, $stmt_cnt) = $create_result;
+
+        $this->view->stmt_cnt = $stmt_cnt;
+        $this->view->base_url = $data['base_url'];
+
+        $config_out = array(
+            'site_title' => $data['site_title'],
+            'base_url' => $data['base_url'],
+            'needs_installation' => false,
+            'database' => array(
+                'adapter' => $data['adapter'],
+                'params'  => array(
+                    'host'     => $data['host'],
+                    'dbname'   => $data['dbname'],
+                    'username' => $data['user_name'],
+                    'password' => $data['password']
+                ),
+                'profile' => false
+            )
+        );
+
+        $this->view->config_src = $config_src =
+            "<?php return " . var_export($config_out, true) . ";";
+        $this->view->config_fn = $config_fn =
+            APPLICATION_PATH . '/../config/local.php';
+
+        if (!is_writable($config_fn)) {
+            $this->view->config_writable = false;
+        } else {
+            file_put_contents($config_fn, $config_src);
+            $this->view->config_writable = true;
+        }
 
     }
 
@@ -53,7 +90,7 @@ class InstallController extends Zend_Controller_Action
         try {
 
             // Attempt to connect to the database using the given credentials.
-            $db = Zend_Db::factory('PDO_MYSQL', array(
+            $db = Zend_Db::factory($data['adapter'], array(
                 'host'     => $data['host'],
                 'username' => $data['user_name'],
                 'password' => $data['password'],
@@ -69,13 +106,13 @@ class InstallController extends Zend_Controller_Action
                 // Report the login failure.
                 $form->setDescription('Database connection failed. ' . 
                     'Incorrect user name or password. ' . $msg);
-                return;
+                return false;
 
             } elseif (strpos($msg, 'Unknown database') !== false) {
 
                 // Try connecting without naming the database, since 
                 // it's unknown.
-                $db = Zend_Db::factory('PDO_MYSQL', array(
+                $db = Zend_Db::factory($data['adapter'], array(
                     'host'     => $data['host'],
                     'username' => $data['user_name'],
                     'password' => $data['password'],
@@ -84,17 +121,17 @@ class InstallController extends Zend_Controller_Action
                 $conn = $db->getConnection();
 
                 // Issue SQL to create the database and grant privileges.
-                $conn->exec("CREATE DATABASE {$data['dbname']}");
-                $conn->exec("GRANT ALL PRIVILEGES ON {$data['dbname']}.* " . 
+                $db->query("CREATE DATABASE {$data['dbname']}");
+                $db->query("GRANT ALL PRIVILEGES ON {$data['dbname']}.* " . 
                     "TO {$data['user_name']}");
-                $conn->exec("USE {$data['dbname']}");
+                $db->query("USE {$data['dbname']}");
 
             } else {
 
                 // Who knows what else happened, so just report the problem.
                 $form->setDescription('Database connection failed. ' . 
                     $e->getMessage() );
-                return;
+                return false;
 
             }
 
@@ -102,15 +139,26 @@ class InstallController extends Zend_Controller_Action
 
         // Now, try loading the schema and issue the individual SQL statements 
         // to build the tables.
-        $config     = Zend_Registry::get('config');
-        $schema_fn  = $config->database->schema;
-        $schema_sql = file_get_contents(APPLICATION_PATH.'/schema/'.$schema_fn);
-        $schema_sql_parts = explode(';', $schema_sql);
-        foreach ($schema_sql_parts as $part) {
-            $part = trim($part);
-            if (!$part) continue;
-            $conn->exec($part);
+        try {
+            $config     = Zend_Registry::get('config');
+            $schema_fn  = $config->database->schema;
+            $schema_sql = file_get_contents(APPLICATION_PATH.'/schema/'.$schema_fn);
+            $schema_sql_parts = explode(';', $schema_sql);
+            $cnt = 0;
+            foreach ($schema_sql_parts as $part) {
+                $cnt++;
+                $part = trim($part);
+                if (!$part) continue;
+                $db->query($part);
+            }
+        } catch (Zend_Db_Adapter_Exception $e) {
+            // Who knows what happened, so just report the problem.
+            $form->setDescription('Database initialization failed. ' . 
+                $e->getMessage() );
+            return false;
         }
+
+        return array($db, $cnt);
 
     }
 
@@ -151,8 +199,18 @@ class InstallController extends Zend_Controller_Action
                 'application',
                 array('legend' => 'application')
             )
+            ->addElement('select', 'adapter', array(
+                'label'        => 'MySQL Adapter',
+                'value'        => 'mysqli',
+                'multioptions' => array(
+                    'mysqli'    => 'mysqli', 
+                    'pdo_mysql' => 'pdo_mysql'
+                ),
+                'required'     => true,
+                'validators'   => array()
+            ))
             ->addElement('text', 'host', array(
-                'label'      => 'MySQL Host',
+                'label'      => 'Host',
                 'value'      => '127.0.0.1',
                 'required'   => true,
                 'filters'    => array('StringTrim'),
@@ -179,7 +237,7 @@ class InstallController extends Zend_Controller_Action
                     array('StringLength', false, array(1, 64))
                 )
             ))
-            ->addElement('password', 'password', array(
+            ->addElement('text', 'password', array(
                 'label'      => 'Password',
                 'value'      => 'memex',
                 'required'   => true,
@@ -189,7 +247,7 @@ class InstallController extends Zend_Controller_Action
                 )
             ))
             ->addDisplayGroup(
-                array('host', 'dbname', 'user_name', 'password'), 
+                array('adapter', 'host', 'dbname', 'user_name', 'password'), 
                 'database',
                 array('legend' => 'database')
             )
@@ -199,7 +257,7 @@ class InstallController extends Zend_Controller_Action
             ->addDisplayGroup(
                 array('save'), 
                 'install',
-                array('legend' => 'install')
+                array('legend' => 'finished')
             )
             ->setDecorators(array(
                 'FormElements',
