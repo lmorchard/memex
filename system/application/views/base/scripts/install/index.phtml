@@ -1,0 +1,20 @@
+<?php $this->placeholder('doc_content')->captureStart() ?>
+
+## First Time Installation
+
+This Memex site has not yet been configured to run.  You can manually configure
+Memex by editing the file `system/config/local.php`
+
+On the other hand, you can use this installer to help guide you through the
+process, assuming you have a MySQL database available.
+
+If the database named below does not yet exist, the installer will attempt
+to create the database before constructing tables.  This will fail if the
+given user name and password do not have access to create a database.
+If the database itself exists, tables and data will be created from the
+application schema.  This will also fail unless the supplied user name
+and password have access to do so.
+
+<?php $this->placeholder('doc_content')->captureEnd() ?>
+
+<?= $this->form ?>
