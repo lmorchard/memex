@@ -1,0 +1,16 @@
+<?php return array(
+
+    'database' => array(
+        'adapter' => 'PDO_MYSQL',
+        'params'  => array(
+            'host'     => '127.0.0.1',
+            'dbname'   => 'memex_dev',
+            'username' => 'memex',
+            'password' => 'memex'
+        ),
+        'profile' => false
+    ),
+
+    'needs_installation' => false
+
+);

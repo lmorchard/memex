@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<?php
+    $request         = Zend_Controller_Front::getInstance()->getRequest();
+    $action_name     = $request->getActionName();
+    $controller_name = $request->getControllerName();
+
+    $sidebar_content = $this->placeholder('sidebar');
+?>
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+    <head>  
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+        <title>memex</title>
+        <link href="<?= $this->baseUrl('/css/nostalgia/main.css') ?>" media="screen" rel="stylesheet" type="text/css" />
+        <link href="<?= $this->baseUrl('/css/nostalgia/' . $controller_name . '.css') ?>" media="screen" rel="stylesheet" type="text/css" />
+    </head> 
+    <body id="<?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>" 
+            class="<?= 'ctrl_' . $controller_name ?> <?= 'act_' . $action_name ?> <?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>">
+        <div id="page" class="<?= ($sidebar_content != '') ? 'with_sidebar' : '' ?>">
+
+            <div id="header">
+
+                <div class="logo"><span></span></div>
+
+                <div class="crumbs">
+                    <span class="title"><a href="/">memex</a> / installation </span>
+                    <?= $this->placeholder('crumbs') ?>
+                </div>
+
+                <div class="main">
+                    <ul class="nav">
+                    </ul>
+                </div>
+
+                <div class="sub">
+
+                    <div class="auth">
+                        <ul class="nav">
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div id="infobar">
+                <?= $this->placeholder('infobar') ?>
+            </div>
+
+            <div id="middle">
+                <div id="content">
+                    <?php
+                        $md_content = $this->placeholder('doc_content');
+                        if ($md_content) {
+                            require_once 'markdown.php';
+                            echo '<div class="doc_content">';
+                            echo Markdown($md_content);
+                            echo '</div>';
+                        }
+                    ?>
+                    <?= $this->layout()->content ?>
+                </div>
+                <?php if ($sidebar_content): ?>
+                    <div id="sidebar">
+                        <?= $sidebar_content ?>
+                    </div>
+                <?php endif ?>
+            </div>
+
+            <div id="footer">
+                <ul class="nav">
+                    <li class="first"><a href="/">memex</a></li>
+                    <?= $this->placeholder('footer_nav') ?>
+                </ul>
+
+                <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="This work is licensed under a Creative Commons Attribution-Share Alike 3.0 Unported License"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a>
+
+            </div>
+
+        </div>
+
+        <script type="text/javascript">
+            var djConfig = {
+                isDebug: false, parseOnLoad: true, 
+                modulePaths: { 'memex': '../memex' }
+            }
+        </script>
+        <script src="<?= $this->baseUrl('/js/dojo/dojo.js') ?>" type="text/javascript"></script>
+        <script type="text/javascript">
+            dojo.require('memex.nostalgia.main');
+            dojo.require('memex.nostalgia.<?= $controller_name ?>');
+        </script>
+    </body>
+</html>
