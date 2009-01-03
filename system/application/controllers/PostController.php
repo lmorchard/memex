@@ -294,6 +294,7 @@ class PostController extends Zend_Controller_Action
             if (!$form->isValid($new_post_data)) {
                 return;
             }
+            $new_post_data = $form->getValues();
 
             $new_post_data['profile_id'] = $profile_id;
 
