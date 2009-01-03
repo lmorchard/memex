@@ -22,6 +22,9 @@ class Memex_Plugin_Delicious
      */
     public function handlePostUpdated($topic, $post_data, $context)
     {
+        $config = Zend_Registry::get('config');
+        if ($config->batch_mode == true) return;
+
         $settings = $this->_getProfileSettings();
         if (null == $settings || !$settings[Memex_Constants::ATTRIB_DELICIOUS_ENABLED]) 
             return;
@@ -56,6 +59,9 @@ class Memex_Plugin_Delicious
      */
     public function handlePostDeleted($topic, $post_data, $context)
     {
+        $config = Zend_Registry::get('config');
+        if ($config->batch_mode == true) return;
+
         $settings = $this->_getProfileSettings();
         if (null == $settings || !$settings[Memex_Constants::ATTRIB_DELICIOUS_ENABLED]) 
             return;

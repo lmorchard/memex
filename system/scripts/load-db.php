@@ -10,6 +10,7 @@ define('APPLICATION_ENVIRONMENT', 'development_mysql');
 include_once dirname(__FILE__) . '/../application/bootstrap.php';
 
 $config = Zend_Registry::get('config');
+$config->batch_mode = true;
 
 // if any parameter is passed after the script name (like 1 or --withdata)
 // load the data file after the schema has loaded.
@@ -36,7 +37,7 @@ foreach ($schema_sql_parts as $part) {
     $part = trim($part);
     if (!$part) continue;
     try {
-        $db->getConnection()->exec($part.';');
+        $db->query($part.';');
     } catch (Exception $e) {
         echo "$part\n";
         throw $e;

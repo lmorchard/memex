@@ -7,14 +7,22 @@ application.
 
 Or, at least, it will help me learn the Zend Framework.
 
+### Requirements
+
+* PHP 5+
+* MySQL 5+
+
+
 ### Installation
 
-* Get a copy or a link of the latest [Zend Framework][zf] into the `system/library/` directory.
-* Edit `system/config/local.php` to reflect your local installation environment. (eg. mysql details)
+* Get a copy of the latest [Zend Framework][zf] `library/Zend` into the `system/library/` directory.
+* Visiting `index.php` should present a quick installer that will create the database tables and attempt to create a configuration file.
+* Or, manually edit `system/config/local.php` to reflect your environment.
     * There is an example `system/config/local.php-dist` you can use as a starting point.
-* Try using `system/scripts/load.sqlite.php` to create the database.
-* Make sure the `system` directory is not web readable.  
-* Modify `index.php` to point to new path, if you move `system`.
+    * Use `system/schema/mysql.sql` to create the database tables.
+* Make sure the `system` directory is not web readable. 
+    * The `.htaccess` should already do this out of the box on Apache.
+    * Modify `index.php` to point to new path, if you move the `system` directory.
 
 [zf]: http://framework.zend.com/download/latest
 

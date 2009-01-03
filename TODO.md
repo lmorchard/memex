@@ -44,6 +44,7 @@
     * Bulk import via file upload
     * Fx addon
     * [Message / work queues and deferred processing][queues]
+    * Maybe change license to BSD?  MIT?
     * Make it scale
 
 [oembed]: http://oohembed.com/
