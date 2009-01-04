@@ -1,4 +1,7 @@
 <?php
+/**
+ * View script to render posts as an Atom feed.
+ */
 $this->layout()->disableLayout();
 
 $config = Zend_Registry::get('config');
@@ -15,7 +18,6 @@ if (!empty($this->screen_name)) {
     if ($this->tags) {
         $title .= ' / ' . join(' / ', $this->tags);
     }
-
     $page_home_url = $site_base . $this->url(
         array( 'screen_name' => $this->screen_name), 
         'post_profile'

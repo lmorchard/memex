@@ -53,30 +53,16 @@ class PostController extends Zend_Controller_Action
         $tag_counts = $this->view->tag_counts = 
             $tags_model->countByProfile($profile['id']);
 
-        // Set up the count, page size, and page number parameters 
-        // for paginator.
         $posts_model = $this->_helper->getModel('Posts');
-        $posts_count = $this->view->posts_count =
+        $posts_count = 
             $posts_model->countByProfileAndTags($profile['id'], $tags);
-        $page_size   = $this->view->page_size = 
-            $request->getCookie('page_size', 10);
-        $page_number = $this->view->page_number =
-            $request->getQuery('page', 1);
 
-        // Build the paginator for the view.
-        $paginator = new Zend_Paginator(
-            new Zend_Paginator_Adapter_Null($posts_count)
-        );
-        $this->view->paginator = $paginator
-            ->setCurrentPageNumber($page_number)
-            ->setItemCountPerPage($page_size);
+        list($start, $count) = $this->setupPagination($posts_count);
 
         // Fetch the posts using the route tags and pagination vars.
-        $posts_start = ($page_number - 1) * $page_size;
-        $posts = $posts_model->fetchByProfileAndTags(
-            $profile['id'], $tags, $posts_start, $page_size
+        $this->view->posts = $posts_model->fetchByProfileAndTags(
+            $profile['id'], $tags, $start, $count
         );
-        $this->view->posts = $posts;
 
         if ($request->getParam('is_feed')) {
             return $this->renderFeed();
@@ -86,7 +72,7 @@ class PostController extends Zend_Controller_Action
     /**
      * Tag view action
      */
-    function tagAction()
+    public function tagAction()
     {
         $request = $this->getRequest();
 
@@ -94,16 +80,61 @@ class PostController extends Zend_Controller_Action
         $tags_model = $this->_helper->getModel('Tags');
         $tags = $this->view->tags = 
             $tags_model->parseTags($request->getParam('tags'));
+        
+        $posts_model = $this->_helper->getModel('Posts');
+        $posts_count = 
+            $posts_model->countByTags($tags);
+
+        list($start, $count) = $this->setupPagination($posts_count);
+
+        // Fetch the posts using the route tags and pagination vars.
+        $this->view->posts = $posts_model->fetchByTags(
+            $tags, $start, $count
+        );
+
+        if ($request->getParam('is_feed')) {
+            return $this->renderFeed();
+        }
+    }
+
+    /**
+     * Set up common pagination elements.
+     */
+    private function setupPagination($posts_count)
+    {
+        $request = $this->getRequest();
+
+        $this->view->posts_count = $posts_count;
 
         // Set up the count, page size, and page number parameters 
         // for paginator.
-        $posts_model = $this->_helper->getModel('Posts');
-        $posts_count = $this->view->posts_count =
-            $posts_model->countByTags($tags);
-        $page_size   = $this->view->page_size = 
-            $request->getCookie('page_size', 10);
-        $page_number = $this->view->page_number =
-            $request->getQuery('page', 1);
+        $start = $request->getQuery('start', null);
+        $count = $request->getQuery('count', null);
+
+        if (null!=$start || null!=$count) {
+            // If the ?start or ?count parameters have been supplied, honor 
+            // them instead of pagination params.
+            if (null==$count) $count = 15; // TODO: Make ?count a configurable default?
+            if ($count < 1) $count = 1;
+            if ($count > 100) $count = 100;
+            if ($start < 0 || null==$start) $start = 0;
+            if ($start > $posts_count) $start = $posts_count;
+            
+            $page_size = $count;
+            $page_number = round($start / $count);
+        } else {
+            // Otherwise, honor the ?page parameter and page_size cookie.
+            $page_size = $this->view->page_size = 
+                $request->getCookie('page_size', 10);
+            $page_number = $this->view->page_number =
+                $request->getQuery('page', 1);
+            
+            $start = ($page_number - 1) * $page_size;
+            $count = $page_size;
+        }
+
+        $this->view->start = $start;
+        $this->view->count = $count;
 
         // Build the paginator for the view.
         $paginator = new Zend_Paginator(
@@ -113,22 +144,13 @@ class PostController extends Zend_Controller_Action
             ->setCurrentPageNumber($page_number)
             ->setItemCountPerPage($page_size);
 
-        // Fetch the posts using the route tags and pagination vars.
-        $posts_start = ($page_number - 1) * $page_size;
-        $posts = $posts_model->fetchByTags(
-            $tags, $posts_start, $page_size
-        );
-        $this->view->posts = $posts;
-
-        if ($request->getParam('is_feed')) {
-            return $this->renderFeed();
-        }
+        return array($start, $count);
     }
 
     /**
      * Utility function to switch view rendering to feed template.
      */
-    function renderFeed()
+    private function renderFeed()
     {
         $request = $this->getRequest();
         $action  = $request->getActionName();
@@ -139,13 +161,16 @@ class PostController extends Zend_Controller_Action
             $format = 'atom';
         }
 
+        $this->view->callback = 
+            $request->getQuery('callback', '');
+
         return $this->render('feed'.ucfirst($format));
     }
 
     /**
      * Post view action.
      */
-    function viewAction()
+    public function viewAction()
     {
         $identity  = Zend_Auth::getInstance()->getIdentity();
         $request   = $this->getRequest();
@@ -161,7 +186,6 @@ class PostController extends Zend_Controller_Action
 
         $posts_model = $this->_helper->getModel('Posts');
 
-        // If we have a URL, try looking up existing post data.
         if ($uuid) {
             $post = $posts_model->fetchOneByUUID($uuid);
         }
@@ -181,7 +205,7 @@ class PostController extends Zend_Controller_Action
     /**
      * Post delete action.
      */
-    function deleteAction()
+    public function deleteAction()
     {
         $identity  = Zend_Auth::getInstance()->getIdentity();
         $request   = $this->getRequest();
@@ -248,7 +272,7 @@ class PostController extends Zend_Controller_Action
      * Handle saving a new bookmark, with a variety of post-save redirection 
      * options.
      */
-    function saveAction()
+    public function saveAction()
     {
         $identity  = Zend_Auth::getInstance()->getIdentity();
         $request   = $this->getRequest();
