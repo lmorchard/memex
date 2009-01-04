@@ -263,7 +263,15 @@ class Memex_Initialize
     public function initRoutes()
     {
         $config = $this->_getConfig();
+
         $router = $this->_front->getRouter();
+        if ($config->base_url) {
+            // HACK: It's called setBaseUrl, but it really wants base path.
+            $parsed_url = parse_url($config->base_url);
+            if (!empty($parsed_url['path'])) {
+                $this->_front->setBaseUrl($parsed_url['path']);
+            }
+        }
 
         if ($config->needs_installation !== false) {
             $router->addConfig($config, 'routes_install');

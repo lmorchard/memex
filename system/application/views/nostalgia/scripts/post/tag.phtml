@@ -1,3 +1,17 @@
+<?php $this->placeholder('head')->captureStart() ?>
+    <?php
+        $feed_url = $this->url(
+            array(
+                'format' => 'atom', 
+                'screen_name' => $this->screen_name,
+                'tags' => ($this->tags) ? join(' ', $this->tags) : ''
+            ), 
+            ($this->tags) ? 'feeds_post_tag' : 'feeds_site_home' //'feeds_post_tag_recent'
+        );
+    ?>
+    <link rel="alternate" type="application/atom+xml" title="Atom feed" href="<?= $feed_url ?>"> 
+<?php $this->placeholder('head')->captureEnd() ?>
+
 <?php $this->placeholder('crumbs')->captureStart() ?>
     <?php if (empty($this->tags)): ?>
     / <a href="<?= $this->url() ?>">recent</a>

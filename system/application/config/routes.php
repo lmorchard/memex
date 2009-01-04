@@ -1,5 +1,6 @@
 <?php
 return array(
+
     'routes_install' => array(
 
         'install_index' => array(
@@ -11,6 +12,7 @@ return array(
         ),
 
     ),
+
     'routes' => array(
 
         'post_profile_tags' => array(
@@ -30,6 +32,29 @@ return array(
             'route' => ':screen_name',
             'defaults' => array(
                 'controller' => 'post', 'action' => 'profile'
+            )
+        ),
+
+        'feeds_post_profile_tags' => array(
+            'type'  => 'Zend_Controller_Router_Route_Regex',
+            'route' => 'feeds/(.*)/(.*)/(.*)',
+            'defaults' => array(
+                'controller' => 'post', 'action' => 'profile', 
+                'is_feed' => true
+            ),
+            'map' => array(
+                1 => 'format',
+                2 => 'screen_name',
+                3 => 'tags'
+            ),
+            'reverse' => 'feeds/%s/%s/%s',
+        ),
+        'feeds_post_profile' => array(
+            'type'  => 'Zend_Controller_Router_Route',
+            'route' => 'feeds/:format/:screen_name',
+            'defaults' => array(
+                'controller' => 'post', 'action' => 'profile',
+                'is_feed' => true
             )
         ),
 
@@ -93,13 +118,42 @@ return array(
             ),
             'reverse' => 'posts/%s;delete',
         ),
-        'post_tag_recent' => array(
-            'type'  => 'Zend_Controller_Router_Route_Static',
-            'route' => 'recent',
+
+        'feeds_post_tag' => array(
+            'type'  => 'Zend_Controller_Router_Route_Regex',
+            'route' => 'feeds/(.*)/tag/(.*)',
             'defaults' => array(
-                'controller' => 'post', 'action' => 'tag'
+                'controller' => 'post', 'action' => 'tag', 
+                'is_feed' => true
+            ),
+            'map' => array(
+                1 => 'format',
+                2 => 'tags'
+            ),
+            'reverse' => 'feeds/%s/tag/%s',
+        ),
+        'feeds_post_tag_2' => array(
+            'type'  => 'Zend_Controller_Router_Route_Regex',
+            'route' => 'feeds/(.*)/recent/(.*)',
+            'defaults' => array(
+                'controller' => 'post', 'action' => 'tag', 
+                'is_feed' => true
+            ),
+            'map' => array(
+                1 => 'format',
+                2 => 'tags'
+            ),
+            'reverse' => 'feeds/%s/recent/%s',
+        ),
+        'feeds_post_tag_recent' => array(
+            'type'  => 'Zend_Controller_Router_Route',
+            'route' => 'feeds/:format/recent',
+            'defaults' => array(
+                'controller' => 'post', 'action' => 'tag',
+                'is_feed' => true
             )
         ),
+
         'post_tag' => array(
             'type'  => 'Zend_Controller_Router_Route_Regex',
             'route' => 'tag/(.*)',
@@ -132,6 +186,14 @@ return array(
             )
         ),
          */
+
+        'post_tag_recent' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'recent',
+            'defaults' => array(
+                'controller' => 'post', 'action' => 'tag'
+            )
+        ),
 
         'profile_settings' => array(
             'type'  => 'Zend_Controller_Router_Route',
@@ -193,7 +255,15 @@ return array(
             )
         ),
 
-        'post_tag_recent' => array(
+        'feeds_site_home' => array(
+            'type'  => 'Zend_Controller_Router_Route',
+            'route' => 'feeds/:format',
+            'defaults' => array(
+                'controller' => 'post', 'action' => 'tag',
+                'is_feed' => true
+            )
+        ),
+        'site_home' => array(
             'type'  => 'Zend_Controller_Router_Route_Static',
             'route' => '',
             'defaults' => array(

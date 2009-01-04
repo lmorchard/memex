@@ -5,6 +5,20 @@
     );
 ?>
 
+<?php $this->placeholder('head')->captureStart() ?>
+    <?php
+        $feed_url = $this->url(
+            array(
+                'format' => 'atom', 
+                'screen_name' => $this->screen_name,
+                'tags' => ($this->tags) ? join(' ', $this->tags) : ''
+            ), 
+            ($this->tags) ? 'feeds_post_profile_tags' : 'feeds_post_profile'
+        );
+    ?>
+    <link rel="alternate" type="application/atom+xml" title="Atom feed" href="<?= $feed_url ?>"> 
+<?php $this->placeholder('head')->captureEnd() ?>
+
 <?php $this->placeholder('crumbs')->captureStart() ?>
     / people / <a href="<?= $profile_home_url ?>"><?= $this->escape($this->screen_name) ?></a>
     <?php if ($this->tags): ?>

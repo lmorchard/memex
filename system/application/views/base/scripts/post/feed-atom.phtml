@@ -1,0 +1,90 @@
+<?php
+$this->layout()->disableLayout();
+
+$config = Zend_Registry::get('config');
+$site_title = $config->get('site_title', 'memex');
+
+// Construct the site absolute base URL.
+$site_base = ( empty($_SERVER['HTTPS']) ? 'http://' : 'https://' ) . 
+    $_SERVER['HTTP_HOST'];
+
+if (!empty($this->screen_name)) {
+    // Screen name given, so this is a profile feed.
+
+    $title = $site_title . ' / ' . $this->screen_name;
+    if ($this->tags) {
+        $title .= ' / ' . join(' / ', $this->tags);
+    }
+
+    $page_home_url = $site_base . $this->url(
+        array( 'screen_name' => $this->screen_name), 
+        'post_profile'
+    );
+
+} else {
+    // No screen name, so this is a recent or a tag feed.
+
+    $title = $site_title . ' / ';
+    if ($this->tags) {
+        // Tags given, so this is a tag feed.
+        $title .= 'tag / ' . join(' / ', $this->tags);
+        $page_home_url = $site_base . $this->url(
+            array('tags'=>join(' ', $this->tags)), 
+            'post_tag'
+        );
+    } else {
+        // No tags, so this is overall recent.
+        $title .= 'recent';
+        $page_home_url = $site_base . $this->url(
+            array(), 'post_tag_recent'
+        );
+    }
+}
+
+$x = new Memex_XmlWriter(array(
+    'parents' => array( 'feed', 'entry', 'author' )
+));
+
+$x->feed(array('xmlns'=>'http://www.w3.org/2005/Atom'))
+    ->id($site_base . $this->url())
+    ->title($title)
+    ->link(array( 'rel'=>'self', 'type'=>'application/atom+xml', 'href'=>$site_base . $this->url() ))
+    ->link(array( 'rel'=>'alternate', 'type'=>'text/html', 'href'=>$page_home_url ))
+    ->updated(date('c', strtotime($this->posts[0]['modified'])));
+
+foreach ($this->posts as $post) {
+
+    $home_url = $site_base . $this->url(
+        array( 'screen_name' => $post['screen_name']), 
+        'post_profile'
+    );
+
+    $x->entry()
+        ->title($post['title'])
+        ->link(array( 'href'=>$post['url'] ))
+        ->id($site_base . $this->url(array('uuid'=>$post['uuid']), 'post_view'))
+        ->updated(date('c', strtotime($post['user_date'])))
+        ->published(date('c', strtotime(empty($post['modified']) ? 
+            $post['user_date'] : $post['modified'])))
+        ->author()
+            ->name($post['screen_name'])
+            ->uri($home_url)
+        ->pop();
+    
+    if (!empty($post['notes'])) {
+        $x->summary(array('type'=>'text'), $post['notes']);
+    }
+
+    foreach ($post['tags_parsed'] as $tag) {
+        $x->category(array( 
+            'scheme' => $home_url, 
+            'term'   => $tag
+        ));
+    }
+
+    $x->pop();
+}
+
+$x->pop();
+
+echo $x->getXML();

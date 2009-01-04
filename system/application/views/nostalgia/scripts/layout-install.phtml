@@ -13,6 +13,7 @@
         <title>memex</title>
         <link href="<?= $this->baseUrl('/css/nostalgia/main.css') ?>" media="screen" rel="stylesheet" type="text/css" />
         <link href="<?= $this->baseUrl('/css/nostalgia/' . $controller_name . '.css') ?>" media="screen" rel="stylesheet" type="text/css" />
+        <?= $this->placeholder('head') ?>
     </head> 
     <body id="<?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>" 
             class="<?= 'ctrl_' . $controller_name ?> <?= 'act_' . $action_name ?> <?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>">

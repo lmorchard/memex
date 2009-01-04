@@ -77,6 +77,10 @@ class PostController extends Zend_Controller_Action
             $profile['id'], $tags, $posts_start, $page_size
         );
         $this->view->posts = $posts;
+
+        if ($request->getParam('is_feed')) {
+            return $this->renderFeed();
+        }
     }
 
     /**
@@ -115,6 +119,27 @@ class PostController extends Zend_Controller_Action
             $tags, $posts_start, $page_size
         );
         $this->view->posts = $posts;
+
+        if ($request->getParam('is_feed')) {
+            return $this->renderFeed();
+        }
+    }
+
+    /**
+     * Utility function to switch view rendering to feed template.
+     */
+    function renderFeed()
+    {
+        $request = $this->getRequest();
+        $action  = $request->getActionName();
+        $format  = $request->getParam('format');
+
+        $alnum = new Zend_Validate_Alnum();
+        if (!$alnum->isValid($format)) {
+            $format = 'atom';
+        }
+
+        return $this->render('feed'.ucfirst($format));
     }
 
     /**

@@ -8,13 +8,14 @@ class Memex_View_Helper_BaseUrl extends Zend_View_Helper_Abstract
     public function baseUrl($file = null) 
     { 
         // Get baseUrl 
-        $baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl(); 
+        $config = Zend_Registry::get('config');
+        $base_url = Zend_Controller_Front::getInstance()->getBaseUrl(); 
  
         // Remove trailing slashes 
         $file = ($file !== null) ? ltrim($file, '/\\') : null; 
  
         // Build return 
-        $return = rtrim($baseUrl, '/\\') . (($file !== null) ? ('/' . $file) : ''); 
+        $return = rtrim($base_url, '/\\') . (($file !== null) ? ('/' . $file) : ''); 
  
         return $return; 
     } 
