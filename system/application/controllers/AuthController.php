@@ -122,9 +122,11 @@ class AuthController extends Zend_Controller_Action
         $request = $this->getRequest();
         if (!$request->isPost()) {
             $get_data = $request->getQuery();
-            $form->populate(array(
-                'jump' => $get_data['jump']
-            ));
+            if (!empty($get_data['jump'])) {
+                $form->populate(array(
+                    'jump' => $get_data['jump']
+                ));
+            }
             return;
         }
 
