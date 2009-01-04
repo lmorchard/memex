@@ -3,23 +3,9 @@
 * Basic stuff
     * Tag suggestions on save form
     * All tags per profile
+        * ..and do not forget feeds.
     * Top tags site-wide
     * Related tags?
-* Installation
-    * Make *-dist versions of config files, delete originals
-    * Implement an installer that can produce local configs
-* Tools
-    * Schema / data loading tool with option to import posts/all from del
-* Documentation
-    * Write more docs and help files
-    * Bookmarklets
-* UI
-    * Create a more original theme than "nostalgia"
-    * AJAXify post save / edit / delete
-    * Tag management
-    * Tag bundles
-    * Item privacy / visibility
-    * [oohembed][oembed] for tumble-log-like media integration?
 * Logins / Profiles
     * Email password recovery
     * Prefs, login password change, screen name, bio, etc.
@@ -31,15 +17,37 @@
     * AtomPub API
     * {Atom,RSS,JSON} feeds
     * Widgets and whatnot
+* Tools
+    * Schema / data loading tool with option to import posts/all from del
+    * Work / message queue process
+* Documentation
+    * Write more docs and help files
+    * Bookmarklets
+* Admin tools
+    * ACLs
+    * CRUD on all models
+* UI
+    * Create a more original theme than "nostalgia"
+    * AJAXify post save / edit / delete
+    * Tag management
+    * Tag bundles
+    * Item privacy / visibility
+    * [oohembed][oembed] for tumble-log-like media integration?
 * Federation
+    * Daily blog poster
     * Carbon-copy posts to other services (eg. magnolia, twitter, friendfeed)
     * Import from other services
     * Implement network / subscriptions based on RSS/Atom aggregation to login-less local proxy profiles
     * [FeedSync?](http://dev.live.com/feedsync/spec/spec.aspx)
 * Misc
+    * Implement automatically applied system:* tags.
+    * Enclosures for Atom / RSS feeds for podcast support.
+    * Etag and Last-Modified for feeds
+    * Bookmarklet for discovering and bookmarking feeds
     * DB prefixes for MySQL?
     * Rename "posts" to "items"?  Not crucial, but odd.
     * More tests, controller tests, filter tests, validator tests, etc
+    * Tag descriptions
     * Search
     * Bulk import via file upload
     * Fx addon
