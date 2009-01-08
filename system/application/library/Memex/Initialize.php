@@ -330,8 +330,7 @@ class Memex_Initialize
             }
 
             // If enabled, and exists, load the local config overrides.
-            if (self::$_config->needs_installation == false && 
-                    self::$_config->config->load_local != false) {
+            if (self::$_config->config->load_local != false) {
                 $path = $this->_appPath . '/../config/local.php';
                 if (is_file($path)) {
                     self::$_config->merge(new Zend_Config(require $path));
