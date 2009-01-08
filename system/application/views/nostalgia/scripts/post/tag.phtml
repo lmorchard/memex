@@ -6,7 +6,7 @@
                 'screen_name' => $this->screen_name,
                 'tags' => ($this->tags) ? join(' ', $this->tags) : ''
             ), 
-            ($this->tags) ? 'feeds_post_tag' : 'feeds_site_home' //'feeds_post_tag_recent'
+            ($this->tags) ? 'feeds_post_tag' : 'feeds_site_home'
         );
     ?>
     <link rel="alternate" type="application/atom+xml" title="Atom feed" href="<?= $feed_url ?>"> 
