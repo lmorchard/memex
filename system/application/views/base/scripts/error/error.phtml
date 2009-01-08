@@ -1,7 +1,7 @@
 <h1>An error occurred</h1> 
 <h2><?= $this->message ?></h2> 
 
-<? if (Memex_Initialize::getConfig()->error->show_exceptions): ?>
+<? if (Zend_Registry::get('config')->error->show_exceptions): ?>
     <h3>Exception information:</h3> 
     <p> 
         <b>Message:</b> <?= $this->exception->getMessage() ?> 
