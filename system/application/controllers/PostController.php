@@ -12,6 +12,7 @@ class PostController extends Zend_Controller_Action
 
         // Accept parameter to set pagination page size.
         if (isset($get_data['set_page_size']) && is_numeric($get_data['set_page_size'])) {
+            // HACK: This means of setting a cookie sucks balls.
             $_COOKIE['page_size'] = (int)$get_data['set_page_size'];
             setcookie('page_size',  $_COOKIE['page_size'], time()+60*60*24*365*5);
         }
@@ -354,10 +355,9 @@ class PostController extends Zend_Controller_Action
         // The ?jump parameter indicates one of several post-save redirect 
         // options.
         $jump = $post_data['jump'];
-        if ($jump == 'doclose' || $jump == 'close') {
+        if ($jump == 'close') {
 
-            // jump=doclose or jump=close should close the window after 
-            // posting.
+            // jump=close should close the window, but we'll do it in a view script.
             return $this->renderScript('post/save_doclose.phtml');
 
         } elseif ($jump == 'yes' && $url) {
@@ -367,15 +367,10 @@ class PostController extends Zend_Controller_Action
 
         } elseif (strpos($jump, '/') === 0) {
             
-            // jump=/... forwards the user to some path within the site
+            // This jump leads to somewhere within the site
             return $this->_helper->redirector->gotoUrl($jump, array(
                 'prependBase' => true
             ));
-
-        } elseif ($jump == 'yes' && $url) {
-            
-            // If there's a URL and ?jump=yes, then hop on over to the original URL.
-            return $this->_helper->redirector->gotoUrl($url);
 
         } else {
 
