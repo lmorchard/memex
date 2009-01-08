@@ -56,6 +56,14 @@ class InstallController extends Zend_Controller_Action
             'site_title' => $data['site_title'],
             'base_url' => $data['base_url'],
             'needs_installation' => false,
+            'auth' => array(
+                // TODO: Better secret?
+                'secret' => md5(uniqid('', true))
+            ),
+            'form' => array(
+                // TODO: Better salt?
+                'salt' => md5(uniqid('', true))
+            ),
             'database' => array(
                 'adapter' => $data['adapter'],
                 'params'  => array(
@@ -187,7 +195,7 @@ class InstallController extends Zend_Controller_Action
             ))
             ->addElement('text', 'base_url', array(
                 'label'       => 'Base URL',
-                'value'       => 'http://' . $_SERVER['HTTP_HOST'] . $request->getBaseUrl(),
+                'value'       => 'http://' . $request->getHttpHost() . $request->getBaseUrl(),
                 'required'    => true,
                 'filters'     => array('StringTrim'),
                 'validators'  => array(

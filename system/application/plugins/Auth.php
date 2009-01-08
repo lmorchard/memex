@@ -1,4 +1,10 @@
 <?php
+/**
+ * Plugin to handle setting up auth
+ *
+ * @package Memex
+ * @author l.m.orchard <l.m.orchard@pobox.com>
+ */
 class Memex_Plugin_Auth extends Zend_Controller_Plugin_Abstract
 {
     protected $_acl;
@@ -18,9 +24,13 @@ class Memex_Plugin_Auth extends Zend_Controller_Plugin_Abstract
         $view   = Zend_Layout::getMvcInstance()->getView();
         $auth   = Zend_Auth::getInstance();
 
-        if ($auth->hasIdentity()) {
-            
-            $identity = $auth->getIdentity();
+        $storage = new Memex_Auth_Storage(Zend_Registry::get('config')->auth->secret);
+        $auth->setStorage($storage);
+
+        $identity = $auth->hasIdentity() ? $auth->getIdentity() : null;
+
+        if ($identity) {
+
             $profile  = $logins_model->fetchDefaultProfileForLogin($identity->id);
             $view->assign(array(
                 'auth_identity' => $identity,

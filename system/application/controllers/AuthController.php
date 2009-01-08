@@ -9,7 +9,9 @@ class AuthController extends Zend_Controller_Action
 
     public function preDispatch()
     {
-        if (Zend_Auth::getInstance()->hasIdentity()) {
+        $auth = Zend_Auth::getInstance();
+
+        if ($auth->hasIdentity()) {
             if (!in_array($this->getRequest()->getActionName(), array('logout', 'home'))) {
                 return $this->_helper->redirector->gotoRoute(
                     array(), 'auth_home'
@@ -136,8 +138,14 @@ class AuthController extends Zend_Controller_Action
         }
 
         // Get our authentication adapter and check credentials
-        $adapter = $this->getAuthAdapter($form->getValues());
-        $auth    = Zend_Auth::getInstance();
+        $auth        = Zend_Auth::getInstance();
+
+        $form_values = $form->getValues();
+        $adapter     = $this->getAuthAdapter($form_values);
+
+        $storage = $auth->getStorage();
+        $storage->setUserName($form_values['login_name']);
+
         $result  = $auth->authenticate($adapter);
         if (!$result->isValid()) {
             $form->setDescription('Login name and password not valid');
@@ -151,7 +159,7 @@ class AuthController extends Zend_Controller_Action
         ));
         $identity->default_profile = 
             $logins_model->fetchDefaultProfileForLogin($identity->id);
-        $auth->getStorage()->write($identity);
+        $storage->write($identity);
 
         // We're authenticated!
         if (isset($post_data['jump']) && substr($post_data['jump'], 0, 1) == '/') {

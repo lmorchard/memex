@@ -231,7 +231,7 @@ class Memex_Initialize
         // Initialize layouts
         Zend_Layout::startMvc();
         $layout = Zend_Layout::getMvcInstance();
-        if ($config->needs_installation !== false) {
+        if ($config->needs_installation != false) {
             $layout->setLayout('layout-install');
         } else {
             $layout->setLayout('layout');
@@ -273,7 +273,7 @@ class Memex_Initialize
             }
         }
 
-        if ($config->needs_installation !== false) {
+        if ($config->needs_installation != false) {
             $router->addConfig($config, 'routes_install');
         } else {
             $router->addConfig($config, 'routes');
