@@ -17,6 +17,14 @@ class Memex_Model_Posts extends Memex_Model
         $this->normalize_url_filter = new Memex_Filter_NormalizeUrl();
     }
 
+    public function buildPostSignature($data)
+    {
+        return md5(join('|', array(
+            @$data['url'], @$data['title'], @$data['notes'], @$data['tags'], 
+            @$data['user_date'], @$data['visibility']
+        )));
+    }
+
     /**
      * Save a post with the given data for the given profile, creating a new 
      * one or overwriting an existing one if necessary.
@@ -38,7 +46,7 @@ class Memex_Model_Posts extends Memex_Model
             $date_in = strtotime($post_data['user_date'], time());
             if (!$date_in)
                 throw new Exception('valid optional date required');
-            $post_data['date'] = date('Y-m-d\TH:i:sP', $date_in);
+            $post_data['user_date'] = gmdate('Y-m-d\TH:i:sP', $date_in);
         }
 
         $table = $this->getDbTable();
@@ -86,12 +94,13 @@ class Memex_Model_Posts extends Memex_Model
         // fields are used, which prevents changes in UUID and others
         $accepted_post_fields = array(
             'profile_id', 'url_id', 'title', 'notes', 'tags', 
-            'visibility', 'user_date'
+            'visibility', 'user_date', 'visibility'
         );
         foreach ($accepted_post_fields as $key) {
             if (isset($post_data[$key]))
                 $row->$key = $post_data[$key];
         }
+        $row->signature = $this->buildPostSignature($post_data);
         $row->save();
         
         // HACK: Re-fetch the just-saved post.  Ensures consistent data, but 
@@ -108,13 +117,32 @@ class Memex_Model_Posts extends Memex_Model
     }
 
     /**
+     * Fetch the last modified date for posts for a profile.
+     *
+     * @param string Profile ID
+     * @return string last modified date
+     */
+    public function fetchLastModifiedDateByProfile($profile_id)
+    {
+        $table  = $this->getDbTable();
+        $select = $this->getDbTable()->select();
+        $select
+            ->where('posts.profile_id=?', $profile_id)
+            ->from($table, array('MAX(modified) as last_modified'));
+        $row = $table->fetchRow($select);
+        return gmdate('c', strtotime($row['last_modified']));
+    }
+
+
+    /**
      * Fetch post by post ID
      *
      * @param string Post ID
      * @return array A single post
      */
-    public function fetchOneById($id) {
-        return $this->fetchOneBy($id, null, null, null);
+    public function fetchOneById($id) 
+    {
+        return $this->fetchOneBy($id, null, null, null, null);
     }
 
     /**
@@ -123,8 +151,9 @@ class Memex_Model_Posts extends Memex_Model
      * @param string Post UUID
      * @return array A single post
      */
-    public function fetchOneByUUID($uuid) {
-        return $this->fetchOneBy(null, null, $uuid, null);
+    public function fetchOneByUUID($uuid) 
+    {
+        return $this->fetchOneBy(null, null, null, $uuid, null);
     }
 
     /**
@@ -136,7 +165,19 @@ class Memex_Model_Posts extends Memex_Model
      */
     public function fetchOneByUrlAndProfile($url, $profile_id)
     {
-        return $this->fetchOneBy(null, $url, null, $profile_id);
+        return $this->fetchOneBy(null, $url, null, null, $profile_id);
+    }
+
+    /**
+     * Attempt to fetch a post for the given hash and profile ID.
+     *
+     * @param string Hash
+     * @param string Profile ID
+     * @return array Post data
+     */
+    public function fetchOneByHashAndProfile($hash, $profile_id)
+    {
+        return $this->fetchOneBy(null, null, $hash, null, $profile_id);
     }
 
     /**
@@ -148,11 +189,13 @@ class Memex_Model_Posts extends Memex_Model
      * @param string Profile ID
      * @return array A single post
      */
-    public function fetchOneBy($id=null, $url=null, $uuid=null, $profile_id=null)
+    public function fetchOneBy($id=null, $url=null, $hash=null, $uuid=null, $profile_id=null)
     {
         // Try looking up an existing post for this URL and profile.
         $table = $this->getDbTable();
         $select = $this->_getPostsSelect();
+
+        $select->limit(1);
 
         if (null != $profile_id) 
             $select->where('profile_id=?', $profile_id);
@@ -160,6 +203,8 @@ class Memex_Model_Posts extends Memex_Model
             $select->where('posts.id=?', $id);
         if (null != $uuid)
             $select->where('posts.uuid=?', $uuid);
+        if (null != $hash)
+            $select->where('urls.hash=?', $hash);
         if (null != $url)
             $select->where('urls.url=?', 
                 $this->normalize_url_filter->filter($url));
@@ -181,7 +226,7 @@ class Memex_Model_Posts extends Memex_Model
      */
     public function fetchByTags($tags, $start=0, $count=10, $order='user_date desc')
     {
-        return $this->fetchBy(null, null, null, $tags, $start, $count, $order);
+        return $this->fetchBy(null, null, null, null, $tags, null, null, $start, $count, $order);
     }
 
     /**
@@ -196,20 +241,50 @@ class Memex_Model_Posts extends Memex_Model
      */
     public function fetchByProfileAndTags($profile_id, $tags, $start=0, $count=10, $order='user_date desc')
     {
-        return $this->fetchBy(null, null, $profile_id, $tags, $start, $count, $order);
+        return $this->fetchBy(null, null, null, $profile_id, $tags, null, null, $start, $count, $order);
+    }
+
+    /**
+     * Fetch posts by an arbitrary list of URL hashes for a profile
+     *
+     * @param array list of URL MD5 hashes
+     * @param string Profile ID
+     * @return array posts
+     */
+    public function fetchByHashesAndProfile($hashes, $profile_id)
+    {
+        if (empty($hashes) || !is_array($hashes))
+            throw new Exception('Array of hashes required');
+
+        $posts = $this->fetchBy($hashes, null, null, $profile_id, 
+            null, null, null, null, null);
+
+        // HACK: Reorder posts by the arbitrary order of hashes provided
+        $posts_by_hash = array();
+        $posts_out = array();
+        foreach ($posts as $post) 
+            $posts_by_hash[$post['hash']] = $post;
+        foreach ($hashes as $hash) 
+            $posts_out[] = $posts_by_hash[$hash];
+
+        return $posts_out;
     }
 
     /**
      * Fetch posts for a variety of criteria
      *
-     * @param string Profile ID
-     * @param array List of tags for intersection
-     * @param integer Start index
-     * @param integer Count of results
+     * @param array URL MD5 hashes (null optional)
+     * @param string Post UUID (null optional)
+     * @param string Profile ID (null optional)
+     * @param string Post ID (null optional)
+     * @param array List of tags for intersection (null optional)
+     * @param integer Start index (null = 0)
+     * @param integer Count of results (null = no limit)
      * @param string Order ({field} {asc,desc})
      * @return array Posts
      */
-    public function fetchBy($uuid=null, $id=null, $profile_id=null, $tags=null, $start=0, $count=10, $order='user_date desc')
+    public function fetchBy($hashes=null, $uuid=null, $id=null, $profile_id=null, $tags=null,
+            $start_date=null, $end_date=null, $start=0, $count=10, $order='user_date desc')
     {
         $table  = $this->getDbTable();
         $select = $this->_getPostsSelect();
@@ -222,8 +297,12 @@ class Memex_Model_Posts extends Memex_Model
             $select->where('posts.id=?', $id);
         if (null !== $profile_id)
             $select->where('posts.profile_id=?', $profile_id);
+        if (null !== $hashes)
+            $select->where('urls.hash in (?)', $hashes);
         if (null !== $tags)
             $this->_addWhereForTags($select, $tags);
+        if (null !== $start_date || null != $end_date) 
+            $this->_addWhereForDates($select, $start_date, $end_date);
         if (null !== $count && null !== $start)
             $select->limit($count, $start);
 
@@ -355,6 +434,52 @@ class Memex_Model_Posts extends Memex_Model
     }
 
     /**
+     * Collect dates and counts by tags and profile ID
+     *
+     * @param array Tags by which to filter
+     * @param string Profile ID
+     * @return array List of tags and counts
+     */
+    public function fetchDatesByTagsAndProfile($tags, $profile_id)
+    {
+        $table = $this->getDbTable();
+        $db = $table->getAdapter();
+        $select = $table->select();
+
+        $select
+            ->where('posts.profile_id=?', $profile_id)
+            ->order('date');
+
+        $adapter_name = strtolower(get_class($db));
+        if (strpos($adapter_name, 'mysql') !== false) {
+
+            // HACK: MySQL-specific query
+            $select
+                ->from($table, array(
+                    'DATE_FORMAT(user_date, "%Y-%m-%d") date', 
+                    'count(posts.id) as count'
+                ))
+                ->group('date');
+
+        } else {
+
+            // HACK: Everything else, assumed ISO8601 date strings like sqlite.
+            $select
+                ->from($table, array(
+                    'substr(user_date, 0, 10) as date', 
+                    'count(posts.id) as count'
+                ))
+                ->group('date');
+
+        }
+
+        $this->_addWhereForTags($select, $tags);
+
+        $rows = $table->fetchAll($select);
+        return $rows->toArray();
+    }
+
+    /**
      * Convert a row set from the posts table into an array of post 
      * data arrays.
      *
@@ -392,6 +517,28 @@ class Memex_Model_Posts extends Memex_Model
                 'profiles.id=posts.profile_id', 
                 array('profiles.screen_name')
             );
+    }
+
+    /**
+     *
+     */
+    private function _addWhereForDates($select, $start_date=null, $end_date=null)
+    {
+        $db = $this->getDbTable()->getAdapter();
+        $adapter_name = strtolower(get_class($db));
+        if (strpos($adapter_name, 'mysql') !== false) {
+            // HACK: MySQL-specific query
+            if (null != $start_date)
+                $select->where('user_date >= ?' , date('Y-m-d H:i:s', strtotime($start_date)));
+            if (null != $end_date)
+                $select->where('user_date <= ?' , date('Y-m-d H:i:s', strtotime($end_date)));
+        } else {
+            // HACK: Everything else, assumed ISO8601 date strings like sqlite.
+            if (null != $start_date)
+                $select->where('user_date >= ?', $start_date);
+            if (null != $end_date) 
+                $select->where('user_date <= ?', $end_date);
+        }
     }
 
     /**

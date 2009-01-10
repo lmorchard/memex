@@ -6,8 +6,10 @@ if (!defined("PHPUnit_MAIN_METHOD")) {
 
 require_once dirname(__FILE__) . '/../TestHelper.php';
 
-/** Model_User */
 require_once 'Posts.php';
+require_once 'Profiles.php';
+require_once 'Urls.php';
+require_once 'Tags.php';
 
 /**
  * Test class for Memex_Model_PostsTest.
@@ -170,8 +172,10 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
         } catch (Exception $e) {
             $this->fail('a valid ISO8601 date should be accepted');
         }
-        $this->assertEquals($test_post['user_date'], 
-            '2007-10-24T10:10:24-0500');
+        $this->assertEquals(
+            strtotime('2007-10-24T10:10:24-0500'),
+            strtotime($test_post['user_date'])
+        );
     }
 
     /**

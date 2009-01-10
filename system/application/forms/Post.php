@@ -82,12 +82,6 @@ class Memex_Form_Post extends Zend_Form
                     )
                 ));
                  */
-                ->addElement('hash', 'csrf', array(
-                    'salt' => Zend_Registry::get('config')->form->salt,
-                    'decorators' => array( 
-                        array('ViewHelper')
-                    )
-                ))
 
                 ->addElement('submit', 'save', array(
                     'label' => 'save'
@@ -95,6 +89,16 @@ class Memex_Form_Post extends Zend_Form
                 ->addElement('submit', 'cancel', array(
                     'label' => 'cancel'
                 ));
+
+
+            if (!$this->getAttrib('csrf') == false) {
+                $this->addElement('hash', 'csrf', array(
+                    'salt' => Zend_Registry::get('config')->form->salt,
+                    'decorators' => array( 
+                        array('ViewHelper')
+                    )
+                ));
+            }
 
         }
 

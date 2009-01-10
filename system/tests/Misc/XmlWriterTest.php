@@ -84,7 +84,8 @@ class Memex_XmlWriterTest extends PHPUnit_Framework_TestCase
             for ($j=0; $j<3; $j++) {
                 $x->category(array( 
                     'scheme'=>'http://example/', 
-                    'term'=>'term' . $j
+                    'term'=>'term' . $j,
+                    'bogus'=>null
                 ));
             }
 

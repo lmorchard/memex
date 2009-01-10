@@ -48,6 +48,7 @@ DROP TABLE IF EXISTS posts;
 CREATE TABLE posts (
     id INTEGER NOT NULL AUTO_INCREMENT,
     uuid VARCHAR(40) NOT NULL,
+    signature VARCHAR(40) NOT NULL,
     profile_id INTEGER NOT NULL,
     url_id INTEGER NOT NULL,
     title VARCHAR(255) default NULL,

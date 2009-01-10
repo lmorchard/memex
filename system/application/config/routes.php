@@ -271,5 +271,56 @@ return array(
             )
         ),
 
+        'del_api_posts_update' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/posts/update',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'posts-update'
+            )
+        ),
+        'del_api_posts_all' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/posts/all',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'posts-all'
+            )
+        ),
+        'del_api_posts_recent' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/posts/recent',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'posts-recent'
+            )
+        ),
+        'del_api_posts_get' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/posts/get',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'posts-get'
+            )
+        ),
+        'del_api_posts_dates' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/posts/dates',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'posts-dates'
+            )
+        ),
+        'del_api_posts_add' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/posts/add',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'posts-add'
+            )
+        ),
+        'del_api_posts_delete' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/posts/delete',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'posts-delete'
+            )
+        ),
+
+
     )
 );

@@ -20,8 +20,11 @@ class Memex_XmlWriter {
      *
      * @param array Options for XML writer, includes indent and list of known parent container elements
      */
-    public function __construct($options)
+    public function __construct($options=null)
     {
+        if (null == $options)
+            $options = array();
+
         $this->indent = isset($options['indent']) ? 
             $options['indent'] : '    ';
 
@@ -160,6 +163,7 @@ class Memex_XmlWriter {
     {
         if (null!=$attributes) {
             foreach ($attributes as $key => $value) {
+                if (null == $value) continue;
                 $this->xml[] = ' '.$key.'="'.htmlspecialchars($value, ENT_QUOTES, 'UTF-8').'"';
             }
         }

@@ -12,6 +12,7 @@ date_default_timezone_set('GMT');
 $root        = realpath(dirname(__FILE__) . '/../');
 $library     = $root . '/library';
 $tests       = $root . '/tests';
+$app         = $root . '/application';
 $app_library = $root . '/application/library';
 $models      = $root . '/application/models';
 $controllers = $root . '/application/controllers';
@@ -33,6 +34,7 @@ $path = array(
     $library,
     $app_library,
     $tests,
+    $controllers,
     get_include_path()
 );
 set_include_path(implode(PATH_SEPARATOR, $path));

@@ -51,6 +51,20 @@ class Memex_Model_Tags extends Memex_Model
     }
 
     /**
+     * Return a string representation of a list of tags.
+     * Currently, this is just joining by spaces but could be more complex 
+     * soon.
+     *
+     * @param array list of tags
+     * @return string
+     */
+    public function concatenateTags($tags)
+    {
+        if (null == $tags) return '';
+        return join(' ', $tags);
+    }
+
+    /**
      * Count tags by profile ID.
      *
      * @param string profile ID
