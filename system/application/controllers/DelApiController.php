@@ -396,7 +396,7 @@ class DelApiController extends Zend_Controller_Action
     }
 
     /**
-     * Return a list of tags and conts for a profile.
+     * Return a list of tags and counts for a profile.
      */
     public function tagsAllAction()
     {
