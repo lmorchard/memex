@@ -1,11 +1,14 @@
 ## TODO
 
+* Dog-food Annoyances
+    * No tag recommendations
 * Basic stuff
     * Tag suggestions on save form
     * All tags per profile
         * ..and do not forget feeds.
     * Top tags site-wide
     * Related tags?
+    * Implement automatically applied system:* tags. (plugin?)
 * Logins / Profiles
     * Email password recovery
     * Prefs, login password change, screen name, bio, etc.
@@ -13,9 +16,7 @@
     * OpenID logins for profiles
 * API / data access
     * [v1 API][v1api]
-    * v2 API
-    * AtomPub API
-    * {Atom,RSS,JSON} feeds
+    * v2 API / AtomPub API
     * Widgets and whatnot
 * Tools
     * Schema / data loading tool with option to import posts/all from del
@@ -40,7 +41,6 @@
     * Implement network / subscriptions based on RSS/Atom aggregation to login-less local proxy profiles
     * [FeedSync?](http://dev.live.com/feedsync/spec/spec.aspx)
 * Misc
-    * Implement automatically applied system:* tags.
     * Enclosures for Atom / RSS feeds for podcast support.
     * Etag and Last-Modified for feeds
     * Bookmarklet for discovering and bookmarking feeds
