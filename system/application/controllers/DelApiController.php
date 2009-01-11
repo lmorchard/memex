@@ -14,6 +14,8 @@ class DelApiController extends Zend_Controller_Action
         $this->_helper->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
 
+        header('Content-Type: text/xml');
+
         // Only the 'unauthorized' action gets a free ride...
         if ($this->getRequest()->getActionName() != 'unauthorized') {
 
@@ -49,7 +51,7 @@ class DelApiController extends Zend_Controller_Action
      */
     public function unauthorizedAction()
     {
-        echo '401 Authorization Required';
+        return $this->renderError('Authorization Required');
     }
 
     /**
@@ -199,8 +201,25 @@ class DelApiController extends Zend_Controller_Action
         $posts_model = $this->_helper->getModel('Posts');
 
         if ($request->getQuery('hashes', false) !== false) {
+            // If ?hashes parameter sent, switch to send hash manifest.
+
+            $hashes = $posts_model->fetchHashesByProfile($this->profile['id']);
+
+            $x = new Memex_XmlWriter(array(
+                'parents' => array('posts')
+            ));
+            $x->posts();
+            foreach ($hashes as $hash) {
+                $x->post(array(
+                    'meta' => $hash['signature'],
+                    'url'  => $hash['hash']
+                ));
+            }
+            $x->pop();
+            echo $x->getXML();
 
         } else {
+            // Otherwise, use supplied criteria to look up posts.
 
             $tags_model = $this->_helper->getModel('Tags');
             $tags = $tags_model->parseTags($request->getQuery('tag', ''));
@@ -374,6 +393,33 @@ class DelApiController extends Zend_Controller_Action
             $posts_model->deleteById($post['id']);
             return $this->renderSuccess();
         }
+    }
+
+    /**
+     * Return a list of tags and conts for a profile.
+     */
+    public function tagsAllAction()
+    {
+        $request = $this->getRequest();
+        $params  = $request->getQuery();
+
+        $tags_model = $this->_helper->getModel('Tags');
+        $tags = $tags_model->countByProfile(
+            $this->profile['id'], 0, null
+        );
+
+        $x = new Memex_XmlWriter(array(
+            'parents' => array('tags')
+        ));
+        $x->tags();
+        foreach ($tags as $tag) {
+            $x->tag(array(
+                'count' => $tag['count'],
+                'tag'   => $tag['tag']
+            ));
+        }
+        $x->pop();
+        echo $x->getXML();
     }
 
     /**

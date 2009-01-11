@@ -320,6 +320,34 @@ return array(
                 'controller' => 'del-api', 'action' => 'posts-delete'
             )
         ),
+        'del_api_tags_get' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/tags/get',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'tags-all'
+            )
+        ),
+        'del_api_tags_all' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/tags/all',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'tags-all'
+            )
+        ),
+        'del_api_tags_delete' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/tags/delete',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'tags-delete'
+            )
+        ),
+        'del_api_tags_rename' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'api/v1/tags/rename',
+            'defaults' => array(
+                'controller' => 'del-api', 'action' => 'tags-rename'
+            )
+        ),
 
 
     )

@@ -117,6 +117,29 @@ class Memex_Model_Posts extends Memex_Model
     }
 
     /**
+     * Fetch just signatures and hashes for all posts for an account.
+     *
+     * @param string Profile ID
+     * @return array list of signature/hash pairs
+     */
+    public function fetchHashesByProfile($profile_id)
+    {
+        $table  = $this->getDbTable();
+        $select = $table->select();
+        $select
+            ->setIntegrityCheck(false)
+            ->from($table, array('signature'))
+            ->join(
+                'urls', 
+                'urls.id=posts.url_id', 
+                array('urls.hash')
+            )
+            ->order('user_date desc');
+        $rows = $table->fetchAll($select);
+        return $rows->toArray();
+    }
+
+    /**
      * Fetch the last modified date for posts for a profile.
      *
      * @param string Profile ID
@@ -125,7 +148,7 @@ class Memex_Model_Posts extends Memex_Model
     public function fetchLastModifiedDateByProfile($profile_id)
     {
         $table  = $this->getDbTable();
-        $select = $this->getDbTable()->select();
+        $select = $table->select();
         $select
             ->where('posts.profile_id=?', $profile_id)
             ->from($table, array('MAX(modified) as last_modified'));
@@ -133,6 +156,51 @@ class Memex_Model_Posts extends Memex_Model
         return gmdate('c', strtotime($row['last_modified']));
     }
 
+    /**
+     * Collect dates and counts by tags and profile ID
+     *
+     * @param array Tags by which to filter
+     * @param string Profile ID
+     * @return array List of tags and counts
+     */
+    public function fetchDatesByTagsAndProfile($tags, $profile_id)
+    {
+        $table = $this->getDbTable();
+        $db = $table->getAdapter();
+        $select = $table->select();
+
+        $select
+            ->where('posts.profile_id=?', $profile_id)
+            ->order('date');
+
+        $adapter_name = strtolower(get_class($db));
+        if (strpos($adapter_name, 'mysql') !== false) {
+
+            // HACK: MySQL-specific query
+            $select
+                ->from($table, array(
+                    'DATE_FORMAT(user_date, "%Y-%m-%d") date', 
+                    'count(posts.id) as count'
+                ))
+                ->group('date');
+
+        } else {
+
+            // HACK: Everything else, assumed ISO8601 date strings like sqlite.
+            $select
+                ->from($table, array(
+                    'substr(user_date, 0, 10) as date', 
+                    'count(posts.id) as count'
+                ))
+                ->group('date');
+
+        }
+
+        $this->_addWhereForTags($select, $tags);
+
+        $rows = $table->fetchAll($select);
+        return $rows->toArray();
+    }
 
     /**
      * Fetch post by post ID
@@ -431,52 +499,6 @@ class Memex_Model_Posts extends Memex_Model
         if (!Zend_Registry::get('config')->model->enable_delete_all)
             throw new Exception('Mass deletion not enabled');
         $this->getDbTable()->delete('');
-    }
-
-    /**
-     * Collect dates and counts by tags and profile ID
-     *
-     * @param array Tags by which to filter
-     * @param string Profile ID
-     * @return array List of tags and counts
-     */
-    public function fetchDatesByTagsAndProfile($tags, $profile_id)
-    {
-        $table = $this->getDbTable();
-        $db = $table->getAdapter();
-        $select = $table->select();
-
-        $select
-            ->where('posts.profile_id=?', $profile_id)
-            ->order('date');
-
-        $adapter_name = strtolower(get_class($db));
-        if (strpos($adapter_name, 'mysql') !== false) {
-
-            // HACK: MySQL-specific query
-            $select
-                ->from($table, array(
-                    'DATE_FORMAT(user_date, "%Y-%m-%d") date', 
-                    'count(posts.id) as count'
-                ))
-                ->group('date');
-
-        } else {
-
-            // HACK: Everything else, assumed ISO8601 date strings like sqlite.
-            $select
-                ->from($table, array(
-                    'substr(user_date, 0, 10) as date', 
-                    'count(posts.id) as count'
-                ))
-                ->group('date');
-
-        }
-
-        $this->_addWhereForTags($select, $tags);
-
-        $rows = $table->fetchAll($select);
-        return $rows->toArray();
     }
 
     /**
