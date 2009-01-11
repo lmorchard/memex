@@ -70,7 +70,10 @@ class DelApiController extends Zend_Controller_Action
         );
 
         $x = new Memex_XmlWriter();
-        $x->update(array('time' => $last_update));
+        $x->update(array(
+            'time' => $last_update,
+            'inboxnew' => 0
+        ));
         echo $x->getXML();
     }
 
@@ -500,9 +503,42 @@ class Memex_Auth_Adapter_Http_Resolver_Logins implements Zend_Auth_Adapter_Http_
     public function resolve($creds, $realm)
     {
         list($username, $password) = $creds;
+        
+        if ($username == 'cookie' && $password == 'cookie') {
+            // MAJOR HACK:
+            //
+            // Special-case auth loophole used by Delicious to submit the 
+            // website login cookie as a parameter for API authentication.
+            //
+            // This enables potential compatibility with the official
+            // Delicious browser extension, though some client-side hacking
+            // will be necessary.
+
+            // Get the cookie auth data from the _user parameter.
+            $request  = Zend_Controller_Front::getInstance()->getRequest();
+            $token    = rawurldecode(str_replace('+', ' ', $request->getParam('_user')));
+
+            // Use the cookie manager to decode the data serialized in the auth data.
+            $secret   = Zend_Registry::get('config')->auth->secret;
+            $manager  = new BigOrNot_CookieManager($secret);
+            $tok_data = $manager->decodeCookieValue($token);
+            if (null == $tok_data) return false;
+
+            // The decoded auth data should deserialize into an identity record.
+            $identity = unserialize($tok_data);
+            if (!empty($identity->login_name)) {
+                return $identity->login_name;
+            } else {
+                return false;
+            }
+        }
+
+        // All other username / password pairs are handled normally.
         $login = $this->logins_model->fetchByLoginName($username);
         if (null==$login) return false;
-        return ($login['password'] == md5($password));
+        if (md5($password) != $login['password']) return false;
+
+        return $username;
     }
 
 }
@@ -563,10 +599,10 @@ class Memex_Auth_Adapter_Http extends Zend_Auth_Adapter_Http
         }
 
         // HACK for ZF-5402: Passing full creds to resolver so that it can
-        // match the password, rather than checking it here.
-        $password_match = $this->_basicResolver->resolve($creds, $this->_realm);
-        if (true == $password_match) {
-            $identity = array('username'=>$creds[0], 'realm'=>$this->_realm);
+        // match the password and alter username, rather than checking it here.
+        $username_match = $this->_basicResolver->resolve($creds, $this->_realm);
+        if (false !== $username_match) {
+            $identity = array('username'=>$username_match, 'realm'=>$this->_realm);
             return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
         } else {
             return $this->_challengeClient();

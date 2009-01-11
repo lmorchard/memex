@@ -76,8 +76,16 @@ class Memex_Auth_Storage implements Zend_Auth_Storage_Interface
             $this->cookie_name,
             serialize($contents),
             $this->user_name,
-            time() + ( 60 * 60 * 24 * 7 * 8 ) // TODO: Config setting for login cookie TTL
+            time() + ( 60 * 60 * 24 * 7 * 8 )
         );
+
+        $this->manager->setCookie(
+            '_user',
+            serialize($contents),
+            $this->user_name,
+            time() + ( 60 * 60 * 24 * 7 * 8 )
+        );
+
     }
 
     /**

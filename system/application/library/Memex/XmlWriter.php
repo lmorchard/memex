@@ -163,7 +163,7 @@ class Memex_XmlWriter {
     {
         if (null!=$attributes) {
             foreach ($attributes as $key => $value) {
-                if (null == $value) continue;
+                if (null === $value) continue;
                 $this->xml[] = ' '.$key.'="'.htmlspecialchars($value, ENT_QUOTES, 'UTF-8').'"';
             }
         }
