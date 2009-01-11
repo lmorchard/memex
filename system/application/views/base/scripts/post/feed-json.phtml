@@ -11,7 +11,7 @@ foreach ($this->posts as $post) {
         'd'  => $post['title'],
         'n'  => $post['notes'],
         't'  => $post['tags_parsed'],
-        'dt' => date('c', strtotime($this->posts[0]['user_date']))
+        'dt' => gmdate('c', strtotime($this->posts[0]['user_date']))
     );
 }
 

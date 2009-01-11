@@ -50,7 +50,7 @@ $x = new Memex_XmlWriter(array(
 $x->feed(array('xmlns'=>'http://www.w3.org/2005/Atom'))
     ->id($site_base . $this->url())
     ->title($title)
-    ->updated(date('c', strtotime($this->posts[0]['modified'])))
+    ->updated(gmdate('c', strtotime($this->posts[0]['modified'])))
     ->link(array('rel'=>'alternate', 'type'=>'text/html', 'href'=>$page_home_url ))
     ;
 
@@ -120,8 +120,8 @@ foreach ($this->posts as $post) {
         ->title($post['title'])
         ->link(array( 'href'=>$post['url'] ))
         ->id($site_base . $this->url(array('uuid'=>$post['uuid']), 'post_view'))
-        ->updated(date('c', strtotime($post['user_date'])))
-        ->published(date('c', strtotime(empty($post['modified']) ? 
+        ->updated(gmdate('c', strtotime($post['user_date'])))
+        ->published(gmdate('c', strtotime(empty($post['modified']) ? 
             $post['user_date'] : $post['modified'])))
         ->author()
             ->name($post['screen_name'])

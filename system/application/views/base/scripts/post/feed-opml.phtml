@@ -49,7 +49,7 @@ $x->opml(array(
 foreach ($this->posts as $post) {
     $attrs = array(
         'text'        => $post['title'],
-        'created'     => date('c', strtotime($post['user_date'])),
+        'created'     => gmdate('c', strtotime($post['user_date'])),
         'url'         => $post['url'],
         'description' => $post['notes'],
         'category'    => join(',', $post['tags_parsed'])
