@@ -14,6 +14,8 @@
     * Prefs, login password change, screen name, bio, etc.
     * Multiple logins per profile
     * OpenID logins for profiles
+    * Private group / friends access
+        * Use invite codes?
 * API / data access
     * [v1 API][v1api]
     * v2 API / AtomPub API
