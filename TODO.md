@@ -1,6 +1,7 @@
 ## TODO
 
 * Dog-food Annoyances
+    * Move from /username to a ~username redirect and /people/username namespace
     * No tag recommendations
 * Basic stuff
     * Tag suggestions on save form
