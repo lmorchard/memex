@@ -9,6 +9,12 @@
     * Top tags site-wide
     * Related tags?
     * Implement automatically applied system:* tags. (plugin?)
+        * system:unfiled where no other tags present
+        * for:*
+            * how might this work between sites?
+        * foo:* to system:has:foo
+        * system:media:* and system:filetype:*
+        * system:host=*
 * Logins / Profiles
     * Email password recovery
     * Prefs, login password change, screen name, bio, etc.
@@ -53,6 +59,7 @@
     * Search
     * Bulk import via file upload
     * Fx addon
+        * Track via:* by tracking clicks on links?
     * [Message / work queues and deferred processing][queues]
     * Maybe change license to BSD?  MIT?
     * Make it scale
