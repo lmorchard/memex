@@ -4,6 +4,10 @@
  */
 class Memex_Plugin_Delicious 
 {
+    const ENABLED   = 'delicious_sync/enabled';
+    const USER_NAME = 'delicious_sync/username';
+    const PASSWORD  = 'delicious_sync/password';
+
     /** Base URL for delicious v1 API calls */
     public $delicious_v1_api_base_url = 'https://api.del.icio.us/v1/';
 
@@ -26,7 +30,7 @@ class Memex_Plugin_Delicious
         if ($config->batch_mode == true) return;
 
         $settings = $this->_getProfileSettings();
-        if (null == $settings || !$settings[Memex_Constants::ATTRIB_DELICIOUS_ENABLED]) 
+        if (null == $settings || !$settings[self::ENABLED]) 
             return;
 
         $data_params_map = array(
@@ -45,8 +49,8 @@ class Memex_Plugin_Delicious
         try {
             $this->_callDeliciousV1API(
                 'posts/add', 
-                $settings[Memex_Constants::ATTRIB_DELICIOUS_USER_NAME],
-                $settings[Memex_Constants::ATTRIB_DELICIOUS_PASSWORD],
+                $settings[self::USER_NAME],
+                $settings[self::PASSWORD],
                 $params
             );
         } catch (Exception $e) {
@@ -63,14 +67,14 @@ class Memex_Plugin_Delicious
         if ($config->batch_mode == true) return;
 
         $settings = $this->_getProfileSettings();
-        if (null == $settings || !$settings[Memex_Constants::ATTRIB_DELICIOUS_ENABLED]) 
+        if (null == $settings || !$settings[self::ENABLED]) 
             return;
         
         try {
             $this->_callDeliciousV1API(
                 'posts/add', 
-                $settings[Memex_Constants::ATTRIB_DELICIOUS_USER_NAME],
-                $settings[Memex_Constants::ATTRIB_DELICIOUS_PASSWORD],
+                $settings[self::USER_NAME],
+                $settings[self::PASSWORD],
                 array( 'url' => $post_data['url'] )
             );
         } catch (Exception $e) {
@@ -126,9 +130,7 @@ class Memex_Plugin_Delicious
         $profile_id = $identity->default_profile['id'];
         
         $settings = $this->profiles_model->getAttributes($profile_id, array(
-            Memex_Constants::ATTRIB_DELICIOUS_ENABLED,
-            Memex_Constants::ATTRIB_DELICIOUS_USER_NAME,
-            Memex_Constants::ATTRIB_DELICIOUS_PASSWORD
+            self::ENABLED, self::USER_NAME, self::PASSWORD
         ));
         return $settings;
     }

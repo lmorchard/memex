@@ -108,9 +108,8 @@ class Memex_Model_Posts extends Memex_Model
         $saved_post = $this->fetchOneById($row->id);
 
         // Send out message that a post has been updated
-        Memex_NotificationCenter::getInstance()->publish(
-            Memex_Constants::TOPIC_POST_UPDATED, $saved_post
-        );
+        $mq = Zend_Registry::get('message_queue');
+        $mq->publish("Memex_Model_Posts/postUpdated", $saved_post);
 
         // Return the results of the save.
         return $saved_post;
@@ -449,9 +448,8 @@ class Memex_Model_Posts extends Memex_Model
             $table->getAdapter()->quoteInto('id=?', $post_id)
         );
 
-        Memex_NotificationCenter::getInstance()->publish(
-            Memex_Constants::TOPIC_POST_DELETED, $data
-        );
+        $mq = Zend_Registry::get('message_queue');
+        $mq->publish("Memex_Model_Posts/postDeleted", $data);
 
         return $rv;
     }
@@ -469,9 +467,8 @@ class Memex_Model_Posts extends Memex_Model
             $table->getAdapter()->quoteInto('uuid=?', $uuid)
         );
 
-        Memex_NotificationCenter::getInstance()->publish(
-            Memex_Constants::TOPIC_POST_DELETED, $data
-        );
+        $mq = Zend_Registry::get('message_queue');
+        $mq->publish("Memex_Model_Posts/postDeleted", $data);
 
         return $rv;
     }

@@ -75,10 +75,10 @@ class Memex_Initialize
         // $this->initPathCache()
         $this->initLogger()
              ->initDb()
-             ->initMessaging()
              ->initHelpers()
              ->initView()
              ->initPlugins()
+             ->initMessaging()
              ->initRoutes()
              ->initControllers();
         return $this;
@@ -172,23 +172,16 @@ class Memex_Initialize
     {
         $config = $this->_getConfig();
 
-        $nc = Memex_NotificationCenter::getInstance();
+        $model_helper = 
+            Zend_Controller_Action_HelperBroker::getStaticHelper('getModel');
+        $mq = $model_helper->getModel('MessageQueue');
 
-        $subs = array(
-
-            array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Model_Tags', 'handlePostUpdated'),
-            array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Model_Tags', 'handlePostDeleted'),
-
-            array(Memex_Constants::TOPIC_POST_UPDATED, 'Memex_Plugin_Delicious', 'handlePostUpdated'),
-            array(Memex_Constants::TOPIC_POST_DELETED, 'Memex_Plugin_Delicious', 'handlePostDeleted'),
-
-        );
+        $subs = $config->messaging->toArray();
         foreach ($subs as $sub) {
-            list($topic, $class, $method) = $sub;
-            $nc->subscribe($topic, $class, $method);
+            $mq->subscribe($sub);
         }
 
-        Zend_Registry::set('notification_center', $nc);
+        Zend_Registry::set('message_queue', $mq);
         return $this;
     }
 
@@ -308,7 +301,8 @@ class Memex_Initialize
             ), true);
             
             $php_files = array(
-                'routes.php'
+                'routes.php',
+                'messaging.php'
             );
             $ini_files = array( 
                 'app.ini'
