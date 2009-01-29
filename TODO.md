@@ -57,6 +57,7 @@
     * Rename "posts" to "items"?  Not crucial, but odd.
     * More tests, controller tests, filter tests, validator tests, etc
     * Tag descriptions
+    * Web hooks on common messages / events
     * Search
     * Bulk import via file upload
     * Fx addon
