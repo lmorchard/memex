@@ -96,17 +96,17 @@ class ProfileController extends Zend_Controller_Action
             // For a GET request, try pre-populating the form with the existing 
             // profile settings.
             $existing = $profiles_model->getAttributes($profile_id, array(
-                Memex_Constants::ATTRIB_DELICIOUS_ENABLED,
-                Memex_Constants::ATTRIB_DELICIOUS_USER_NAME,
-                Memex_Constants::ATTRIB_DELICIOUS_PASSWORD
+                Memex_Plugin_Delicious::ENABLED,
+                Memex_Plugin_Delicious::USER_NAME,
+                Memex_Plugin_Delicious::PASSWORD
             ));
             $form->populate(array(
                 'enabled' => 
-                    @$existing[Memex_Constants::ATTRIB_DELICIOUS_ENABLED],
+                    @$existing[Memex_Plugin_Delicious::ENABLED],
                 'user_name' => 
-                    @$existing[Memex_Constants::ATTRIB_DELICIOUS_USER_NAME],
+                    @$existing[Memex_Plugin_Delicious::USER_NAME],
                 'password' =>
-                    @$existing[Memex_Constants::ATTRIB_DELICIOUS_PASSWORD]
+                    @$existing[Memex_Plugin_Delicious::PASSWORD]
             ));
             return;
         }
@@ -140,11 +140,11 @@ class ProfileController extends Zend_Controller_Action
 
         // Update the profile settings.
         $profiles_model->setAttributes($profile_id, array(
-            Memex_Constants::ATTRIB_DELICIOUS_ENABLED => 
+            Memex_Plugin_Delicious::ENABLED => 
                 !!$post_data['enabled'],
-            Memex_Constants::ATTRIB_DELICIOUS_USER_NAME => 
+            Memex_Plugin_Delicious::USER_NAME => 
                 $post_data['user_name'],
-            Memex_Constants::ATTRIB_DELICIOUS_PASSWORD => 
+            Memex_Plugin_Delicious::PASSWORD => 
                 $post_data['password']
         ));
 

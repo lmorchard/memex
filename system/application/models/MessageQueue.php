@@ -4,6 +4,8 @@ require_once dirname(__FILE__) . '/Model.php';
 /**
  * Model managing message queue
  *
+ * @TODO un-reserve a message to release it
+ *
  * @TODO allow selective dequeue of messages based on subscription pattern
  * @TODO implement dependent batches that are processed in sequence
  * @TODO somehow exercise the lock on fetching a new message?
@@ -281,8 +283,8 @@ class Memex_Model_MessageQueue extends Memex_Model
 
                 // Convert the row to an array and decode the data blobs.
                 $msg = $row->toArray();
-                $msg['context'] = json_decode($msg['context']);
-                $msg['body']    = json_decode($msg['body']);
+                $msg['context'] = json_decode($msg['context'], true);
+                $msg['body']    = json_decode($msg['body'], true);
 
             }
 

@@ -18,7 +18,7 @@ class Memex_Plugin_Delicious
     {
         $this->model_helper = Zend_Controller_Action_HelperBroker::getStaticHelper('getModel');
         $this->profiles_model = $this->model_helper->getModel('Profiles');
-        $this->logger = Zend_Registry::get('logger');
+        $this->log = Zend_Registry::get('logger');
     }
 
     /**
@@ -29,7 +29,7 @@ class Memex_Plugin_Delicious
         $config = Zend_Registry::get('config');
         if ($config->batch_mode == true) return;
 
-        $settings = $this->_getProfileSettings();
+        $settings = $this->_getProfileSettings($post_data['profile_id']);
         if (null == $settings || !$settings[self::ENABLED]) 
             return;
 
@@ -53,8 +53,9 @@ class Memex_Plugin_Delicious
                 $settings[self::PASSWORD],
                 $params
             );
+            $this->log->debug("delicious post for " . $post_data['uuid'] . " success");
         } catch (Exception $e) {
-            $this->logger->error("delicious post for " . $post_data['uuid'] . "failed");
+            $this->log->err("delicious post for " . $post_data['uuid'] . "failed");
         }
     }
 
@@ -66,7 +67,7 @@ class Memex_Plugin_Delicious
         $config = Zend_Registry::get('config');
         if ($config->batch_mode == true) return;
 
-        $settings = $this->_getProfileSettings();
+        $settings = $this->_getProfileSettings($post_data['profile_id']);
         if (null == $settings || !$settings[self::ENABLED]) 
             return;
         
@@ -78,7 +79,7 @@ class Memex_Plugin_Delicious
                 array( 'url' => $post_data['url'] )
             );
         } catch (Exception $e) {
-            $this->logger->error("delicious delete for " . $post_data['uuid'] . "failed");
+            $this->log->err("delicious delete for " . $post_data['uuid'] . "failed");
         }
     }
 
@@ -122,13 +123,8 @@ class Memex_Plugin_Delicious
     /**
      * Get settings for the plugin from the current profile.
      */
-    private function _getProfileSettings()
+    private function _getProfileSettings($profile_id)
     {
-        $identity = Zend_Auth::getInstance()->getIdentity();
-        if (!$identity) return null;
-
-        $profile_id = $identity->default_profile['id'];
-        
         $settings = $this->profiles_model->getAttributes($profile_id, array(
             self::ENABLED, self::USER_NAME, self::PASSWORD
         ));

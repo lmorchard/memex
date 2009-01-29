@@ -23,8 +23,8 @@ class Memex_Db_Table_MessageQueue extends Zend_Db_Table_Abstract
     {
         $u = new UUID();
         $data['uuid'] = $u->toRFC4122String();
-        $data['created'] = date('Y-m-d\TH:i:sP', time());
-        $data['modified'] = date('Y-m-d\TH:i:sP', time());
+        $data['created'] = date('c');
+        $data['modified'] = date('c');
         return parent::insert($data);
     }
 
@@ -33,7 +33,7 @@ class Memex_Db_Table_MessageQueue extends Zend_Db_Table_Abstract
      */
     public function update(array $data, $where)
     {
-        $data['modified'] = date('Y-m-d\TH:i:sP', time());
+        $data['modified'] = date('c');
         return parent::update($data, $where);
     }
 

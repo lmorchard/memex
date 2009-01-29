@@ -349,6 +349,14 @@ return array(
             )
         ),
 
+        'message_queue_run' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'queue/run',
+            'defaults' => array(
+                'controller' => 'message-queue', 'action' => 'run'
+            )
+
+        ),
 
     )
 );
