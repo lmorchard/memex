@@ -12,6 +12,7 @@
     * Implement automatically applied system:* tags. (plugin?)
         * system:unfiled where no other tags present
         * for:*
+            * make for:* tags (optionally?) invisible
             * how might this work between sites?
         * foo:* to system:has:foo
         * system:media:* and system:filetype:*
