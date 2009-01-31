@@ -31,14 +31,14 @@ Or, at least, it will help me learn the Zend Framework.
 * Leslie Michael Orchard - <http://decafbad.com/> - <mailto:l.m.orchard@pobox.com>
 * Liberal portions stolen from <http://github.com/weierophinney/bugapp/tree/master>
 * Using [Zend Framework][zf] v1.7.1
-* Using [Dojo Toolkit][dojo] [v1.2.3][dojodl]
+* Using [MooTools][mootools] [1.2.1][moodownload]
 * Using [Markdown PHP][markdown] for documentation.
 * Using [UUID implementation][uuid] from OmniTI 
 * "nostalgia" theme inspired by [del.icio.us][del], circa 2005
 
+[mootools]: http://mootools.net/
+[moodownload]: http://mootools.net/download/
 [zf]: http://framework.zend.com/
-[dojo]: http://dojotoolkit.org/
-[dojodl]: http://download.dojotoolkit.org/release-1.2.3/
 [del]: http://del.icio.us/
 [markdown]: http://michelf.com/projects/php-markdown/
 [uuid]: https://labs.omniti.com/trac/alexandria/browser/trunk/OmniTI/UUID.php?rev=7
