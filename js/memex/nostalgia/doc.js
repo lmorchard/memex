@@ -1,16 +1,14 @@
 /**
  * Module for doc controller pages.
  */
-dojo.provide("memex.nostalgia.doc");
-memex.nostalgia.doc = function() {
-
+Memex.Nostalgia.Doc = function() {
     return {
 
         init: function() {
-            dojo.addOnLoad(this, 'onLoad');
+            window.addEvent('domready', this.onReady.bind(this));
         },
 
-        onLoad: function() {
+        onReady: function() {
 
         },
 

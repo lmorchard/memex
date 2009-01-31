@@ -1,21 +1,15 @@
 /**
  * Module for post controller pages.
  */
-dojo.provide("memex.nostalgia.post");
-memex.nostalgia.post = function() {
-
+Memex.Nostalgia.Post = function() {
     return {
 
         init: function() {
-            dojo.addOnLoad(this, 'onLoad');
+            window.addEvent('domready', this.onReady.bind(this));
         },
 
-        onLoad: function() {
-
-            dojo.query('#post #tags').forEach(function(el) {
-                el.focus();
-            }, this);
-
+        onReady: function() {
+            $$('#post #tags').forEach(function(el) { el.focus() });
         },
 
         EOF: null

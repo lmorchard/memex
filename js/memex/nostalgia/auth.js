@@ -1,16 +1,14 @@
 /**
  * Module for auth controller pages.
  */
-dojo.provide("memex.nostalgia.auth");
-memex.nostalgia.auth = function() {
-
+Memex.Nostalgia.Auth = function() {
     return {
 
         init: function() {
-            dojo.addOnLoad(this, 'onLoad');
+            window.addEvent('domready', this.onReady.bind(this));
         },
 
-        onLoad: function() {
+        onReady: function() {
 
         },
 

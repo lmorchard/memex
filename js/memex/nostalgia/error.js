@@ -1,16 +1,14 @@
 /**
  * Module for error controller pages.
  */
-dojo.provide("memex.nostalgia.error");
-memex.nostalgia.error = function() {
-
+Memex.Nostalgia.Error = function() {
     return {
 
         init: function() {
-            dojo.addOnLoad(this, 'onLoad');
+            window.addEvent('domready', this.onReady.bind(this));
         },
 
-        onLoad: function() {
+        onReady: function() {
 
         },
 

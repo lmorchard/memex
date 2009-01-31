@@ -1,16 +1,14 @@
 /**
  * Module for index controller pages.
  */
-dojo.provide("memex.nostalgia.index");
-memex.nostalgia.index = function() {
-
+Memex.Nostalgia.Index = function() {
     return {
 
         init: function() {
-            dojo.addOnLoad(this, 'onLoad');
+            window.addEvent('domready', this.onReady.bind(this));
         },
 
-        onLoad: function() {
+        onReady: function() {
 
         },
 

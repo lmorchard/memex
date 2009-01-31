@@ -1,16 +1,14 @@
 /**
  * Module for install controller pages.
  */
-dojo.provide("memex.nostalgia.install");
-memex.nostalgia.install = function() {
-
+Memex.Nostalgia.Install = function() {
     return {
 
         init: function() {
-            dojo.addOnLoad(this, 'onLoad');
+            window.addEvent('domready', this.onReady.bind(this));
         },
 
-        onLoad: function() {
+        onReady: function() {
 
         },
 

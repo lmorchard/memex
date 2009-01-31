@@ -1,16 +1,14 @@
 /**
  * Module for profile controller pages.
  */
-dojo.provide("memex.nostalgia.profile");
-memex.nostalgia.profile = function() {
-
+Memex.Nostalgia.Profile = function() {
     return {
 
         init: function() {
-            dojo.addOnLoad(this, 'onLoad');
+            window.addEvent('domready', this.onReady.bind(this));
         },
 
-        onLoad: function() {
+        onReady: function() {
 
         },
 
