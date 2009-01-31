@@ -7,7 +7,10 @@ Thumbs.db
 *.swp
 *.swo
 xfers/
+logs/
 logs/*log
+system/data/cache/
+system/config/local.php
 system/tests/log/report/*
 system/data/db/*.db*
 httpd.conf
