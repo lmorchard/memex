@@ -16,38 +16,44 @@ class MessageQueueController extends Zend_Controller_Action
      */
     public function runAction()
     {
-        $this->_helper->layout()->disableLayout();
-        $this->_helper->viewRenderer->setNoRender(true);
+        $request = $this->getRequest();
+        $format  = $request->getParam('format');
 
-        $worker = new Memex_MessageQueueWorker();
-        $msg = $worker->runOnce();
+        if ($format == 'json') {
 
-        if ($msg) {
-            // Report the UUID of the message.
-            // TODO: Only release this info on a debug setting?
-            $out = json_encode(array(
-                'uuid' => $msg['uuid'] 
-            ));
-        } else {
-            // If no message available, throw a 304 header.
-            header('HTTP/1.1 304 Not Modified');
-            $out = '{}';
-        }
+            $worker = new Memex_MessageQueueWorker();
+            $msg = $worker->runOnce();
 
-        if (!isset($_GET['callback'])) {
-            $callback = FALSE;
-        } else {
-            $callback = preg_replace(
-                '/[^0-9a-zA-Z\(\)\[\]\,\.\_\-\+\=\/\|\\\~\?\!\#\$\^\*\: \'\"]/', '', 
-                $_GET['callback']
-            );
-        }
+            if ($msg) {
+                // Report the UUID of the message.
+                // TODO: Only release this info on a debug setting?
+                $out = json_encode(array(
+                    'uuid' => $msg['uuid'] 
+                ));
+            } else {
+                // If no message available, throw a 304 header.
+                header('HTTP/1.1 304 Not Modified');
+                $out = '{}';
+            }
 
-        header('Content-Type: application/json');
-        if ($callback) {
-            echo "$callback($out)";
-        } else {
-            echo $out;
+            if (!isset($_GET['callback'])) {
+                $callback = FALSE;
+            } else {
+                $callback = preg_replace(
+                    '/[^0-9a-zA-Z\(\)\[\]\,\.\_\-\+\=\/\|\\\~\?\!\#\$\^\*\: \'\"]/', '', 
+                    $_GET['callback']
+                );
+            }
+
+            $this->_helper->layout()->disableLayout();
+            $this->_helper->viewRenderer->setNoRender(true);
+            header('Content-Type: application/json');
+            if ($callback) {
+                echo "$callback($out)";
+            } else {
+                echo $out;
+            }
+
         }
 
     }

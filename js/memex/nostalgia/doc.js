@@ -1,17 +1,14 @@
 /**
  * Module for doc controller pages.
  */
-Memex.Nostalgia.Doc = function() {
+$module('Memex.Nostalgia.Doc', function() {
     return {
+        initialize: function() {
+            this.parent();
 
-        init: function() {
-            window.addEvent('domready', this.onReady.bind(this));
         },
-
         onReady: function() {
 
-        },
-
-        EOF: null
+        }
     };
-}().init();
+}());

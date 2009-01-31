@@ -358,5 +358,14 @@ return array(
 
         ),
 
+        'message_queue_run_json' => array(
+            'type'  => 'Zend_Controller_Router_Route_Static',
+            'route' => 'queue/run/json',
+            'defaults' => array(
+                'controller' => 'message-queue', 'action' => 'run', 'format' => 'json'
+            )
+
+        ),
+
     )
 );

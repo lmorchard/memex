@@ -1,17 +1,14 @@
 /**
  * Module for profile controller pages.
  */
-Memex.Nostalgia.Profile = function() {
+$module('Memex.Nostalgia.Profile', function() {
     return {
+        initialize: function() {
+            this.parent();
 
-        init: function() {
-            window.addEvent('domready', this.onReady.bind(this));
         },
-
         onReady: function() {
 
-        },
-
-        EOF: null
+        }
     };
-}().init();
+}());

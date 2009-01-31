@@ -1,17 +1,14 @@
 /**
  * Module for install controller pages.
  */
-Memex.Nostalgia.Install = function() {
+$module('Memex.Nostalgia.Install', function() {
     return {
+        initialize: function() {
+            this.parent();
 
-        init: function() {
-            window.addEvent('domready', this.onReady.bind(this));
         },
-
         onReady: function() {
 
-        },
-
-        EOF: null
+        }
     };
-}().init();
+}());
