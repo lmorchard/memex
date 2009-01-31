@@ -72,15 +72,15 @@ class Memex_Initialize
      */
     public function init() 
     {
-        // $this->initPathCache()
-        $this->initLogger()
+        $this->initPathCache()
+             ->initLogger()
              ->initDb()
              ->initHelpers()
              ->initView()
-             ->initPlugins()
              ->initMessaging()
              ->initRoutes()
-             ->initControllers();
+             ->initControllers()
+             ->initPlugins();
         return $this;
     }
 
@@ -105,7 +105,6 @@ class Memex_Initialize
         if (file_exists($pluginIncFile)) {
             include_once $pluginIncFile;
         }
-        Zend_Loader::setIncludeFileCache($pluginIncFile);
         Zend_Loader_PluginLoader::setIncludeFileCache($pluginIncFile);
         return $this;
     }
