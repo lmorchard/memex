@@ -5,7 +5,7 @@ $module('Memex.Main', function() {
     return {
 
         options: {
-            check_queue_enable: true,
+            check_queue_enabled: true,
             check_queue_delay_success: 500,
             check_queue_delay_fail:    5000,
         },
