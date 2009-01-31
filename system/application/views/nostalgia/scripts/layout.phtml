@@ -109,10 +109,9 @@
                 modulePaths: { 'memex': '../memex' }
             }
         </script>
-        <script src="<?= $this->baseUrl('/js/dojo/dojo.js') ?>" type="text/javascript"></script>
-        <script type="text/javascript">
-            dojo.require('memex.nostalgia.main');
-            dojo.require('memex.nostalgia.<?= $controller_name ?>');
-        </script>
+        <script src="<?= $this->baseUrl('/js/mootools-1.2.1-core-yc.js') ?>" type="text/javascript"></script>
+        <script src="<?= $this->baseUrl('/js/mootools-1.2-more.js') ?>" type="text/javascript"></script>
+        <script src="<?= $this->baseUrl('/js/memex/nostalgia/main.js') ?>" type="text/javascript"></script>
+        <script src="<?= $this->baseUrl('/js/memex/nostalgia/'.$controller_name.'.js') ?>" type="text/javascript"></script>
     </body>
 </html>
