@@ -21,8 +21,8 @@ class MessageQueueController extends Zend_Controller_Action
 
         if ($format == 'json') {
 
-            $worker = new Memex_MessageQueueWorker();
-            $msg = $worker->runOnce();
+            $mq = Zend_Registry::get('message_queue');
+            $msg = $mq->runOnce();
 
             if ($msg) {
                 // Report the UUID of the message.

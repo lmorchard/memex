@@ -320,4 +320,48 @@ class Memex_Model_MessageQueue extends Memex_Model
         $row->save();
     }
 
+    /**
+     * Process messages continually.
+     */
+    public function run()
+    {
+        while (True) {
+            $msg = $this->runOnce();
+            if (!$msg) sleep(1);
+        }
+    }
+
+    /**
+     * Process messages until the queue comes up empty.
+     */
+    public function exhaust()
+    {
+        while ($msg = $this->runOnce()) {
+            // No-op.
+        }
+    }
+
+    /**
+     * Attempt to reserve and handle one message.
+     */
+    public function runOnce()
+    {
+        $msg = $this->reserve();
+        if ($msg) try {
+            $this->handle($msg);
+            $this->finish($msg);
+            $this->log->debug(
+                "processed {$msg['topic']} {$msg['uuid']} ".
+                "{$msg['object']} {$msg['method']}"
+            ); 
+        } catch (Exception $e) {
+            $this->log->err(
+                "EXCEPTION! {$msg['topic']} {$msg['uuid']} ".
+                "{$msg['object']} {$msg['method']} " . 
+                $e->getMessage()
+            );
+        }
+        return $msg;
+    }
+
 }

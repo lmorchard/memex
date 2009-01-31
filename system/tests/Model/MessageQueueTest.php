@@ -405,10 +405,7 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
         $mq->publish('t1', 'd1'); 
         
         // Process all available messages.
-        while ($msg = $mq->reserve()) {
-            $mq->handle($msg);
-            $mq->finish($msg);
-        }
+        $mq->exhaust();
 
         // The order of messages resulting from subscription priorities should 
         // match the order of numbers in the context data.  This sums up the 
@@ -477,29 +474,22 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
         $mq->handle($m1);
 
         // Reserve the second message, finish it.
-        $m2 = $mq->reserve();
-        $mq->handle($m2); $mq->finish($m2);
+        $mq->runOnce();
 
         // Reserve the third message, leave it hanging.
         $m3 = $mq->reserve();
         $mq->handle($m3);
 
         // This should exhaust messages from the second queue.
-        while ($msg = $mq->reserve()) {
-            $mq->handle($msg); $mq->finish($msg);
-        }
+        $mq->exhaust();
 
         // This should exhaust messages from the third queue.
         $mq->finish($m3);
-        while ($msg = $mq->reserve()) {
-            $mq->handle($msg); $mq->finish($msg);
-        }
+        $mq->exhaust();
 
         // This should exhaust messages from the first queue.
         $mq->finish($m1);
-        while ($msg = $mq->reserve()) {
-            $mq->handle($msg); $mq->finish($msg);
-        }
+        $mq->exhaust();
 
         // The log results should reflect the parallel batches / serial 
         // handling logic.
