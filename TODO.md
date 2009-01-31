@@ -1,7 +1,6 @@
 ## TODO
 
 * Dog-food Annoyances
-    * Move from /username to a ~username redirect and /people/username namespace
     * No tag recommendations
 * Basic stuff
     * Tag suggestions on save form
@@ -51,6 +50,17 @@
     * Implement network / subscriptions based on RSS/Atom aggregation to login-less local proxy profiles
     * [FeedSync?](http://dev.live.com/feedsync/spec/spec.aspx)
 * Misc
+    * Message queue
+        * admin pages with queue list and stats
+        * per-profile status page list of waiting messages
+    * UI notification queue
+        * global and per-profile notifications
+        * flash / toaster popups
+        * piggy-backed on response to JSON message queue check?
+        * use as feedback when jobs done (ie. import, tag rename, etc)
+    * Event log
+        * more persistent version of notification queue?
+        * show per-profile log of events
     * Enclosures for Atom / RSS feeds for podcast support.
     * Etag and Last-Modified for feeds
     * Bookmarklet for discovering and bookmarking feeds

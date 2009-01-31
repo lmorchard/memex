@@ -15,9 +15,43 @@ return array(
 
     'routes' => array(
 
+        'post_profile_alias_default' => array(
+            'type'  => 'Zend_Controller_Router_Route_Regex',
+            'route' => '(.*)',
+            'reverse' => '%s',
+            'defaults' => array(
+                'controller' => 'post', 'action' => 'profile'
+            ),
+            'map' => array(
+                1 => 'screen_name'
+            ),
+        ),
+        'post_profile_alias_unix_oldschool' => array(
+            'type'  => 'Zend_Controller_Router_Route_Regex',
+            'route' => '~(.*)',
+            'reverse' => '~%s',
+            'defaults' => array(
+                'controller' => 'post', 'action' => 'profile'
+            ),
+            'map' => array(
+                1 => 'screen_name'
+            ),
+        ),
+        'post_profile' => array(
+            'type'  => 'Zend_Controller_Router_Route_Regex',
+            'route' => 'people/(.*)',
+            'reverse' => 'people/%s',
+            'defaults' => array(
+                'controller' => 'post', 'action' => 'profile'
+            ),
+            'map' => array(
+                1 => 'screen_name'
+            ),
+        ),
         'post_profile_tags' => array(
             'type'  => 'Zend_Controller_Router_Route_Regex',
-            'route' => '(.*)/(.*)',
+            'route' => 'people/(.*)/(.*)',
+            'reverse' => 'people/%s/%s',
             'defaults' => array(
                 'controller' => 'post', 'action' => 'profile'
             ),
@@ -25,14 +59,6 @@ return array(
                 1 => 'screen_name',
                 2 => 'tags'
             ),
-            'reverse' => '%s/%s',
-        ),
-        'post_profile' => array(
-            'type'  => 'Zend_Controller_Router_Route',
-            'route' => ':screen_name',
-            'defaults' => array(
-                'controller' => 'post', 'action' => 'profile'
-            )
         ),
 
         'feeds_post_profile_tags' => array(
