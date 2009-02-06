@@ -9,8 +9,6 @@ Thumbs.db
 xfers/
 logs/
 logs/*log
-system/data/cache/
-system/config/local.php
-system/tests/log/report/*
-system/data/db/*.db*
+application/config/config.php
 httpd.conf
+.htaccess

@@ -15,7 +15,6 @@ Or, at least, it will help me learn the Zend Framework.
 
 ### Installation
 
-* Get a copy of the latest [Zend Framework][zf] `library/Zend` into the `system/library/` directory.
 * Visiting `index.php` should present a quick installer that will create the database tables and attempt to create a configuration file.
 * Or, manually edit `system/config/local.php` to reflect your environment.
     * There is an example `system/config/local.php-dist` you can use as a starting point.
@@ -24,13 +23,13 @@ Or, at least, it will help me learn the Zend Framework.
     * The `.htaccess` should already do this out of the box on Apache.
     * Modify `index.php` to point to new path, if you move the `system` directory.
 
-[zf]: http://framework.zend.com/download/latest
+[kf]: http://kohanaphp.com/download
 
 ### Credits / Colophon
 
 * Leslie Michael Orchard - <http://decafbad.com/> - <mailto:l.m.orchard@pobox.com>
 * Liberal portions stolen from <http://github.com/weierophinney/bugapp/tree/master>
-* Using [Zend Framework][zf] v1.7.1
+* Using [Kohana Framework][kf] v2.3.1
 * Using [MooTools][mootools] [1.2.1][moodownload]
 * Using [Markdown PHP][markdown] for documentation.
 * Using [UUID implementation][uuid] from OmniTI 
