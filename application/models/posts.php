@@ -1,12 +1,10 @@
 <?php
-require_once dirname(__FILE__) . '/Model.php';
-
 /**
  * Model managing posts
  */
-class Memex_Model_Posts extends Memex_Model
+class Posts_Model extends Model
 {
-    protected $_table_name = 'Posts';
+    protected $_table_name = 'posts';
 
     /**
      * Initialize the model.
@@ -46,13 +44,11 @@ class Memex_Model_Posts extends Memex_Model
             $date_in = strtotime($post_data['user_date'], time());
             if (!$date_in)
                 throw new Exception('valid optional date required');
-            $post_data['user_date'] = gmdate('Y-m-d\TH:i:sP', $date_in);
+            $post_data['user_date'] = date('c', $date_in);
         }
 
-        $table = $this->getDbTable();
-
         // Get an ID for the post's URL and set the ID in post data
-        $urls_model = $this->getModel('Urls');
+        $urls_model = new Urls_Model();
         $url_data = $urls_model->fetchOrCreate(
             $post_data['url'], $post_data['profile_id']
         );
@@ -61,28 +57,35 @@ class Memex_Model_Posts extends Memex_Model
         // Try looking up an existing post for this URL and profile.
         $row = null;
         if (!empty($post_data['id'])) {
-            $row = $table->fetchRow($table->select()
-                ->where('id=?', $post_data['id'])
-            );
+            $row = $this->db->select()->from($this->_table_name)
+                ->where('id', $post_data['id'])
+                ->get()->current();
         } elseif (!empty($post_data['uuid'])) {
-            $row = $table->fetchRow($table->select()
-                ->where('uuid=?', $post_data['uuid'])
-            );
+            $row = $this->db->select()->from($this->_table_name)
+                ->where('uuid', $post_data['uuid'])
+                ->get()->current();
         } else {
-            $row = $table->fetchRow($table->select()
-                ->where('url_id=?', $url_data['id'])
-                ->where('profile_id=?', $post_data['profile_id'])
-            );
+            $row = $this->db->select()->from($this->_table_name)
+                ->where('url_id', $url_data['id'])
+                ->where('profile_id', $post_data['profile_id'])
+                ->get()->current();
         }
 
         // If there's no existing post, create a new one.
-        if (null == $row) {
-            $row = $table->createRow()->setFromArray(array(
-                'uuid'       => $this->uuid(),
+        if (false == $row) {
+            $update = false;
+            $row = array(
+                'uuid'       => uuid::uuid(),
                 'url_id'     => $url_data['id'],
-                'profile_id' => $post_data['profile_id']
-            ));
+                'profile_id' => $post_data['profile_id'],
+                'created'    => date('c'),
+                'tags'       => '',
+                'notes'      => ''
+            );
+        } else {
+            $update = true;
         }
+        $row['modified'] = date('c');
 
         // Has the URL been changed in an existing post?
         if ($row['url_id'] != $url_data['id']) {
@@ -98,18 +101,32 @@ class Memex_Model_Posts extends Memex_Model
         );
         foreach ($accepted_post_fields as $key) {
             if (isset($post_data[$key]))
-                $row->$key = $post_data[$key];
+                $row[$key] = $post_data[$key];
         }
-        $row->signature = $this->buildPostSignature($post_data);
-        $row->save();
+        $row['signature'] = $this->buildPostSignature($post_data);
+
+        if ($update) {
+            $this->db->update(
+                $this->_table_name, 
+                $row, 
+                array('id' => $row['id'])
+            );
+        } else {
+            $row['id'] = $this->db
+                ->insert($this->_table_name, $row)
+                ->insert_id();
+        }
         
         // HACK: Re-fetch the just-saved post.  Ensures consistent data, but 
         // probably needs some work to avoid cache issues later on.
-        $saved_post = $this->fetchOneById($row->id);
+        $saved_post = $this->fetchOneById($row['id']);
 
         // Send out message that a post has been updated
-        $mq = Zend_Registry::get('message_queue');
-        $mq->publish("Memex_Model_Posts/postUpdated", $saved_post);
+        //$mq = Zend_Registry::get('message_queue');
+        //$mq->publish("Memex_Model_Posts/postUpdated", $saved_post);
+
+        $tags_model = new Tags_Model();
+        $tags_model->updateTagsForPost($row);
 
         // Return the results of the save.
         return $saved_post;
@@ -133,7 +150,7 @@ class Memex_Model_Posts extends Memex_Model
                 'urls.id=posts.url_id', 
                 array('urls.hash')
             )
-            ->order('user_date desc');
+            ->orderby('user_date desc');
         $rows = $table->fetchAll($select);
         return $rows->toArray();
     }
@@ -149,7 +166,7 @@ class Memex_Model_Posts extends Memex_Model
         $table  = $this->getDbTable();
         $select = $table->select();
         $select
-            ->where('posts.profile_id=?', $profile_id)
+            ->where('posts.profile_id', $profile_id)
             ->from($table, array('MAX(modified) as last_modified'));
         $row = $table->fetchRow($select);
         return gmdate('c', strtotime($row['last_modified']));
@@ -169,8 +186,8 @@ class Memex_Model_Posts extends Memex_Model
         $select = $table->select();
 
         $select
-            ->where('posts.profile_id=?', $profile_id)
-            ->order('date');
+            ->where('posts.profile_id', $profile_id)
+            ->orderby('date');
 
         $adapter_name = strtolower(get_class($db));
         if (strpos($adapter_name, 'mysql') !== false) {
@@ -259,25 +276,23 @@ class Memex_Model_Posts extends Memex_Model
     public function fetchOneBy($id=null, $url=null, $hash=null, $uuid=null, $profile_id=null)
     {
         // Try looking up an existing post for this URL and profile.
-        $table = $this->getDbTable();
         $select = $this->_getPostsSelect();
 
         $select->limit(1);
 
         if (null != $profile_id) 
-            $select->where('profile_id=?', $profile_id);
+            $select->where('profile_id', $profile_id);
         if (null != $id)
-            $select->where('posts.id=?', $id);
+            $select->where('posts.id', $id);
         if (null != $uuid)
-            $select->where('posts.uuid=?', $uuid);
+            $select->where('posts.uuid', $uuid);
         if (null != $hash)
-            $select->where('urls.hash=?', $hash);
+            $select->where('urls.hash', $hash);
         if (null != $url)
-            $select->where('urls.url=?', 
-                $this->normalize_url_filter->filter($url));
+            $select->where('urls.url', url::normalize($url));
 
         $data = $this->_postsRowSetToArray(
-            $table->fetchAll($select)
+            $select->get()->result_array()
         );
         return empty($data) ? null : $data[0];
     }
@@ -353,19 +368,18 @@ class Memex_Model_Posts extends Memex_Model
     public function fetchBy($hashes=null, $uuid=null, $id=null, $profile_id=null, $tags=null,
             $start_date=null, $end_date=null, $start=0, $count=10, $order='user_date desc')
     {
-        $table  = $this->getDbTable();
         $select = $this->_getPostsSelect();
 
         if ($order == 'user_date desc')
-            $select->order('user_date DESC');
+            $select->orderby('user_date', 'DESC');
         if (null !== $uuid)
-            $select->where('posts.uuid=?', $uuid);
+            $select->where('posts.uuid', $uuid);
         if (null !== $id)
-            $select->where('posts.id=?', $id);
+            $select->where('posts.id', $id);
         if (null !== $profile_id)
-            $select->where('posts.profile_id=?', $profile_id);
+            $select->where('posts.profile_id', $profile_id);
         if (null !== $hashes)
-            $select->where('urls.hash in (?)', $hashes);
+            $select->in('urls.hash', $hashes);
         if (null !== $tags)
             $this->_addWhereForTags($select, $tags);
         if (null !== $start_date || null != $end_date) 
@@ -374,7 +388,7 @@ class Memex_Model_Posts extends Memex_Model
             $select->limit($count, $start);
 
         return $this->_postsRowSetToArray(
-            $table->fetchAll($select)
+            $select->get()->result_array()
         );
     }
 
@@ -421,16 +435,16 @@ class Memex_Model_Posts extends Memex_Model
      */
     public function countBy($profile_id=null, $tags=null)
     {
-        $table = $this->getDbTable();
-        $select = $table->select()
-            ->from($table, 'count(posts.id) as count');
+        $select = $this->db
+            ->select('count(posts.id) as count')
+            ->from($this->_table_name);
 
         if (null !== $profile_id)
-            $select->where('posts.profile_id=?', $profile_id);
+            $select->where('posts.profile_id', $profile_id);
         if (null !== $tags)
             $this->_addWhereForTags($select, $tags);
 
-        $row = $table->fetchRow($select);
+        $row = $select->get()->current();
         return $row['count'];
     }
 
@@ -442,16 +456,16 @@ class Memex_Model_Posts extends Memex_Model
     public function deleteById($post_id)
     {
         $data = $this->fetchOneById($post_id);
+        if (!$data) return false;
 
-        $table = $this->getDbTable();
-        $rv = $table->delete(
-            $table->getAdapter()->quoteInto('id=?', $post_id)
-        );
+        $this->db->delete($this->_table_name, array('id' => $post_id));
 
-        $mq = Zend_Registry::get('message_queue');
-        $mq->publish("Memex_Model_Posts/postDeleted", $data);
+        // $mq = Zend_Registry::get('message_queue');
+        // $mq->publish("Memex_Model_Posts/postDeleted", $data);
 
-        return $rv;
+        $tags_model = new Tags_Model();
+        $tags_model->deleteTagsForPost($post_id);
+
     }
 
     /**
@@ -462,15 +476,15 @@ class Memex_Model_Posts extends Memex_Model
     public function deleteByUUID($uuid)
     {
         $data = $this->fetchOneByUUID($uuid);
-        $table = $this->getDbTable();
-        $rv = $table->delete(
-            $table->getAdapter()->quoteInto('uuid=?', $uuid)
-        );
+        if (!$data) return false;
 
-        $mq = Zend_Registry::get('message_queue');
-        $mq->publish("Memex_Model_Posts/postDeleted", $data);
+        $this->db->delete($this->_table_name, 'uuid', $uuid);
 
-        return $rv;
+        // $mq = Zend_Registry::get('message_queue');
+        // $mq->publish("Memex_Model_Posts/postDeleted", $data);
+
+        $tags_model = new Tags_Model();
+        $tags_model->deleteTagsForPost($data['id']);
     }
 
     /**
@@ -483,9 +497,15 @@ class Memex_Model_Posts extends Memex_Model
     {
         $data = $this->fetchOneByUrlAndProfile($url, $profile_id);
         if (null == $data) return null;
-        $tags_model = $this->getModel('Tags');
+
+        $this->deleteById($data['id']);
+        
+        // $mq = Zend_Registry::get('message_queue');
+        // $mq->publish("Memex_Model_Posts/postDeleted", $data);
+
+        $tags_model = new Tags_Model();
         $tags_model->deleteTagsForPost($data['id']);
-        return $this->deleteById($data['id']);
+
     }
 
     /**
@@ -493,9 +513,9 @@ class Memex_Model_Posts extends Memex_Model
      */
     public function deleteAll()
     {
-        if (!Zend_Registry::get('config')->model->enable_delete_all)
+        if (!Kohana::config('model.enable_delete_all'))
             throw new Exception('Mass deletion not enabled');
-        $this->getDbTable()->delete('');
+        $this->db->query('DELETE FROM ' . $this->_table_name);
     }
 
     /**
@@ -507,13 +527,14 @@ class Memex_Model_Posts extends Memex_Model
      */
     private function _postsRowSetToArray($posts)
     {
-        $tags_model = $this->getModel('Tags');
+        $tags_model = new Tags_Model();
         $posts_out = array();
         foreach ($posts as $row) {
-            $row_data = $row->toArray();
-            $row_data['tags_parsed'] = 
-                $tags_model->parseTags($row_data['tags']);
-            $posts_out[] = $row_data;
+            $row['tags_parsed'] = 
+                $tags_model->parseTags($row['tags']);
+            foreach(array('user_date', 'created', 'modified') as $field)
+                $row[$field] = date('c', strtotime($row[$field]));
+            $posts_out[] = $row;
         }
         return $posts_out;
     }
@@ -523,19 +544,12 @@ class Memex_Model_Posts extends Memex_Model
      */
     private function _getPostsSelect()
     {
-        return $this->getDbTable()->select()
-            ->setIntegrityCheck(false)
-            ->from('posts')
-            ->join(
-                'urls', 
-                'urls.id=posts.url_id', 
-                array('urls.url', 'urls.hostname', 'urls.hash')
+        return $this->db->select(
+                'posts.*, urls.url, urls.hostname, urls.hash, profiles.screen_name'
             )
-            ->join(
-                'profiles', 
-                'profiles.id=posts.profile_id', 
-                array('profiles.screen_name')
-            );
+            ->from('posts')
+            ->join('urls', 'urls.id=posts.url_id')
+            ->join('profiles', 'profiles.id=posts.profile_id');
     }
 
     /**
@@ -574,11 +588,10 @@ class Memex_Model_Posts extends Memex_Model
         if (!is_array($tags)) 
             $tags = array($tags);
         
-        $select->setIntegrityCheck(false);
         if (count($tags) == 1) {
             $select
-                ->join('tags', 'tags.post_id=posts.id', array())
-                ->where('tags.tag=?', $tags[0]);
+                ->join('tags', 'tags.post_id=posts.id')
+                ->where('tags.tag', $tags[0]);
             
         // TODO: Optimize for more common intersections of 2-3
         // } elseif (count($tags) == 2) {
@@ -586,9 +599,9 @@ class Memex_Model_Posts extends Memex_Model
 
         } else {
             foreach ($tags as $tag) {
-                $select->where(
-                    'posts.id IN ( SELECT post_id FROM tags WHERE tag=? )', 
-                    $tag
+                $select->in(
+                    'posts.id', 
+                    '( SELECT post_id FROM tags WHERE tag=' . $this->db->escape($tag) . ' )'
                 );
             }
         }

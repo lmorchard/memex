@@ -1,13 +1,4 @@
 <?php
-// Call Memex_Model_LoginsTest::main() if this source file is executed directly.
-if (!defined("PHPUnit_MAIN_METHOD")) {
-    define("PHPUnit_MAIN_METHOD", "Memex_XmlWriterTest::main");
-}
-
-require_once dirname(__FILE__) . '/../TestHelper.php';
-
-require_once 'Memex/XmlWriter.php';
-
 /**
  * Test class for Memex_XmlWriter
  *
@@ -49,6 +40,8 @@ class Memex_XmlWriterTest extends PHPUnit_Framework_TestCase
      */
     public function testWriter()
     {
+        //include_once( Kohana::find_file('libraries', 'Memex/XmlWriter') );
+
         $x = new Memex_XmlWriter(array(
             'parents' => array( 'feed', 'entry', 'author' )
         ));
@@ -58,14 +51,14 @@ class Memex_XmlWriterTest extends PHPUnit_Framework_TestCase
             ->subtitle('This is a subtitle')
             ->link(array( 'rel'=>'self', 'type'=>'application/atom+xml', 'href'=>'http://example.com' ))
             ->link(array( 'rel'=>'alternate', 'type'=>'text.html', 'href'=>'http://example.com' ))
-            ->updated(date('c', strtotime('2009-01-03T12:00:15-0500')));
+            ->updated(gmdate('c', strtotime('2009-01-03T12:00:15-0500')));
 
         for ($i=0; $i<5; $i++) {
             $x->entry()
                 ->title("HI MOM $i '<>!@#$%^&*()")
                 ->id("entry<$i>")
-                ->updated(date('c', strtotime('2009-01-03T12:00:15-0500')))
-                ->published(date('c', strtotime('2009-01-02T12:00:15-0500')))
+                ->updated(gmdate('c', strtotime('2009-01-03T12:00:15-0500')))
+                ->published(gmdate('c', strtotime('2009-01-02T12:00:15-0500')))
                 ->author()
                     ->name('joe schmoe')
                     ->email('joe@schmoe.com')
@@ -195,9 +188,4 @@ END_FEED;
         $this->assertEquals($parsed_xml, $x->getXML());
     }
     
-}
-
-// Call Memex_Model_LoginsTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Memex_XmlWriterTest::main") {
-    Memex_XmlWriterTest::main();
 }

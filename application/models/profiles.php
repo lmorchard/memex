@@ -1,12 +1,10 @@
 <?php
-require_once dirname(__FILE__) . '/Model.php';
-
 /**
  * This is the DbTable class for the profiles table.
  */
-class Memex_Model_Profiles extends Memex_Model
+class Profiles_Model extends Model
 {
-    protected $_table_name = 'Profiles';
+    protected $_table_name = 'profiles';
 
     /**
      * Create a new profile
@@ -23,18 +21,18 @@ class Memex_Model_Profiles extends Memex_Model
         if ($this->fetchByScreenName($data['screen_name']))
             throw new Exception('duplicate screen name');
 
-        $table = $this->getDbTable();
-
-        $row = $table->createRow()->setFromArray(array(
-            'uuid'        => $this->uuid(),
+        $data = array(
+            'uuid'        => uuid::uuid(),
             'screen_name' => $data['screen_name'],
             'full_name'   => $data['full_name'],
             'bio'         => empty($data['bio']) ? '' : $data['bio'],
             'created'     => date('Y-m-d H:i:s', time())
-        ));
-        $row->save();
+        );
+        $data['id'] = $this->db
+            ->insert('profiles', $data)
+            ->insert_id();
 
-        return $row->toArray();
+        return $data;
     }
 
     /**
@@ -48,20 +46,24 @@ class Memex_Model_Profiles extends Memex_Model
         if (empty($data['id']))
             throw new Exception('id required');
 
-        $table = $this->getDbTable();
-        $profile = $table->fetchRow(
-            $table->select()->where('id=?', $data['id'])
-        );
+        $profile = $this->db
+            ->select()
+            ->from('profiles')
+            ->where('id', $data['id'])
+            ->get()->current();
+
         $accepted_fields = array(
             'screen_name', 'full_name', 'bio'
         );
         foreach ($accepted_fields as $key) {
             if (isset($data[$key]))
-                $profile->$key = $data[$key];
+                $profile[$key] = $data[$key];
         }
-        $profile->save();
+        $this->db->update(
+            'profiles', $profile, array('id'=>$data['id'])
+        );
 
-        return $profile->toArray();
+        return $profile;
     }
 
     /**
@@ -95,16 +97,13 @@ class Memex_Model_Profiles extends Memex_Model
      */
     public function fetchOneBy($id=null, $screen_name=null)
     {
-        $table = $this->getDbTable();
-        $select = $table->select();
+        $select = $this->db->
+            select()->from('profiles');
         if (null != $id)
-            $select->where('id=?', $id);
+            $select->where('id', $id);
         if (null != $screen_name)
-            $select->where('screen_name=?', $screen_name);
-        $row = $table->fetchRow($select);
-        if (null == $row) return false;
-        $data = $row->toArray();
-        return $data;
+            $select->where('screen_name', $screen_name);
+        return $select->get()->current();
     }
 
     /**
@@ -116,20 +115,28 @@ class Memex_Model_Profiles extends Memex_Model
      */
     public function setAttribute($profile_id, $name, $value)
     {
-        $table = $this->getDbTable('ProfileAttribs');
-        $select = $table->select()
-            ->where('profile_id=?', $profile_id)
-            ->where('name=?', $name);
-        $row = $table->fetchRow($select);
+        $row = $this->db
+            ->select()->from('profile_attribs')
+            ->where('profile_id', $profile_id)
+            ->where('name', $name)
+            ->get()->current();
+
         if (null == $row) {
-            $row = $table->createRow()->setFromArray(array(
+            $data = array(
                 'profile_id' => $profile_id,
-                'name'       => $name
-            ));
+                'name'       => $name,
+                'value'      => $value
+            );
+            $data['id'] = $this->db
+                ->insert('profile_attribs', $data)
+                ->insert_id();
+        } else {
+            $this->db->update(
+                'profile_attribs', 
+                array('value' => $value),
+                array('profile_id'=>$profile_id, 'name'=>$name)
+            );
         }
-        $row->value = $value;
-        $row->save();
-        return $row->toArray();
     }
 
     /**
@@ -154,12 +161,12 @@ class Memex_Model_Profiles extends Memex_Model
      */
     public function getAttribute($profile_id, $name)
     {
-        $table = $this->getDbTable('ProfileAttribs');
-        $select = $table->select()
-            ->from($table, array('value'))
-            ->where('profile_id=?', $profile_id)
-            ->where('name=?', $name);
-        $row = $table->fetchRow($select);
+        $select = $this->db
+            ->select('value')
+            ->from('profile_attribs')
+            ->where('profile_id', $profile_id)
+            ->where('name', $name);
+        $row = $select->get()->current();
         if (null == $row) return false;
         return $row['value'];
     }
@@ -172,18 +179,13 @@ class Memex_Model_Profiles extends Memex_Model
      */
     public function getAttributes($profile_id, $names=null)
     {
-        $table  = $this->getDbTable('ProfileAttribs');
-        $db     = $table->getAdapter();
-        $select = $table->select()
-            ->where('profile_id=?', $profile_id);
+        $select = $this->db->select()
+            ->from('profile_attribs')
+            ->where('profile_id', $profile_id);
         if (null != $names) {
-            $names_where = array();
-            foreach ($names as $name) {
-                $names_where[] = $db->quoteInto('name=?', $name);
-            }
-            $select->where(join(' OR ', $names_where));
+            $select->in('name', $names);
         }
-        $rows = $table->fetchAll($select)->toArray();
+        $rows = $select->get();
         $attribs = array();
         foreach ($rows as $row) {
             $attribs[$row['name']] = $row['value'];
@@ -197,9 +199,10 @@ class Memex_Model_Profiles extends Memex_Model
      */
     public function deleteAll()
     {
-        if (!Zend_Registry::get('config')->model->enable_delete_all)
+        if (!Kohana::config('model.enable_delete_all'))
             throw new Exception('Mass deletion not enabled');
-        $this->getDbTable()->delete('');
+        $this->db->query('DELETE FROM ' . $this->_table_name);
+        $this->db->query('DELETE FROM profile_attribs');
     }
 
 }

@@ -1,20 +1,10 @@
 <?php
-// Call Memex_Model_TagsTest::main() if this source file is executed directly.
-if (!defined("PHPUnit_MAIN_METHOD")) {
-    define("PHPUnit_MAIN_METHOD", "Memex_Model_TagsTest::main");
-}
-
-require_once dirname(__FILE__) . '/../TestHelper.php';
-
-/** Model_User */
-require_once 'Tags.php';
-
 /**
  * Test class for Memex_Model_TagsTest.
  *
  * @group Models
  */
-class Memex_Model_TagsTest extends PHPUnit_Framework_TestCase 
+class TagsTest extends PHPUnit_Framework_TestCase 
 {
     /**
      * Runs the test methods of this class.
@@ -35,16 +25,16 @@ class Memex_Model_TagsTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->model = new Memex_Model_Tags();
+        $this->model = new Tags_Model();
         $this->model->deleteAll();
 
-        $this->posts_model = new Memex_Model_Posts();
+        $this->posts_model = new Posts_Model();
         $this->posts_model->deleteAll();
 
-        $this->profiles_model = new Memex_Model_Profiles();
+        $this->profiles_model = new Profiles_Model();
         $this->profiles_model->deleteAll();
 
-        $this->urls_model = new Memex_Model_Urls();
+        $this->urls_model = new Urls_Model();
         $this->urls_model->deleteAll();
 
         $this->profile_1 = $this->profiles_model->create(array(
@@ -369,20 +359,20 @@ class Memex_Model_TagsTest extends PHPUnit_Framework_TestCase
 
         $this->posts_model->deleteById($p3['id']);
 
-        $test_counts_3 = array(
-            array( 'tag' => 'baz',   'count' => '1')
-        );
-        $result_counts_3 = 
-            $this->model->countByProfile($this->profile_1['id']);
-        $this->assertEquals($test_counts_3, $result_counts_3);
-
-        $this->posts_model->deleteById($p4['id']);
-
         $test_counts_4 = array(
+            array( 'tag' => 'baz',   'count' => '1')
         );
         $result_counts_4 = 
             $this->model->countByProfile($this->profile_1['id']);
         $this->assertEquals($test_counts_4, $result_counts_4);
+
+        $this->posts_model->deleteById($p4['id']);
+
+        $test_counts_5 = array(
+        );
+        $result_counts_5 = 
+            $this->model->countByProfile($this->profile_1['id']);
+        $this->assertEquals($test_counts_5, $result_counts_5);
     }
 
     /**
@@ -441,9 +431,4 @@ class Memex_Model_TagsTest extends PHPUnit_Framework_TestCase
 
     }
 
-}
-
-// Call Memex_Model_TagsTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Memex_Model_TagsTest::main") {
-    Memex_Model_TagsTest::main();
 }

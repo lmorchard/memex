@@ -1,6 +1,4 @@
 <?php
-require_once dirname(__FILE__) . '/Model.php';
-
 /**
  * Model managing message queue
  *
@@ -16,9 +14,9 @@ require_once dirname(__FILE__) . '/Model.php';
  * @author l.m.orchard <l.m.orchard@pobox.com>
  * @package Memex
  */
-class Memex_Model_MessageQueue extends Memex_Model
+class MessageQueue_Model extends Model
 {
-    protected $_table_name = 'MessageQueue';
+    protected $_table_name = 'message_queue';
 
     protected $_subscriptions;
     protected $_objs;
@@ -30,14 +28,13 @@ class Memex_Model_MessageQueue extends Memex_Model
     /**
      * Initialize the model.
      */
-    function init() 
+    function __construct() 
     {
-        $this->_batch_uuid = $this->uuid();
+        parent::__construct();
+        $this->_batch_uuid = uuid::uuid();
         $this->_batch_seq = 0;
         $this->_subscriptions = array();
         $this->_objs = array();
-
-        $this->log = Zend_Registry::get('logger');
     }
 
     /**
@@ -69,7 +66,7 @@ class Memex_Model_MessageQueue extends Memex_Model
         // Punt on serializing object instances in deferred subscriptions that 
         // can be handled out of process.
         if ($deferred && !is_string($object)) {
-            throw new Zend_Exception(
+            throw new Exception(
                 'Object instances cannot be used in deferred subscriptions.'
             );
         }
@@ -181,12 +178,10 @@ class Memex_Model_MessageQueue extends Memex_Model
     public function queue($topic, $object, $method, $context, $data, $priority, $scheduled_for, $duplicate=self::DUPLICATE_IGNORE)
     {
         if (!is_string($object)) {
-            throw new Zend_Exception(
+            throw new Exception(
                 'Object instances cannot be used in deferred subscriptions.'
             );
         }
-
-        $table = $this->getDbTable();
 
         // Encode the context and body data as JSON.
         $context = json_encode($context);
@@ -202,20 +197,24 @@ class Memex_Model_MessageQueue extends Memex_Model
 
             // Look for an unreserved message with the same signature as the 
             // one about to be queued.
-            $table->lock();
-            $select = $table->select()
-                ->where('reserved_at IS NULL')
-                ->where('signature=?', $signature);
-            $row = $table->fetchRow($select);
+            $this->lock();
+            $row = $this->db->select()
+                ->from($this->_table_name)
+                ->where('reserved_at IS', NULL)
+                ->where('signature', $signature)
+                ->get()->current();
 
             if ($row) {
                 if ($duplicate == self::DUPLICATE_REPLACE) {
                     // In replace case, delete the existing message.
-                    $row->delete();
-                    $table->unlock();
+                    $this->db->delete(
+                        $this->_table_name,
+                        array('uuid' => $row['uuid'])
+                    );
+                    $this->unlock();
                 } else if ($duplicate == self::DUPLICATE_DISCARD) {
                     // In discard case, fail silently.
-                    $table->unlock();
+                    $this->unlock();
                     return false;
                 }
             }
@@ -223,8 +222,10 @@ class Memex_Model_MessageQueue extends Memex_Model
         }
 
         // Finally insert a new message.
-        $row = $table->createRow()->setFromArray(array(
-            'uuid'          => $this->uuid(),
+        $row = array(
+            'created'       => date('c'),
+            'modified'      => date('c'),
+            'uuid'          => uuid::uuid(),
             'batch_uuid'    => $this->_batch_uuid,
             'batch_seq'     => ($this->_batch_seq++),
             'priority'      => $priority,
@@ -235,10 +236,10 @@ class Memex_Model_MessageQueue extends Memex_Model
             'context'       => $context,
             'body'          => $body,
             'signature'     => $signature
-        ));
-        $row->save();
+        );
+        $this->db->insert($this->_table_name, $row);
 
-        return $row->toArray();
+        return $row;
     }
 
     /**
@@ -248,56 +249,58 @@ class Memex_Model_MessageQueue extends Memex_Model
      */
     public function reserve()
     {
-        $table = $this->getDbTable();
-        $table->lock();
+        $this->lock();
         try {
 
             // Start building query to find an unreserved message.  Account for 
             // priority and FIFO.
-            $select = $table->select()
-                ->where('scheduled_for IS NULL OR scheduled_for < ?', date('c'))
-                ->where('reserved_at IS NULL')
-                ->where('finished_at IS NULL')
-                ->order('priority ASC')
-                ->order('created ASC')
-                ->order('batch_seq ASC')
-                ->limit(1);
+            $now = date('c');
+            $msg = $this->db->query("
+                SELECT * FROM {$this->_table_name}
+                WHERE
+                    ( scheduled_for IS NULL OR scheduled_for < '{$now}' ) AND
+                    reserved_at IS NULL AND
+                    finished_at IS NULL AND
+                    batch_uuid NOT IN (
+                        SELECT DISTINCT l1.batch_uuid
+                        FROM message_queue AS l1
+                        WHERE
+                            l1.reserved_at IS NOT NULL AND
+                            l1.finished_at IS NULL
+                    )
+                ORDER BY
+                    priority ASC, created ASC, batch_seq ASC
+                LIMIT 1
+            ")->current();
 
-            // Subselect to find batch UUIDs for which there are reserved 
-            // messages.
-            $reserved_batches_select = $table->select()->distinct()
-                ->from(array('l1'=>'message_queue'), 'batch_uuid')
-                ->where('reserved_at IS NOT NULL')
-                ->where('finished_at IS NULL');
-
-            // Batches are serial, so don't yield a message from an batches in 
-            // which any message is already reserved.
-            $select->where('batch_uuid NOT IN ('.$reserved_batches_select.')');
-
-            // Now, try getting a message row.
-            $row = $table->fetchRow($select);
-            if (!$row) {
+            if (!$msg) {
                 $msg = null;
             } else {
 
-                // Update the timestamp to reserve the message.
-                $row->reserved_at = date('c');
-                $row->save();
-
-                // Convert the row to an array and decode the data blobs.
-                $msg = $row->toArray();
+                // Decode the data blobs.
                 $msg['context'] = json_decode($msg['context'], true);
                 $msg['body']    = json_decode($msg['body'], true);
+
+                // Update the timestamp to reserve the message.
+                $msg['reserved_at'] = date('c');
+                $this->db->update(
+                    $this->_table_name,
+                    array(
+                        'modified'    => date('c'),
+                        'reserved_at' => $msg['reserved_at']
+                    ),
+                    array('uuid' => $msg['uuid'])
+                );
 
             }
 
             // Finally, unlock the table and return the message.
-            $table->unlock();
+            $this->unlock();
             return $msg;
 
         } catch (Exception $e) {
             // If anything goes wrong, be sure to unlock the table.
-            $table->unlock();
+            $this->unlock();
             throw $e;
         }
 
@@ -310,14 +313,21 @@ class Memex_Model_MessageQueue extends Memex_Model
      */
     public function finish($msg)
     {
-        $table = $this->getDbTable();
-        $select = $table->select()->where('uuid=?', $msg['uuid']);
-        $row = $table->fetchRow($select);
+        $row = $this->db->select()
+            ->from($this->_table_name)
+            ->where('uuid', $msg['uuid'])
+            ->get()->current();
         if (!$row) {
             throw new Exception("No such message $uuid found.");
         }
-        $row->finished_at = date('c');
-        $row->save();
+        $this->db->update(
+            $this->_table_name,
+            array(
+                'modified'    => date('c'),
+                'finished_at' => date('c')
+            ),
+            array('uuid' => $msg['uuid'])
+        );
     }
 
     /**
@@ -334,10 +344,12 @@ class Memex_Model_MessageQueue extends Memex_Model
     /**
      * Process messages until the queue comes up empty.
      */
-    public function exhaust()
+    public function exhaust($max_runs=NULL)
     {
+        $cnt = 0;
         while ($msg = $this->runOnce()) {
-            // No-op.
+            if ($max_runs != NULL && ( ++$cnt > $max_runs ) )
+                throw new Exception('Too many runs');
         }
     }
 
@@ -350,18 +362,54 @@ class Memex_Model_MessageQueue extends Memex_Model
         if ($msg) try {
             $this->handle($msg);
             $this->finish($msg);
-            $this->log->debug(
+            Kohana::log('debug',
                 "processed {$msg['topic']} {$msg['uuid']} ".
                 "{$msg['object']} {$msg['method']}"
             ); 
         } catch (Exception $e) {
-            $this->log->err(
+            Kohana::log('error',
                 "EXCEPTION! {$msg['topic']} {$msg['uuid']} ".
                 "{$msg['object']} {$msg['method']} " . 
                 $e->getMessage()
             );
         }
         return $msg;
+    }
+
+    /**
+     * Lock the table for read/write.
+     */
+    public function lock()
+    {
+        //$adapter_name = strtolower(get_class($db));
+        //if (strpos($adapter_name, 'mysql') !== false) {
+            $this->db->query(
+                "LOCK TABLES {$this->_table_name} WRITE, ".
+                // HACK: Throw in a few aliased locks for subqueries.
+                "{$this->_table_name} AS l1 WRITE, ".
+                "{$this->_table_name} AS l2 WRITE, ".
+                "{$this->_table_name} AS l3 WRITE"
+            );
+        //}
+    }
+
+    public function unlock()
+    {
+        //$db = $this->getAdapter();
+        //$adapter_name = strtolower(get_class($db));
+        //if (strpos($adapter_name, 'mysql') !== false) {
+            $this->db->query('UNLOCK TABLES'); 
+        //}
+    }
+
+    /**
+     * Delete all.  Useful for tests, but dangerous otherwise.
+     */
+    public function deleteAll()
+    {
+        if (!Kohana::config('model.enable_delete_all'))
+            throw new Exception('Mass deletion not enabled');
+        $this->db->query('DELETE FROM ' . $this->_table_name);
     }
 
 }

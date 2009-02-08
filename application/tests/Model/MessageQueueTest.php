@@ -1,13 +1,4 @@
 <?php
-// Call Memex_Model_LoginsTest::main() if this source file is executed directly.
-if (!defined("PHPUnit_MAIN_METHOD")) {
-    define("PHPUnit_MAIN_METHOD", "Memex_Model_MessageQueueTest::main");
-}
-
-require_once dirname(__FILE__) . '/../TestHelper.php';
-
-require_once 'MessageQueue.php';
-
 /**
  * Test class for Memex_MessageQueue
  *
@@ -17,7 +8,7 @@ require_once 'MessageQueue.php';
  * @author l.m.orchard <l.m.orchard@pobox.com>
  * @package Memex
  */
-class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase 
+class MessageQueueTest extends PHPUnit_Framework_TestCase 
 {
     /**
      * Runs the test methods of this class.
@@ -26,7 +17,7 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
      */
     public static function main()
     {
-        $suite  = new PHPUnit_Framework_TestSuite("Memex_Model_MessageQueueTest");
+        $suite  = new PHPUnit_Framework_TestSuite("MessageQueueTest");
         $result = PHPUnit_TextUI_TestRunner::run($suite);
     }
 
@@ -37,10 +28,11 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->log = Zend_Registry::get('logger');
-
-        $log = Memex_Model_MessageQueueTest_LogCollector::getInstance();
+        $log = MessageQueueTest_LogCollector::getInstance();
         $log->reset();
+
+        $mq = new MessageQueue_Model();
+        $mq->deleteAll();
     }
 
     /**
@@ -57,15 +49,15 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
      */
     public function testInProcessSubscribeUnsubscribePublish()
     {
-        $mq = new Memex_Model_MessageQueue();
+        $mq = new MessageQueue_Model();
 
-        $log = Memex_Model_MessageQueueTest_LogCollector::getInstance();
+        $log = MessageQueueTest_LogCollector::getInstance();
 
-        $cn = 'Memex_Model_MessageQueueTest_Listener';
-        $l1 = new Memex_Model_MessageQueueTest_Listener('l1');
-        $l2 = new Memex_Model_MessageQueueTest_Listener('l2');
-        $l3 = new Memex_Model_MessageQueueTest_Listener('l3');
-        $l4 = new Memex_Model_MessageQueueTest_Listener('l4');
+        $cn = 'MessageQueueTest_Listener';
+        $l1 = new MessageQueueTest_Listener('l1');
+        $l2 = new MessageQueueTest_Listener('l2');
+        $l3 = new MessageQueueTest_Listener('l3');
+        $l4 = new MessageQueueTest_Listener('l4');
 
         $s1 = $mq->subscribe(array('topic' => 't1', 'object' => $l1));
         $s2 = $mq->subscribe(array('topic' => 't2', 'object' => $l2, 'method' => 'h1'));
@@ -144,11 +136,11 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
      */
     public function testDeferredPublishSubscribe()
     {
-        $log = Memex_Model_MessageQueueTest_LogCollector::getInstance();
-        $mq = new Memex_Model_MessageQueue();
+        $log = MessageQueueTest_LogCollector::getInstance();
+        $mq = new MessageQueue_Model();
 
         // Ensure that deferred subscriptions refuse to accept an object instance.
-        $l1 = new Memex_Model_MessageQueueTest_Listener('l1');
+        $l1 = new MessageQueueTest_Listener('l1');
         try {
             $s1 = $mq->subscribe(array('deferred' => true, 'topic' => 't1', 'object' => $l1));
             $this->fail('Object instances should be disallowed in deferred subscriptions');
@@ -156,7 +148,7 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
             // no-op
         }
 
-        $cn = 'Memex_Model_MessageQueueTest_Listener';
+        $cn = 'MessageQueueTest_Listener';
         $s1 = $mq->subscribe(array('deferred' => true, 'topic' => 't1', 'object' => $cn));
         $s2 = $mq->subscribe(array('deferred' => true, 'topic' => 't2', 'object' => $cn, 'method' => 'h1'));
         $s3 = $mq->subscribe(array('deferred' => true, 'topic' => 't2', 'object' => $cn, 'method' => 'h3', 'context' => 'c3'));
@@ -222,14 +214,14 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
      */
     public function testDeferredScheduledMessage()
     {
-        $log = Memex_Model_MessageQueueTest_LogCollector::getInstance();
+        $log = MessageQueueTest_LogCollector::getInstance();
 
         $base_msg = array(
             'deferred' => true, 
-            'object'   => 'Memex_Model_MessageQueueTest_Listener'
+            'object'   => 'MessageQueueTest_Listener'
         );
 
-        $mq = new Memex_Model_MessageQueue();
+        $mq = new MessageQueue_Model();
         $mq->subscribe(array_merge($base_msg, array('topic'=>'t1')));
 
         // Publish some messages scheduled in reverse order, each 2 
@@ -299,25 +291,25 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
      */
     public function testDeferredDuplicateReplaceOrUnique()
     {
-        $log = Memex_Model_MessageQueueTest_LogCollector::getInstance();
+        $log = MessageQueueTest_LogCollector::getInstance();
 
         $base_msg = array(
             'deferred' => true, 
-            'object'   => 'Memex_Model_MessageQueueTest_Listener'
+            'object'   => 'MessageQueueTest_Listener'
         );
 
-        $mq = new Memex_Model_MessageQueue();
+        $mq = new MessageQueue_Model();
         $mq->subscribe(array_merge($base_msg, array(
             'topic'     => 't0'
-            //'duplicate' => Memex_Model_MessageQueue::DUPLICATE_IGNORE
+            //'duplicate' => MessageQueue::DUPLICATE_IGNORE
         )));
         $mq->subscribe(array_merge($base_msg, array(
             'topic'     => 't1', 
-            'duplicate' => Memex_Model_MessageQueue::DUPLICATE_REPLACE
+            'duplicate' => MessageQueue_Model::DUPLICATE_REPLACE
         )));
         $mq->subscribe(array_merge($base_msg, array(
             'topic'     => 't2', 
-            'duplicate' => Memex_Model_MessageQueue::DUPLICATE_DISCARD
+            'duplicate' => MessageQueue_Model::DUPLICATE_DISCARD
         )));
 
         // Under DUPLICATE_REPLACE, each additional message to the same 
@@ -378,17 +370,17 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
      */
     public function testDeferredMessagePriority()
     {
-        $log = Memex_Model_MessageQueueTest_LogCollector::getInstance();
+        $log = MessageQueueTest_LogCollector::getInstance();
 
         $base_msg = array(
             'deferred' => true, 
-            'object'   => 'Memex_Model_MessageQueueTest_Listener'
+            'object'   => 'MessageQueueTest_Listener'
         );
 
         // Create some subscriptions with priorities.  The subscription 
         // creation is jumbled up a bit to get a mix of priority and natural
         // subscription order as influences on message processing order.
-        $mq = new Memex_Model_MessageQueue();
+        $mq = new MessageQueue_Model();
         $mq->subscribe(array_merge($base_msg, array('topic'=>'t3', 'context'=>'c4', 'priority'=>0)));
         $mq->subscribe(array_merge($base_msg, array('topic'=>'t3', 'context'=>'c5', 'priority'=>0)));
         $mq->subscribe(array_merge($base_msg, array('topic'=>'t3', 'context'=>'c6', 'priority'=>0)));
@@ -405,7 +397,7 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
         $mq->publish('t1', 'd1'); 
         
         // Process all available messages.
-        $mq->exhaust();
+        $mq->exhaust(10);
 
         // The order of messages resulting from subscription priorities should 
         // match the order of numbers in the context data.  This sums up the 
@@ -433,23 +425,23 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
      */
     public function testParallelDeferredBatches()
     {
-        $log = Memex_Model_MessageQueueTest_LogCollector::getInstance();
+        $log = MessageQueueTest_LogCollector::getInstance();
 
         $base_msg = array(
             'deferred' => true, 
-            'object'   => 'Memex_Model_MessageQueueTest_Listener'
+            'object'   => 'MessageQueueTest_Listener'
         );
 
         // Set up a few queues and respective subscriptions.
-        $mq1 = new Memex_Model_MessageQueue();
+        $mq1 = new MessageQueue_Model();
         $mq1->subscribe(array_merge($base_msg, array('topic'=>'t1_1')));
         $mq1->subscribe(array_merge($base_msg, array('topic'=>'t1_2')));
         $mq1->subscribe(array_merge($base_msg, array('topic'=>'t1_3')));
-        $mq2 = new Memex_Model_MessageQueue();
+        $mq2 = new MessageQueue_Model();
         $mq2->subscribe(array_merge($base_msg, array('topic'=>'t2_1')));
         $mq2->subscribe(array_merge($base_msg, array('topic'=>'t2_2')));
         $mq2->subscribe(array_merge($base_msg, array('topic'=>'t2_3')));
-        $mq3 = new Memex_Model_MessageQueue();
+        $mq3 = new MessageQueue_Model();
         $mq3->subscribe(array_merge($base_msg, array('topic'=>'t3_1')));
         $mq3->subscribe(array_merge($base_msg, array('topic'=>'t3_2')));
         $mq3->subscribe(array_merge($base_msg, array('topic'=>'t3_3')));
@@ -467,7 +459,7 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
         $mq3->publish('t3_3'); 
 
         // Use yet another queue instance to simulate an external worker.
-        $mq = new Memex_Model_MessageQueue();
+        $mq = new MessageQueue_Model();
 
         // Reserve the first message from first queue, but leave it hanging.
         $m1 = $mq->reserve();
@@ -481,15 +473,15 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
         $mq->handle($m3);
 
         // This should exhaust messages from the second queue.
-        $mq->exhaust();
+        $mq->exhaust(10);
 
         // This should exhaust messages from the third queue.
         $mq->finish($m3);
-        $mq->exhaust();
+        $mq->exhaust(10);
 
         // This should exhaust messages from the first queue.
         $mq->finish($m1);
-        $mq->exhaust();
+        $mq->exhaust(10);
 
         // The log results should reflect the parallel batches / serial 
         // handling logic.
@@ -512,7 +504,7 @@ class Memex_Model_MessageQueueTest extends PHPUnit_Framework_TestCase
     
 }
 
-class Memex_Model_MessageQueueTest_LogCollector
+class MessageQueueTest_LogCollector
 {
     public $log;
 
@@ -537,7 +529,7 @@ class Memex_Model_MessageQueueTest_LogCollector
     }
 }
 
-class Memex_Model_MessageQueueTest_Listener
+class MessageQueueTest_Listener
 {
     public $log;
     public $id;
@@ -550,7 +542,7 @@ class Memex_Model_MessageQueueTest_Listener
     private function _log($method, $topic, $data, $context) {
         if ($data == null) $data = 'NU';
         if ($context == null) $context = 'NU';
-        Memex_Model_MessageQueueTest_LogCollector::getInstance()->log(
+        MessageQueueTest_LogCollector::getInstance()->log(
             $this->id . " $method $topic $data $context"
         );
     }
@@ -571,9 +563,4 @@ class Memex_Model_MessageQueueTest_Listener
         $this->_log('h3', $topic, $data, $context);
     }
 
-}
-
-// Call Memex_Model_LoginsTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Memex_Model_MessageQueueTest::main") {
-    Memex_Model_MessageQueueTest::main();
 }

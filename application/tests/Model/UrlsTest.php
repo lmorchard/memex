@@ -1,14 +1,4 @@
 <?php
-// Call Memex_Model_UrlsTest::main() if this source file is executed directly.
-if (!defined("PHPUnit_MAIN_METHOD")) {
-    define("PHPUnit_MAIN_METHOD", "Memex_Model_UrlsTest::main");
-}
-
-require_once dirname(__FILE__) . '/../TestHelper.php';
-
-/** Model_User */
-require_once 'Urls.php';
-
 /**
  * Test class for Memex_Model_UrlsTest.
  *
@@ -146,9 +136,4 @@ class Memex_Model_UrlsTest extends PHPUnit_Framework_TestCase
         $this->assertNull($test);
     }
     */
-}
-
-// Call Memex_Model_UrlsTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Memex_Model_UrlsTest::main") {
-    Memex_Model_UrlsTest::main();
 }

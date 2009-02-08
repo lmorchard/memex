@@ -1,12 +1,10 @@
 <?php
-require_once dirname(__FILE__) . '/Model.php';
-
 /**
  * Model managing known URLs
  */
-class Memex_Model_Urls extends Memex_Model
+class Urls_Model extends Model
 {
-    protected $_table_name = 'Urls';
+    protected $_table_name = 'urls';
 
     /**
      * Initialize model
@@ -58,18 +56,16 @@ class Memex_Model_Urls extends Memex_Model
      */
     public function fetchBy($url=null, $hash=null)
     {
-        $table = $this->getDbTable();
-        $select = $table->select();
+        $select = $this->db->select()
+            ->from($this->_table_name);
         if (null != $url) {
-            $url = $this->normalize_url_filter->filter($url);
-            //$select->where('url=?', $url);
+            $url = url::normalize($url);
             $hash = md5($url);
         } 
         if (null != $hash) {
-            $select->where('hash=?', $hash);
+            $select->where('hash', $hash);
         }
-        $row = $table->fetchRow($select);
-        return (null == $row) ? null : $row->toArray();
+        return $select->get()->current();
     }
 
     /**
@@ -81,8 +77,7 @@ class Memex_Model_Urls extends Memex_Model
      */
     public function fetchOrCreate($url, $profile_id)
     {
-        $url   = $this->normalize_url_filter->filter($url);
-        $table = $this->getDbTable();
+        $url = url::normalize($url);
 
         // Try fetching an existing URL and return it if found.
         $data = $this->fetchByUrl($url);
@@ -94,15 +89,20 @@ class Memex_Model_Urls extends Memex_Model
         $url_parts = parse_url($url);
 
         // Next, create a new URL record and return it.
-        $new_id = $table->insert(array(
-            'url'              => $url,
-            'hash'             => md5($url),
-            'hostname'         => empty($url_parts['host']) ? '' : $url_parts['host'],
-            'first_profile_id' => $profile_id,
-            'created'          => date('Y-m-d H:i:s', time())
-        ));
-        $rows = $table->find($new_id);
-        return ($rows) ? $rows->current()->toArray() : null;
+        $new_id = $this->db->insert(
+            $this->_table_name,
+            array(
+                'url'              => $url,
+                'hash'             => md5($url),
+                'hostname'         => empty($url_parts['host']) ? '' : $url_parts['host'],
+                'first_profile_id' => $profile_id,
+                'created'          => date('Y-m-d H:i:s', time())
+            )
+        )->insert_id();
+        return $this->db->select()
+            ->from($this->_table_name)
+            ->where('id', $new_id)
+            ->get()->current();
     }
 
     /**
@@ -110,9 +110,9 @@ class Memex_Model_Urls extends Memex_Model
      */
     public function deleteAll()
     {
-        if (!Zend_Registry::get('config')->model->enable_delete_all)
+        if (!Kohana::config('model.enable_delete_all'))
             throw new Exception('Mass deletion not enabled');
-        $this->getDbTable()->delete('');
+        $this->db->query('DELETE FROM ' . $this->_table_name);
     }
 
 }

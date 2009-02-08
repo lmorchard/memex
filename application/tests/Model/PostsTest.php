@@ -1,22 +1,10 @@
 <?php
-// Call Memex_Model_PostsTest::main() if this source file is executed directly.
-if (!defined("PHPUnit_MAIN_METHOD")) {
-    define("PHPUnit_MAIN_METHOD", "Memex_Model_PostsTest::main");
-}
-
-require_once dirname(__FILE__) . '/../TestHelper.php';
-
-require_once 'Posts.php';
-require_once 'Profiles.php';
-require_once 'Urls.php';
-require_once 'Tags.php';
-
 /**
  * Test class for Memex_Model_PostsTest.
  *
  * @group Models
  */
-class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase 
+class PostsTest extends PHPUnit_Framework_TestCase 
 {
     /**
      * Runs the test methods of this class.
@@ -36,16 +24,16 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->model = new Memex_Model_Posts();
+        $this->model = new Posts_Model();
         $this->model->deleteAll();
 
-        $this->profiles_model = new Memex_Model_Profiles();
+        $this->profiles_model = new Profiles_Model();
         $this->profiles_model->deleteAll();
 
-        $this->urls_model = new Memex_Model_Urls();
+        $this->urls_model = new Urls_Model();
         $this->urls_model->deleteAll();
 
-        $this->tags_model = new Memex_Model_Tags();
+        $this->tags_model = new Tags_Model();
         $this->tags_model->deleteAll();
 
         $this->profile_1 = $this->profiles_model->create(array(
@@ -195,7 +183,7 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
 
         // There shouldn't yet be a URL entry for this bookmark.
         $url = $this->urls_model->fetchByUrl($post_data['url']);
-        $this->assertNull($url);
+        $this->assertFalse($url);
 
         // Saving the bookmark should result in data returned.
         $saved_post = $this->model->save($post_data);
@@ -582,9 +570,4 @@ class Memex_Model_PostsTest extends PHPUnit_Framework_TestCase
 
     }
 
-}
-
-// Call Memex_Model_PostsTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Memex_Model_PostsTest::main") {
-    Memex_Model_PostsTest::main();
 }

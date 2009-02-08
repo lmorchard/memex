@@ -7,8 +7,10 @@ Thumbs.db
 *.swp
 *.swo
 xfers/
+application/tests/log/
 logs/
 logs/*log
 application/config/config.php
+application/config/database.php
 httpd.conf
 .htaccess

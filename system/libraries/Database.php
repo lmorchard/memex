@@ -237,6 +237,8 @@ class Database_Core {
 	{
 		if ($sql == '') return FALSE;
 
+        Kohana::log('debug', $sql);
+        
 		// No link? Connect!
 		$this->link or $this->connect();
 

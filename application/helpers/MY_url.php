@@ -8,9 +8,9 @@
  *      * Cleaning up YouTube links
  *      * etc...
  */
-class Memex_Filter_NormalizeUrl implements Zend_Filter_Interface
+class url extends url_Core
 {
-    public function filter($url)
+    public static function normalize($url)
     {
         // Bail if the URL is empty or null.
         if (!$url) return '';

@@ -1,12 +1,10 @@
 <?php
-require_once dirname(__FILE__) . '/Model.php';
-
 /**
  * Model managing known URLs
  */
-class Memex_Model_Tags extends Memex_Model
+class Tags_Model extends Model
 {
-    protected $_table_name  ='Tags';
+    protected $_table_name = 'tags';
 
     /**
      * Initialize model
@@ -91,25 +89,24 @@ class Memex_Model_Tags extends Memex_Model
      */
     public function countBy($profile_id=null, $start=0, $count=10, $threshold=null, $order='count desc')
     {
-        $table = $this->getDbTable();
-        $select = $table->select()
-            ->from($table, array('(tag) as tag', 'count(id) as count'))
-            ->group('tag');
+        $select = $this->db
+            ->select('tag as tag, count(id) as count')
+            ->from($this->_table_name)
+            ->groupby('tag');
 
         if (null !== $profile_id)
-            $select->where('profile_id=?', $profile_id);
+            $select->where('profile_id', $profile_id);
         if (null !== $threshold)
-            $select->where('count>?', $threshold);
+            $select->where('count>', $threshold);
         if ('count desc' == $order)
-            $select->order(array('count desc'));
+            $select->orderby('count', 'desc');
 
-        $select->order(array('tag asc'));
+        $select->orderby('tag', 'asc');
         
         if (null !== $start && null !== $count)
             $select->limit($count, $start);
 
-        $rows = $table->fetchAll($select);
-        return $rows->toArray();
+        return $select->get()->result_array();
     }
 
     /**
@@ -117,12 +114,11 @@ class Memex_Model_Tags extends Memex_Model
      */
     public function fetchByTagAndProfile($tag_name, $profile_id)
     {
-        $table = $this->getDbTable();
-        $row = $table->fetchRow($table->select()
-            ->where('tag=?', $tag_name)
-            ->where('profile_id=?', $profile_id)
-        );
-        return (null == $row) ? null : $row->toArray();
+        return $this->db->select()
+            ->from($this->_table_name)
+            ->where('tag', $tag_name)
+            ->where('profile_id', $profile_id)
+            ->get()->current();
     }
 
     /**
@@ -130,12 +126,11 @@ class Memex_Model_Tags extends Memex_Model
      */
     public function fetchByPost($post_id)
     {
-        $table = $this->getDbTable();
-        $select = $table->select()
-            ->where('post_id=?', $post_id)
-            ->order('position');
-        $rows = $table->fetchAll($select);
-        return $rows->toArray();
+        return $this->db->select()
+            ->from($this->_table_name)
+            ->where('post_id', $post_id)
+            ->orderby('position')
+            ->get()->result_array();
     }
 
     /**
@@ -145,11 +140,10 @@ class Memex_Model_Tags extends Memex_Model
      */
     public function deleteTagsForPost($post_id)
     {
-        $table    = $this->getDbTable();
-        $db       = $table->getAdapter();
-        $table->delete(array(
-            $db->quoteInto('post_id=?', $post_id),
-        ));
+        $this->db->delete(
+            $this->_table_name, 
+            array('post_id' => $post_id)
+        );
     }
 
     /**
@@ -158,15 +152,15 @@ class Memex_Model_Tags extends Memex_Model
      */
     public function updateTagsForPost($post_data)
     {
-        $table    = $this->getDbTable();
-        $db       = $table->getAdapter();
-        $posts    = $this->getModel('Posts');
+        $posts    = new Posts_Model();
         $new_tags = $this->parseTags($post_data['tags']);
 
         // Look up all existing tags for the post.
-        $tag_rows = $table->fetchAll(
-            $table->select()->where('post_id=?', $post_data['id'])
-        );
+        $tag_rows = $this->db->select()
+            ->from($this->_table_name)
+            ->where('post_id', $post_data['id'])
+            ->get();
+
         $old_tags = array();
         foreach ($tag_rows as $row) {
             $old_tags[] = $row['tag'];
@@ -175,30 +169,42 @@ class Memex_Model_Tags extends Memex_Model
         // The existing tags to delete are the difference between old and new
         $delete_tags = array_diff($old_tags, $new_tags);
         foreach ($delete_tags as $tag) {
-            $table->delete(array(
-                $db->quoteInto('post_id=?', $post_data['id']),
-                $db->quoteInto('tag=?', $tag)
-            ));
+            $this->db->delete(
+                $this->_table_name, 
+                array(
+                    'post_id' => $post_data['id'],
+                    'tag'     => $tag
+                )
+            );
         }
 
         // The new tags to add are the difference between new and old
         $create_tags = array_diff($new_tags, $old_tags);
         foreach ($create_tags as $tag) {
-            $table->insert(array( 
-                'tag'        => $tag,
-                'post_id'    => $post_data['id'], 
-                'profile_id' => $post_data['profile_id'], 
-                'url_id'     => $post_data['url_id']
-            ));
+            $this->db->insert(
+                $this->_table_name,
+                array( 
+                    'tag'        => $tag,
+                    'post_id'    => $post_data['id'], 
+                    'profile_id' => $post_data['profile_id'], 
+                    'url_id'     => $post_data['url_id'],
+                    'created'    => date('c'),
+                    'modified'   => date('c')
+                )
+            );
         }
 
         // Update the position index on all the updated tags.
         foreach ($new_tags as $position=>$tag) {
-            $table->update(
-                array( 'position' => $position ),
+            $this->db->update(
+                $this->_table_name,
+                array( 
+                    'position' => $position,
+                    'modified' => date('c')
+                ),
                 array(
-                    $db->quoteInto('post_id=?', $post_data['id']),
-                    $db->quoteInto('tag=?', $tag)
+                    'post_id'  => $post_data['id'],
+                    'tag'      => $tag
                 )
             );
         }
@@ -211,9 +217,9 @@ class Memex_Model_Tags extends Memex_Model
      */
     public function deleteAll()
     {
-        if (!Zend_Registry::get('config')->model->enable_delete_all)
-            throw new Exception('Mass deletion only supported during testing');
-        $this->getDbTable()->delete('');
+        if (!Kohana::config('model.enable_delete_all'))
+            throw new Exception('Mass deletion not enabled');
+        $this->db->query('DELETE FROM ' . $this->_table_name);
     }
 
 }

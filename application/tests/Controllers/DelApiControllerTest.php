@@ -1,24 +1,11 @@
 <?php
-// Call DelApiControllerTest::main() if this source file is executed directly.
-if (!defined("PHPUnit_MAIN_METHOD")) {
-    define("PHPUnit_MAIN_METHOD", "DelApiControllerTest::main");
-}
-
-require_once dirname(__FILE__) . '/../TestHelper.php';
-
-require_once 'DelApiController.php';
-require_once 'Logins.php';
-require_once 'Profiles.php';
-require_once 'Posts.php';
-require_once 'Urls.php';
-require_once 'Tags.php';
-
 /**
  * Test class for DelApiControllerTest.
  *
  * @group Models
  */
-class DelApiControllerTest extends Zend_Test_PHPUnit_ControllerTestCase //PHPUnit_Framework_TestCase 
+// class DelApiControllerTest extends Zend_Test_PHPUnit_ControllerTestCase //PHPUnit_Framework_TestCase 
+class DelApiControllerTest extends PHPUnit_Framework_TestCase 
 {
     /**
      * Runs the test methods of this class.
@@ -40,19 +27,19 @@ class DelApiControllerTest extends Zend_Test_PHPUnit_ControllerTestCase //PHPUni
     {
         $this->bootstrap = array($this, 'appBootstrap');
 
-        $this->logins_model = new Memex_Model_Logins();
+        $this->logins_model = new Logins_Model();
         $this->logins_model->deleteAll();
 
-        $this->profiles_model = new Memex_Model_Profiles();
+        $this->profiles_model = new Profiles_Model();
         $this->profiles_model->deleteAll();
 
-        $this->urls_model = new Memex_Model_Urls();
+        $this->urls_model = new Urls_Model();
         $this->urls_model->deleteAll();
 
-        $this->posts_model = new Memex_Model_Posts();
+        $this->posts_model = new Posts_Model();
         $this->posts_model->deleteAll();
 
-        $this->tags_model = new Memex_Model_Tags();
+        $this->tags_model = new Tags_Model();
         $this->tags_model->deleteAll();
 
         $this->login_data = array(
@@ -885,9 +872,4 @@ class DelApiControllerTest extends Zend_Test_PHPUnit_ControllerTestCase //PHPUni
         return $doc;
     }
 
-}
-
-// Call DelApiControllerTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "DelApiControllerTest::main") {
-    DelApiControllerTest::main();
 }

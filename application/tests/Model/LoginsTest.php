@@ -1,21 +1,10 @@
 <?php
-// Call Memex_Model_LoginsTest::main() if this source file is executed directly.
-if (!defined("PHPUnit_MAIN_METHOD")) {
-    define("PHPUnit_MAIN_METHOD", "Memex_Model_LoginsTest::main");
-}
-
-require_once dirname(__FILE__) . '/../TestHelper.php';
-
-/** Model_User */
-require_once 'Logins.php';
-require_once 'Profiles.php';
-
 /**
  * Test class for Model_User.
  *
  * @group Models
  */
-class Memex_Model_LoginsTest extends PHPUnit_Framework_TestCase 
+class LoginsTest extends PHPUnit_Framework_TestCase 
 {
     /**
      * Runs the test methods of this class.
@@ -35,10 +24,10 @@ class Memex_Model_LoginsTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->model = new Memex_Model_Logins();
+        $this->model = new Logins_Model();
         $this->model->deleteAll();
 
-        $this->profiles_model = new Memex_Model_Profiles();
+        $this->profiles_model = new Profiles_Model();
         $this->profiles_model->deleteAll();
     }
 
@@ -179,9 +168,4 @@ class Memex_Model_LoginsTest extends PHPUnit_Framework_TestCase
         }
     }
     
-}
-
-// Call Memex_Model_LoginsTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Memex_Model_LoginsTest::main") {
-    Memex_Model_LoginsTest::main();
 }

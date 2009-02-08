@@ -1,12 +1,10 @@
 <?php
-require_once dirname(__FILE__) . '/Model.php';
-
 /**
  * This is the DbTable class for the logins table.
  */
-class Memex_Model_Logins extends Memex_Model
+class Logins_Model extends Model
 {
-    protected $_table_name = 'Logins';
+    protected $_table_name = 'logins';
 
     /**
      * Create a new login
@@ -25,17 +23,17 @@ class Memex_Model_Logins extends Memex_Model
         if ($this->fetchByLoginName($data['login_name']))
             throw new Exception('duplicate login name');
 
-        $table = $this->getDbTable();
-
-        $row = $table->createRow()->setFromArray(array(
+        $data = array(
             'login_name' => $data['login_name'],
             'email'      => $data['email'],
             'password'   => md5($data['password']),
             'created'    => date('Y-m-d H:i:s', time())
-        ));
-        $row->save();
+        );
+        $data['id'] = $this->db
+            ->insert($this->_table_name, $data)
+            ->insert_id();
 
-        return $row->toArray();
+        return $data;
     }
 
     /**
@@ -48,7 +46,7 @@ class Memex_Model_Logins extends Memex_Model
      * @param string Login ID
      */
     public function delete($id) {
-        $this->getDbTable()->delete($id);
+        $this->db->delete($this->_table_name, array('id'=>$id));
     }
 
     /**
@@ -58,7 +56,8 @@ class Memex_Model_Logins extends Memex_Model
     {
         $new_login = $this->create($data);
         try {
-            $new_profile = $this->getModel('Profiles')->create($data);
+            $profiles_model = new Profiles_Model();
+            $new_profile = $profiles_model->create($data);
             $this->addProfileToLogin($new_login['id'], $new_profile['id']);
         } catch (Exception $e) {
             // If profile creation failed, delete the login.
@@ -74,7 +73,7 @@ class Memex_Model_Logins extends Memex_Model
      */
     public function addProfileToLogin($login_id, $profile_id) 
     {
-        return $this->getDbTable()->getAdapter()->insert(
+        return $this->db->insert(
             'logins_profiles', array(
                 'login_id'   => $login_id, 
                 'profile_id' => $profile_id
@@ -90,13 +89,12 @@ class Memex_Model_Logins extends Memex_Model
      */
     public function fetchByLoginName($login_name)
     {
-        $table = $this->getDbTable();
-        $row = $table->fetchRow(
-            $table->select()->where('login_name=?', $login_name)
-        );
-        if (null == $row) return null;
-        $data = $row->toArray();
-        return $data;
+        $row = $this->db->select()
+            ->from($this->_table_name)
+            ->where('login_name', $login_name)
+            ->get()->current();
+        if (!$row) return null;
+        return $row;
     }
 
     /**
@@ -113,16 +111,23 @@ class Memex_Model_Logins extends Memex_Model
      */
     public function fetchProfilesForLogin($login_id)
     {
-        $login_row = $this->getDbTable()->find($login_id)->current();
+        $login_row = $this->db->select()
+            ->from($this->_table_name)
+            ->where('id', $login_id)
+            ->get()->current();
+
         if (null == $login_row) return null;
 
-        $profile_rows = $login_row->findManyToManyRowset(
-            'Memex_Db_Table_Profiles', 
-            'Memex_Db_Table_LoginsProfiles'
-        );
+        $profile_rows = $this->db
+            ->select('profiles.*')
+            ->from('profiles')
+            ->join('logins_profiles', 'logins_profiles.profile_id=profiles.id')
+            ->where('logins_profiles.login_id', $login_row['id'])
+            ->get()->result_array();
+
         $profiles = array();
         foreach ($profile_rows as $row)
-            $profiles[] = $row->toArray();
+            $profiles[] = $row;
 
         return $profiles;
     }
@@ -133,9 +138,9 @@ class Memex_Model_Logins extends Memex_Model
      */
     public function deleteAll()
     {
-        if (!Zend_Registry::get('config')->model->enable_delete_all)
+        if (!Kohana::config('model.enable_delete_all'))
             throw new Exception('Mass deletion not enabled');
-        $this->getDbTable()->delete('');
+        $this->db->query('DELETE FROM ' . $this->_table_name);
     }
 
 }
