@@ -133,6 +133,47 @@ class Logins_Model extends Model
     }
 
     /**
+     * Build and return a validator for a registration form
+     *
+     * @param array Form data to validate.
+     */
+    public function getValidator($data)
+    {
+        $profiles_model = new Profiles_Model();
+
+        $valid = Validation::factory($data)
+            ->pre_filter('trim')
+            ->add_rules('login_name',       
+                'required', 'length[3,64]', 'valid::alpha_dash', 
+                array($this, 'isLoginNameAvailable'))
+            ->add_rules('email',            
+                'required', 'valid::email')
+            ->add_rules('password',         
+                'required')
+            ->add_rules('password_confirm', 
+                'required', 'matches[password]')
+            ->add_rules('screen_name',      
+                'required', 'length[3,64]', 'valid::alpha_dash', 
+                array($profiles_model, 'isScreenNameAvailable'))
+            ->add_rules('full_name',        
+                'required', 'valid::standard_text')
+            ->add_rules('captcha',          
+                'required', 'Captcha::valid')
+            ;
+        return $valid;
+    }
+
+    /**
+     * Check to see whether a login name is available, for use in form 
+     * validator.
+     */
+    public function isLoginNameAvailable($name)
+    {
+        $login = $this->fetchByLoginName($name);
+        return empty($login);
+    }
+
+    /**
      * Delete all users from the system.  Useful for tests, but dangerous 
      * otherwise.
      */

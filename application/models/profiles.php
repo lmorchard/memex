@@ -194,6 +194,33 @@ class Profiles_Model extends Model
     }
 
     /**
+     * Build and return a validator for a profile editing form
+     *
+     * @param array Form data to validate.
+     */
+    public function getValidator($data)
+    {
+        $valid = Validation::factory($data)
+            ->pre_filter('trim')
+
+            ->add_rules('screen_name',      
+                'required', 'length[3,64]', 'valid::alpha_dash', array($profiles_model, 'isScreenNameAvailable'))
+            ->add_rules('full_name',        
+                'required', 'valid::standard_text')
+            ;
+        return $valid;
+    }
+
+    /**
+     *
+     */
+    public function isScreenNameAvailable($name)
+    {
+        $profile = $this->fetchByScreenName($name);
+        return empty($profile);
+    }
+
+    /**
      * Delete all profiles from the system.  Useful for tests, but dangerous 
      * otherwise.
      */

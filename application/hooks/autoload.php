@@ -25,3 +25,12 @@ class Memex_Autoloader
 }
 
 spl_autoload_register(array('Memex_Autoloader', 'auto_load'));
+
+$path = array(
+    APPPATH,
+    APPPATH . '/libraries',
+    APPPATH . '/vendors',
+    get_include_path()
+);
+set_include_path(implode(PATH_SEPARATOR, $path));
+

@@ -6,12 +6,12 @@ class Memex_Form_Registration extends Zend_Form
 {
     public function init()
     {
-        $helper = Zend_Controller_Action_HelperBroker::getStaticHelper('getModel');
+        // $helper = Zend_Controller_Action_HelperBroker::getStaticHelper('getModel');
 
         $this->setAttrib('id', 'registration')
             ->setMethod('post')
             ->addElementPrefixPath(
-                'Memex_Validate', APPLICATION_PATH . '/models/Validate/', 
+                'Memex_Validate', APPPATH . '/library/Memex/Validate', 
                 'validate'
             );
 
@@ -23,7 +23,7 @@ class Memex_Form_Registration extends Zend_Form
                 'validators' => array(
                     array('StringLength', false, array(3, 64)),
                     array('Alnum', true, array(false)),
-                    array('LoginNameAvailable', false, array($helper->getModel('Logins')))
+                    // array('LoginNameAvailable', false, array($helper->getModel('Logins')))
                 )
             ))
             ->addElement('text', 'email', array(

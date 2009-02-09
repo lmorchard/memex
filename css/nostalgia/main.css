@@ -29,44 +29,48 @@ form p.hint {
     padding: 0.25em 1em;
     font-weight: bold;
 }
-form dl {
+form {
     margin: 0; padding: 0;
 }
-form fieldset dl {
+form fieldset {
+    margin: 0.25em;
+    padding: 0.25em;
+}
+form fieldset ul {
+    list-style-type: none;
+}
+form fieldset ul li {
     clear: both;
 }
-form fieldset dl {
-    clear: both;
-}
-form fieldset dl dt {
-    width: 23ex;
+form fieldset ul li label {
+    width: 18ex;
     text-align: right;
     float: left;
-    height: 3.5em;
-}
-form fieldset dl dt label {
     display: block;
-    padding: 0.75em 0em;
+    padding: 0.5em 0.5em 0.5em 0;
 }
-form fieldset dl dt label:after {
+form fieldset ul li label:after {
     content: ': ';
 }
-form fieldset dl dd {
-    min-height: 3.5em;
-    margin-left: 24ex;
-}
-form fieldset dl dd input.text, 
-form fieldset dl dd input.password {
+form fieldset ul li.input input,
+form fieldset ul li.password input {
     margin: 0.5em 0em;
     width: 75ex;
 }
-form fieldset dl dd input.submit {
+form fieldset ul li.submit input {
     margin: 0.5em 0em;
 }
-form fieldset dl dd textarea {
+form fieldset ul textarea {
     font-family: arial, sans-serif;
     font-size: 100%; 
     width: 75ex;
+}
+form fieldset ul li.captcha input {
+    width: 10ex;
+    clear: right;
+    display: block;
+}
+form fieldset ul li.captcha img {
 }
 
 #header {
