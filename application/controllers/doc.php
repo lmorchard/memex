@@ -8,15 +8,16 @@ class Doc_Controller extends Controller
 
     public function index() 
     {
-        $doc_path = join('/', Router::$arguments);
-        if (!$doc_path) $doc_path = 'README';
+        $params = $this->getParamsFromRoute(array(
+            'doc_path' => 'README'
+        ));
 
         $root_docs = array( 'README', 'TODO' );
 
-        if (in_array($doc_path, $root_docs)) {
-            $path = dirname(APPPATH) . '/' . $doc_path . '.md';
+        if (in_array($params['doc_path'], $root_docs)) {
+            $path = dirname(APPPATH) . '/' . $params['doc_path'] . '.md';
         } else {
-            $path = dirname(APPPATH) . '/docs/' . $doc_path . '.md';
+            $path = dirname(APPPATH) . '/docs/' . $params['doc_path'] . '.md';
         }
 
         if (!is_file($path)) {
@@ -29,7 +30,7 @@ class Doc_Controller extends Controller
 
         require_once 'Markdown.php';
         $this->setViewData(array(
-            'doc_path'    => $doc_path,
+            'doc_path'    => $params['doc_path'],
             'doc_content' => Markdown(file_get_contents($path))
         ));
     }

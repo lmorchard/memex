@@ -54,6 +54,27 @@ class Controller extends Controller_Core {
     }
 
     /**
+     * Convert the arguments in the route to name/value parameters.
+     *
+     * @return array Parameters based on current route.
+     */
+    public function getParamsFromRoute($defaults=null)
+    {
+        $args = Router::$arguments;
+        $params = empty($defaults) ? array() : $defaults;
+        while (!empty($args)) {
+            $name = array_shift($args);
+            if ('tags' == $name || 'path' == $name) {
+                $params[$name] = join('/', $args);
+                break;
+            } else {
+                $params[$name] = array_shift($args);
+            }
+        }
+        return $params;
+    }
+
+    /**
      * Set the state of auto rendering at the end of controller method.
      *
      * @param  boolean whether or not to autorender

@@ -32,23 +32,22 @@ class Post_Controller extends Controller
      */
     public function profile()
     {
-        $args = Router::$arguments;
-        $screen_name = 
-            count($args) ? array_shift($args) : null;
-        $tags = 
-            count($args) ? urldecode(join('/',$args)) : '';
-        $is_feed = false;
+        $params = $this->getParamsFromRoute(array(
+            'tags'    => '',
+            'is_feed' => false
+        ));
 
         // Try to match the screen name to a profile, or bail with a 404.
         $profiles_model = new Profiles_Model();
-        $profile        = $profiles_model->fetchByScreenName($screen_name);
+        $profile = 
+            $profiles_model->fetchByScreenName($params['screen_name']);
         if (!$profile) {
             return Event::run('system.404');
         }
 
         // Parse out any tags specified in the URL route.
         $tags_model = new Tags_Model();
-        $tags = $tags_model->parseTags($tags);
+        $tags = $tags_model->parseTags($params['tags']);
 
         $tag_counts = $tags_model->countByProfile($profile['id']);
 
@@ -68,12 +67,12 @@ class Post_Controller extends Controller
             'tags'        => $tags,
             'posts'       => $posts,
             'profile'     => $profile,
-            'screen_name' => $screen_name
+            'screen_name' => $params['screen_name']
         ));
 
-        //if ($is_feed) {
-        //    return $this->renderFeed();
-        //}
+        if ('true' == $params['is_feed']) {
+            return $this->renderFeed();
+        }
     }
 
     /**
@@ -81,17 +80,13 @@ class Post_Controller extends Controller
      */
     public function tag()
     {
-        $is_feed = False;
-
-        $args = Router::$arguments;
-        if (0 == count($args)) {
-            $tags = '';
-        } else {
-            $tags = urldecode(join('/', $args));
-        }
+        $params = $this->getParamsFromRoute(array(
+            'tags'    => '',
+            'is_feed' => false
+        ));
 
         $tags_model = new Tags_Model();
-        $tags = $tags_model->parseTags($tags);
+        $tags = $tags_model->parseTags($params['tags']);
 
         $posts_model = new Posts_Model();
         $posts_count = $posts_model->countByTags($tags);
@@ -105,7 +100,7 @@ class Post_Controller extends Controller
             'profile' => null
         ));
 
-        if ($is_feed) {
+        if ('true' == $params['is_feed']) {
             return $this->renderFeed();
         }
     }

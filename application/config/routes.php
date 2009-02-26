@@ -6,26 +6,26 @@ $config['login']    = 'auth/login';
 $config['logout']   = 'auth/logout';
 
 $config['save']              = 'post/save';
-$config['posts/(.*);edit']   = 'post/save/$1/edit';
-$config['posts/(.*);copy']   = 'post/save/$1/copy';
-$config['posts/(.*);delete'] = 'post/delete/$1';
-$config['posts/(.*)']        = 'post/view/$1';
+$config['posts/(.*);edit']   = 'post/save/uuid/$1/submethod/edit';
+$config['posts/(.*);copy']   = 'post/save/uuid/$1/submethod/copy';
+$config['posts/(.*);delete'] = 'post/delete/uuid/$1';
+$config['posts/(.*)']        = 'post/view/uuid/$1';
 
-$config['docs/(.*)'] = 'doc/index/$1';
+$config['docs/(.*)'] = 'doc/index/path/$1';
 $config['docs']      = 'doc/index';
 
-$config['~(.*)/(.*)']       = 'post/profile/$1/$2';
-$config['~(.*)']            = 'post/profile/$1';
-$config['people/(.*)/(.*)'] = 'post/profile/$1/$2';
-$config['people/(.*)']      = 'post/profile/$1';
+$config['~([^/]+)/(.*)']       = 'post/profile/screen_name/$1/tags/$2';
+$config['~(.*)']               = 'post/profile/screen_name/$1';
+$config['people/([^/]+)/(.*)'] = 'post/profile/screen_name/$1/tags/$2';
+$config['people/(.*)']         = 'post/profile/screen_name/$1';
 
-$config['feeds/(.*)/recent']      = 'post/tag//$1';
-$config['feeds/(.*)/recent/(.*)'] = 'post/tag/$2/$1';
-$config['feeds/(.*)/tag/(.*)']    = 'post/tag/$2/$1';
-$config['feeds/(.*)/(.*)/(.*)']   = 'post/profile/$2/$3/$1';
-$config['feeds/(.*)']             = 'post/tag//$1';
+$config['feeds/([^/]+)/recent']       = 'post/tag/is_feed/true/format/$1';
+$config['feeds/([^/]+)/recent/(.*)']  = 'post/tag/is_feed/true/format/$1/tags/$2';
+$config['feeds/([^/]+)/tag/(.*)']     = 'post/tag/is_feed/true/format/$1/tags/$2';
+$config['feeds/([^/]+)/([^/]+)/(.*)'] = 'post/profile/is_feed/true/format/$1/screen_name/$2/tags/$3';
+$config['feeds/(.*)']                 = 'post/tag/is_feed/true/format/$1';
 
-$config['tag/(.*)'] = 'post/tag/$1';
+$config['tag/(.*)'] = 'post/tag/tags/$1';
 $config['recent']   = 'post/tag';
 
 $config['_default'] = 'post/tag';
