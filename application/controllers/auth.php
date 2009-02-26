@@ -12,6 +12,7 @@ class Auth_Controller extends Controller
      */
     public function index()
     {
+        return url::redirect('login');
     }
 
     /**
@@ -19,21 +20,12 @@ class Auth_Controller extends Controller
      */
     public function home()
     {
-        $logins   = $this->_helper->getModel('Logins');
-        $identity = Zend_Auth::getInstance()->getIdentity();
-        $profile  = $logins->fetchDefaultProfileForLogin($identity->id);
-
-        if (empty($profile['screen_name'])) {
-            return $this->_helper->redirector->gotoRoute(
-                array('screen_name' => $profile['screen_name']),
-                'auth_logout'
-            );
+        if (!$this->auth->isLoggedIn()) {
+            url::redirect('login');
+        } else {
+            url::redirect('profile/' . 
+                $this->auth_data['profile']['screen_name']);
         }
-
-        return $this->_helper->redirector->gotoRoute(
-            array('screen_name' => $profile['screen_name']),
-            'post_profile'
-        );
     }
 
     /**
@@ -41,15 +33,18 @@ class Auth_Controller extends Controller
      */
     function register()
     {
-        // Accept only POST requests for registration.
         if ('post' != request::method())
             return;
 
         $logins = new Logins_Model();
-        $validator = $logins->getValidator($this->input->post());
+        $validator = $logins->getRegistrationValidator(
+            $this->input->post()
+        );
+
         if (!$validator->validate()) {
-            $this->setViewData('errors', 
-                $validator->errors('form_errors_registration'));
+            $this->setViewData(
+                'errors', $validator->errors('form_errors_auth')
+            );
             return;
         }
 
@@ -69,63 +64,37 @@ class Auth_Controller extends Controller
      */
     public function login()
     {
-        /*
-        $form = $this->view->login_form;
+        if ('post' != request::method())
+            return;
 
-        $request = $this->getRequest();
-        if (!$request->isPost()) {
-            $get_data = $request->getQuery();
-            if (!empty($get_data['jump'])) {
-                $form->populate(array(
-                    'jump' => $get_data['jump']
-                ));
-            }
+        $logins = new Logins_Model();
+        $validator = $logins->getLoginValidator(
+            $this->input->post()
+        );
+
+        if (!$validator->validate()) {
+            $this->setViewData(
+                'errors', $validator->errors('form_errors_auth')
+            );
             return;
         }
 
-        $post_data = $request->getPost();
-        if (!$form->isValid($post_data)) {
-            return;
-        }
+        $data = $validator->as_array();
 
-        // Get our authentication adapter and check credentials
-        $auth        = Zend_Auth::getInstance();
+        $login   = $logins->fetchByLoginName($data['login_name']);
+        $profile = $logins->fetchDefaultProfileForLogin($login['id']);
 
-        $form_values = $form->getValues();
-        $adapter     = $this->getAuthAdapter($form_values);
-
-        $storage = $auth->getStorage();
-        $storage->setUserName($form_values['login_name']);
-
-        $result  = $auth->authenticate($adapter);
-        if (!$result->isValid()) {
-            $form->setDescription('Login name and password not valid');
-            return;
-        }
-
-        // Persist some identity details
-        $logins_model = $this->_helper->getModel('Logins');
-        $identity = $adapter->getResultRowObject(array(
-            'id', 'login_name', 'email', 'created'
+        $this->auth->login($data['login_name'], array(
+            'login' => $login, 'profile' => $profile
         ));
-        $identity->default_profile = 
-            $logins_model->fetchDefaultProfileForLogin($identity->id);
-        $storage->write($identity);
 
-        // We're authenticated!
-        if (isset($post_data['jump']) && substr($post_data['jump'], 0, 1) == '/') {
-            // Jump to the site-relative URL retained before login (ie. a 
-            // populated bookmark form)
-            return $this->_helper->redirector->gotoUrl(
-                $post_data['jump'], array('prependBase' => true)
-            );
+        if (isset($data['jump']) && substr($data['jump'], 0, 1) == '/') {
+            // Allow post-login redirect only if the param starts with '/', 
+            // interpreted as relatve to root of site.
+            return url::redirect($data['jump']);
         } else {
-            // Jump to the profile home page.
-            return $this->_helper->redirector->gotoRoute(
-                array(), 'auth_home'
-            );
+            return url::redirect();
         }
-        */
     }
 
     /**
@@ -133,14 +102,11 @@ class Auth_Controller extends Controller
      */
     public function logout()
     {
-        /*
-        // Clear the identity and remove it from the view.
-        Zend_Auth::getInstance()->clearIdentity();
-        $this->view->assign(array(
-            'auth_identity' => null,
-            'auth_profile'  => null
+        $this->setViewData(array(
+            'auth_login'   => null,
+            'auth_profile' => null
         ));
-         */
+        $this->auth->logout();
     }
          
 } 

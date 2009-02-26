@@ -202,7 +202,6 @@ class Profiles_Model extends Model
     {
         $valid = Validation::factory($data)
             ->pre_filter('trim')
-
             ->add_rules('screen_name',      
                 'required', 'length[3,64]', 'valid::alpha_dash', array($profiles_model, 'isScreenNameAvailable'))
             ->add_rules('full_name',        

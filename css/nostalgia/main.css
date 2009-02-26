@@ -52,6 +52,12 @@ form fieldset ul li label {
 form fieldset ul li label:after {
     content: ': ';
 }
+form fieldset ul li label.hidden:after {
+    content: '';
+}
+form fieldset ul li.hidden {
+    display: none;
+}
 form fieldset ul li.input input,
 form fieldset ul li.password input {
     margin: 0.5em 0em;

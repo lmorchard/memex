@@ -1,34 +1,36 @@
 <?php
-require_once 'markdown.php';
-
 /**
  * Markdown-based frontend to docs directory.
  */
-class DocController extends Zend_Controller_Action 
+class Doc_Controller extends Controller 
 {
-    public function indexAction() 
-    {
-        $request = $this->getRequest();
+    protected $auto_render = TRUE;
 
-        $doc_path = $request->getParam('path');
+    public function index() 
+    {
+        $doc_path = join('/', Router::$arguments);
         if (!$doc_path) $doc_path = 'README';
 
         $root_docs = array( 'README', 'TODO' );
 
         if (in_array($doc_path, $root_docs)) {
-            $path = dirname(dirname(APPLICATION_PATH)) . '/' . $doc_path . '.md';
+            $path = dirname(APPPATH) . '/' . $doc_path . '.md';
         } else {
-            $path = dirname(dirname(APPLICATION_PATH)) . '/docs/' . $doc_path . '.md';
+            $path = dirname(APPPATH) . '/docs/' . $doc_path . '.md';
         }
 
-        if (!is_file($path))
-            throw new Zend_Exception('Not Found', 404);
-        if (realpath($path) != $path)
-            throw new Zend_Exception('Forbidden ' . realpath($path) . ' != ' . $path, 403);
+        if (!is_file($path)) {
+            return Event::run('system.404');
+        }
+        if (realpath($path) != $path) {
+            header('HTTP/1.1 403 Forbidden');
+            return;
+        }
 
-        $this->view->doc_path = 
-            $doc_path;
-        $this->view->doc_content = 
-            Markdown(file_get_contents($path));
+        require_once 'Markdown.php';
+        $this->setViewData(array(
+            'doc_path'    => $doc_path,
+            'doc_content' => Markdown(file_get_contents($path))
+        ));
     }
 }

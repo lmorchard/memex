@@ -71,21 +71,26 @@ class form extends form_Core
             'class' => $type
         );
 
-        return join("\n", array(
-            '<li ' . html::attributes($li_attrs) .'>',
-            form::label($name, $label),
-            call_user_func(
-                array('form', $type), 
-                array(
-                    'name'  => $name,
-                    'class' => $type
+        if ('hidden' == $type) {
+            return join("\n", array(
+                form::hidden(array($name => $value))
+            ));
+        } else {
+            return join("\n", array(
+                '<li ' . html::attributes($li_attrs) .'>',
+                ($label != null) ?
+                    form::label($name, $label) : 
+                    form::label(array('for'=>$name, 'class'=>'hidden'), ''),
+                call_user_func(
+                    array('form', $type), 
+                    array('name' => $name, 'class' => $type),
+                    $value,
+                    '',
+                    false
                 ),
-                $value,
-                '',
-                false
-            ),
-            '</li>'
-        ));
+                '</li>'
+            ));
+        }
     }
 
     /**

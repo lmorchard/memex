@@ -17,7 +17,7 @@ class out_Core
      * @param string content to escape
      * @return string HTML-encoded content
      */
-    public static function H($s, $echo=TRUE) {
+    public static function H($s, $echo=FALSE) {
         $out = htmlentities($s);
         if ($echo) echo $out;
         else return $out;
@@ -29,7 +29,7 @@ class out_Core
      * @param string content to encode
      * @return string URL-encoded content
      */
-    public static function U($s, $echo=TRUE) {
+    public static function U($s, $echo=FALSE) {
         $out = rawurlencode($s);
         if ($echo) echo $out;
         else return $out;
@@ -41,7 +41,7 @@ class out_Core
      * @param mixed some data to be encoded
      * @return string JSON-encoded data
      */
-    public static function JSON($s, $echo=TRUE) {
+    public static function JSON($s, $echo=FALSE) {
         $out = json_encode($s);
         if ($echo) echo $out;
         else return $out;

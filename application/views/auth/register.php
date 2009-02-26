@@ -3,7 +3,7 @@
 <?php slot::end() ?>
 
 <?php
-    echo form::build('register', array('class'=>'signup'), @$errors, array(
+    echo form::build('register', array('class'=>'register'), @$errors, array(
         form::fieldset('login details', array('class'=>'login'), array(
             form::field('input',    'login_name',       'Login name'),
             form::field('input',    'email',            'Email address'),
@@ -17,7 +17,7 @@
         )),
         form::fieldset('finish', array(), array(
             form::captcha('captcha', 'Captcha'),
-            form::field('submit', 'register', 'Register', array('value'=>'Register'))
+            form::field('submit', 'register', null, array('value'=>'Register'))
         ))
     ));
 ?>

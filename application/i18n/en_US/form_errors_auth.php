@@ -23,6 +23,8 @@ $lang = array(
             => 'Valid email address is required.'
     ),
     'password' => array(
+        'default'
+            => 'Password is invalid.',
         'required' 
             => 'Password is required.'
     ),

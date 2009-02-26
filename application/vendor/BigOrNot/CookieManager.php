@@ -6,7 +6,6 @@
  * All wrongs reserved
  *
  * Hacks and tweaks by l.m.orchard@pobox.com
- *
  */
 
 class    BigOrNot_CookieManager

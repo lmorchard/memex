@@ -5,8 +5,6 @@
 This hopes one day to grow up to be an Open Source social bookmarking web
 application.  
 
-Or, at least, it will help me learn the Zend Framework.
-
 ### Requirements
 
 * PHP 5+

@@ -2,14 +2,6 @@
 <?php
     $action_name     = Router::$method;
     $controller_name = Router::$controller;
-
-    if (null === $auth_profile) {
-    } else {
-        $profile_home_url = $url(
-            array('screen_name' => $auth_profile['screen_name']), 
-            'post_profile'
-        );
-    }
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml"> 
     <head>  
@@ -35,8 +27,8 @@
                 <div class="main">
                     <?php if (null != $auth_profile): ?>
                         <ul class="nav">
-                            <li class="first"><a href="<?= $profile_home_url ?>">your bookmarks</a></li> 
-                            <li><a href="<?= $url(array(), 'post_save', true) ?>">save new</a></li>
+                            <li class="first"><a href="<?= url::base() . 'people/' . out::U($auth_profile['screen_name']) ?>">your bookmarks</a></li> 
+                            <li><a href="<?= url::base() . 'save' ?>">save new</a></li>
                         </ul>
                     <?php endif ?>
                 </div>
@@ -45,11 +37,11 @@
 
                     <div class="auth">
                         <ul class="nav">
-                            <?php if (false && null === $auth_profile): ?>
+                            <?php if (null === $auth_profile): ?>
                                 <li class="first"><a href="<?= url::base() . 'login' ?>">login</a></li>
                                 <li><a href="<?= url::base() . 'register' ?>">register</a></li>
                             <?php else: ?>
-                                <li class="first">logged in as <a href="<?= $profile_home_url ?>"><?= out::H($auth_profile['screen_name']) ?></a></li>
+                                <li class="first">logged in as <a href="<?= url::base() . 'people/' . out::U($auth_profile['screen_name']) ?>"><?= out::H($auth_profile['screen_name']) ?></a></li>
                                 <li><a href="<?= url::base() . 'register' ?>">settings</a></li>
                                 <li><a href="<?= url::base() . 'logout' ?>">logout</a></li>
                             <?php endif; ?>
@@ -66,15 +58,6 @@
 
             <div id="middle">
                 <div id="content">
-                    <?php
-                        $md_content = slot::output('doc_content');
-                        if ($md_content) {
-                            require_once 'markdown.php';
-                            echo '<div class="doc_content">';
-                            echo Markdown($md_content);
-                            echo '</div>';
-                        }
-                    ?>
                     <?php echo $content ?>
                 </div>
                 <?php if ( slot::exists('sidebar') ): ?>
@@ -85,9 +68,9 @@
             <div id="footer">
                 <ul class="nav">
                     <li class="first"><a href="/">memex</a></li>
-                    <li><a href="<?= url::base() . 'doc/about' ?>">about</a></li>
-                    <li><a href="<?= url::base() . 'doc/todo' ?>">todo</a></li>
-                    <li><a href="<?= url::base() . 'doc/faq' ?>">faq</a></li>
+                    <li><a href="<?= url::base() . 'docs/README' ?>">about</a></li>
+                    <li><a href="<?= url::base() . 'docs/TODO' ?>">todo</a></li>
+                    <li><a href="<?= url::base() . 'docs/FAQ' ?>">faq</a></li>
                     <?= slot::output('footer_nav') ?>
                 </ul>
 

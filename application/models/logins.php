@@ -137,7 +137,7 @@ class Logins_Model extends Model
      *
      * @param array Form data to validate.
      */
-    public function getValidator($data)
+    public function getRegistrationValidator($data)
     {
         $profiles_model = new Profiles_Model();
 
@@ -164,6 +164,22 @@ class Logins_Model extends Model
     }
 
     /**
+     * Build and return a validator for the login form
+     *
+     * @param array Form data to validate
+     */
+    public function getLoginValidator($data)
+    {
+        $valid = Validation::factory($data)
+            ->pre_filter('trim')
+            ->add_rules('login_name', 'required', 'length[3,64]', 'valid::alpha_dash')
+            ->add_rules('password', 'required')
+            ->add_callbacks('password', array($this, 'isPasswordValid'))
+            ;
+        return $valid;
+    }
+
+    /**
      * Check to see whether a login name is available, for use in form 
      * validator.
      */
@@ -171,6 +187,17 @@ class Logins_Model extends Model
     {
         $login = $this->fetchByLoginName($name);
         return empty($login);
+    }
+
+    /**
+     * Check to see whether a login name is available, for use in form 
+     * validator.
+     */
+    public function isPasswordValid($valid, $field)
+    {
+        $login = $this->fetchByLoginName($valid['login_name']);
+        if (md5($valid[$field]) != $login['password'])
+            $valid->add_error($field, 'invalid');
     }
 
     /**
