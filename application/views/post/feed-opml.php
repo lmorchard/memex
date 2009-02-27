@@ -2,26 +2,21 @@
 /**
  * View script to render posts as an OPML outline.
  */
-$this->layout()->disableLayout();
-
-$config = Zend_Registry::get('config');
-$site_title = $config->get('site_title', 'memex');
+$site_title = Kohana::config('config.site_title');
 
 // Construct the site absolute base URL.
 $site_base = ( empty($_SERVER['HTTPS']) ? 'http://' : 'https://' ) . 
     $_SERVER['HTTP_HOST'];
 
-if (!empty($this->screen_name)) {
+if (!empty($screen_name)) {
     // Screen name given, so this is a profile feed.
-    $title = $site_title . ' / ' . $this->screen_name;
-    if ($this->tags) {
-        $title .= ' / ' . join(' / ', $this->tags);
-    }
+    $title = $site_title . ' / ' . $screen_name;
+    if ($tags) $title .= ' / ' . join(' / ', $tags);
 } else {
     // No screen name, so this is a recent or a tag feed.
     $title = $site_title . ' / ';
-    if ($this->tags) {
-        $title .= 'tag / ' . join(' / ', $this->tags);
+    if ($tags) {
+        $title .= 'tag / ' . join(' / ', $tags);
     } else {
         $title .= 'recent';
     }
@@ -39,14 +34,14 @@ $x->opml(array(
         ->title($title)
         ->emptyelement('atom:link', array( 
             'rel'=>'self', 'type'=>'application/atom+xml', 
-            'href'=>$site_base . $this->url()
+            'href'=>url::current()
         ))
     ->pop()
     ->body();
 
 // Add each of the posts as OPML outline elements, with details 
 // encoded in attributes.
-foreach ($this->posts as $post) {
+foreach ($posts as $post) {
     $attrs = array(
         'text'        => $post['title'],
         'created'     => gmdate('c', strtotime($post['user_date'])),

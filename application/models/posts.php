@@ -6,15 +6,6 @@ class Posts_Model extends Model
 {
     protected $_table_name = 'posts';
 
-    /**
-     * Initialize the model.
-     */
-    function init() 
-    {
-        require_once dirname(__FILE__) . '/Filter/NormalizeUrl.php';
-        $this->normalize_url_filter = new Memex_Filter_NormalizeUrl();
-    }
-
     public function buildPostSignature($data)
     {
         return md5(join('|', array(
@@ -45,6 +36,8 @@ class Posts_Model extends Model
             if (!$date_in)
                 throw new Exception('valid optional date required');
             $post_data['user_date'] = date('c', $date_in);
+        } else {
+            $post_data['user_date'] = date('c');
         }
 
         // Get an ID for the post's URL and set the ID in post data
@@ -475,10 +468,11 @@ class Posts_Model extends Model
      */
     public function deleteByUUID($uuid)
     {
+        if (empty($uuid)) return false;
         $data = $this->fetchOneByUUID($uuid);
         if (!$data) return false;
 
-        $this->db->delete($this->_table_name, 'uuid', $uuid);
+        $this->db->delete($this->_table_name, array('uuid' => $uuid));
 
         // $mq = Zend_Registry::get('message_queue');
         // $mq->publish("Memex_Model_Posts/postDeleted", $data);
@@ -495,6 +489,7 @@ class Posts_Model extends Model
      */
     public function deleteByUrlAndProfile($url, $profile_id)
     {
+        if (empty($uuid) || empty($profile_id)) return false;
         $data = $this->fetchOneByUrlAndProfile($url, $profile_id);
         if (null == $data) return null;
 
@@ -606,6 +601,23 @@ class Posts_Model extends Model
             }
         }
 
+    }
+
+    /**
+     * Build and return a validator
+     *
+     * @param array Form data to validate.
+     */
+    public function getValidator($data)
+    {
+        $valid = Validation::factory($data)
+            ->pre_filter('trim')
+            ->pre_filter(array('url','normalize'), 'url')
+            ->add_rules('url',   'url')
+            ->add_rules('title', 'required')
+            ->add_rules('notes', 'length[0,1000]')
+            ;
+        return $valid;
     }
 
 }

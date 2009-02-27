@@ -19,11 +19,12 @@ $config['~(.*)']               = 'post/profile/screen_name/$1';
 $config['people/([^/]+)/(.*)'] = 'post/profile/screen_name/$1/tags/$2';
 $config['people/(.*)']         = 'post/profile/screen_name/$1';
 
-$config['feeds/([^/]+)/recent']       = 'post/tag/is_feed/true/format/$1';
-$config['feeds/([^/]+)/recent/(.*)']  = 'post/tag/is_feed/true/format/$1/tags/$2';
-$config['feeds/([^/]+)/tag/(.*)']     = 'post/tag/is_feed/true/format/$1/tags/$2';
-$config['feeds/([^/]+)/([^/]+)/(.*)'] = 'post/profile/is_feed/true/format/$1/screen_name/$2/tags/$3';
-$config['feeds/(.*)']                 = 'post/tag/is_feed/true/format/$1';
+$config['feeds/([^/]+)/recent']              = 'post/tag/is_feed/true/format/$1';
+$config['feeds/([^/]+)/recent/(.*)']         = 'post/tag/is_feed/true/format/$1/tags/$2';
+$config['feeds/([^/]+)/tag/(.*)']            = 'post/tag/is_feed/true/format/$1/tags/$2';
+$config['feeds/([^/]+)/people/([^/]+)/(.*)'] = 'post/profile/is_feed/true/format/$1/screen_name/$2/tags/$3';
+$config['feeds/([^/]+)/people/([^/]+)']      = 'post/profile/is_feed/true/format/$1/screen_name/$2';
+$config['feeds/(.*)']                        = 'post/tag/is_feed/true/format/$1';
 
 $config['tag/(.*)'] = 'post/tag/tags/$1';
 $config['recent']   = 'post/tag';

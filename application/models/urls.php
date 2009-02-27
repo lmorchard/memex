@@ -7,15 +7,6 @@ class Urls_Model extends Model
     protected $_table_name = 'urls';
 
     /**
-     * Initialize model
-     */
-    public function init()
-    {
-        require_once dirname(__FILE__) . '/Filter/NormalizeUrl.php';
-        $this->normalize_url_filter = new Memex_Filter_NormalizeUrl();
-    }
-
-    /**
      * Fetch data for a URL by URL
      *
      * @param string URL for lookup

@@ -1,6 +1,6 @@
 <ul class="posts">
-    <?= $this->partial('post.phtml', array(
-        'auth_profile' => $this->auth_profile,
-        'post'         => $this->post
-    )); ?>
+    <?php View::factory('post/post', array(
+        'auth_profile' => $auth_profile,
+        'post'         => $post
+    ))->render(true) ?>
 </ul>

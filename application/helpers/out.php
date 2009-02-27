@@ -18,7 +18,7 @@ class out_Core
      * @return string HTML-encoded content
      */
     public static function H($s, $echo=FALSE) {
-        $out = htmlentities($s);
+        $out = htmlentities($s, ENT_QUOTES, 'utf-8');
         if ($echo) echo $out;
         else return $out;
     }

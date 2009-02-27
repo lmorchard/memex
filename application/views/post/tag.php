@@ -23,11 +23,11 @@
 
 <?php slot::start('infobar') ?>
     <?php if (empty($tags)): ?>
-        Recent items (<?= $posts_count ?>)
+        Recent items (<?= $pagination['total'] ?>)
     <?php else: ?>
         Recent items tagged <?php foreach ($tags as $tag): ?>
             <a href="<?= url::base() . 'tag/' . out::U($tag) ?>"><?= out::H($tag) ?></a>
-        <?php endforeach ?> (<?= $posts_count ?>)
+        <?php endforeach ?> (<?= $pagination['total'] ?>)
     <?php endif ?>
 <?php slot::end() ?>
 
@@ -50,22 +50,17 @@
 
 <?php else: ?>
 
-    <!-- $paginationControl(
-        $paginator, 'Sliding', 'pagination_mini_control.phtml'
-    ); -->
+    <?php View::factory('pagination_mini_control', $pagination)->render(true) ?>
 
     <ul class="posts">
         <?php foreach ($posts as $post): ?>
             <?php View::factory('post/post', array(
-                'profile'      => $profile,
                 'auth_profile' => $auth_profile,
                 'post'         => $post
             ))->render(true) ?>
         <?php endforeach; ?>
     </ul>
 
-    <!-- $paginationControl(
-        $paginator, 'Sliding', 'pagination_control.phtml'
-    ); -->
+    <?php View::factory('pagination_control', $pagination)->render(true) ?>
 
 <?php endif ?>

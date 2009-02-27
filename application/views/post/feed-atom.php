@@ -2,44 +2,28 @@
 /**
  * View script to render posts as an Atom feed.
  */
-$this->layout()->disableLayout();
-
-$config = Zend_Registry::get('config');
-$site_title = $config->get('site_title', 'memex');
+$site_title = Kohana::config('config.site_title');
 
 // Construct the site absolute base URL.
 $site_base = ( empty($_SERVER['HTTPS']) ? 'http://' : 'https://' ) . 
     $_SERVER['HTTP_HOST'];
 
-if (!empty($this->screen_name)) {
+if (!empty($screen_name)) {
     // Screen name given, so this is a profile feed.
-
-    $title = $site_title . ' / ' . $this->screen_name;
-    if ($this->tags) {
-        $title .= ' / ' . join(' / ', $this->tags);
-    }
-    $page_home_url = $site_base . $this->url(
-        array( 'screen_name' => $this->screen_name), 
-        'post_profile'
-    );
-
+    $title = $site_title . ' / ' . $screen_name;
+    if ($tags) $title .= ' / ' . join(' / ', $tags);
+    $page_home_url = $site_base . '/people/' . $screen_name;
 } else {
     // No screen name, so this is a recent or a tag feed.
-
     $title = $site_title . ' / ';
-    if ($this->tags) {
+    if ($tags) {
         // Tags given, so this is a tag feed.
-        $title .= 'tag / ' . join(' / ', $this->tags);
-        $page_home_url = $site_base . $this->url(
-            array('tags'=>join(' ', $this->tags)), 
-            'post_tag'
-        );
+        $title .= 'tag / ' . join(' / ', $tags);
+        $page_home_url = $site_base . '/tag/' . out::U(join(' ', $tags));
     } else {
         // No tags, so this is overall recent.
         $title .= 'recent';
-        $page_home_url = $site_base . $this->url(
-            array(), 'post_tag_recent'
-        );
+        $page_home_url = $site_base . '/recent';
     }
 }
 
@@ -48,9 +32,9 @@ $x = new Memex_XmlWriter(array(
 ));
 
 $x->feed(array('xmlns'=>'http://www.w3.org/2005/Atom'))
-    ->id($site_base . $this->url())
+    ->id(url::current())
     ->title($title)
-    ->updated(gmdate('c', strtotime($this->posts[0]['modified'])))
+    ->updated(gmdate('c', strtotime($posts[0]['modified'])))
     ->link(array('rel'=>'alternate', 'type'=>'text/html', 'href'=>$page_home_url ))
     ;
 
@@ -58,68 +42,37 @@ $x->feed(array('xmlns'=>'http://www.w3.org/2005/Atom'))
 $x->link(array(
     'rel'  => 'self',
     'type' =>'application/atom+xml', 
-    'href' => $site_base . $this->url()
+    'href' => url::current()
 ));
 
-// Add a first-page pagination link. (RFC 5005)
-$url_first = $site_base . $this->queryUrl(array(
-    'count'=>$this->count, 'start' => 0
-)); 
-$x->link(array(
-    'rel'  => 'first',
-    'type' => 'application/atom+xml', 
-    'href' => $url_first
-));
-
-// Add a previous-page pagination link, if necessary. (RFC 5005)
-$prev_start = $this->start - $this->count;
-if ($prev_start < 0) $prev_start = 0;
-if ($prev_start != $this->start) {
-    $url_previous = $site_base . $this->queryUrl(array(
-        'count'=>$this->count, 'start' => $prev_start
-    )); 
+// Add a pagination links. (RFC 5005)
+extract($pagination);
+$links = array(
+    'first'    => 0,
+    'previous' => $previous ? ($previous - 1) * $page_size : null,
+    'next'     => $next ? ($next - 1) * $page_size : null,
+    'last'     => $total
+);
+foreach ($links as $name=>$link_start) {
+    if ($link_start === null) continue;
     $x->link(array(
-        'rel'  => 'previous',
+        'rel'  => $name,
         'type' => 'application/atom+xml', 
-        'href' => $url_previous
+        'href' => url::current(true, array(
+            'count' => $count, 'start' => $link_start
+        ))
     ));
 }
-
-// Add a next-page pagination link, if necessary. (RFC 5005)
-$next_start = $this->start + $this->count;
-if ($next_start < $this->posts_count) {
-    $url_next = $site_base . $this->queryUrl(array(
-        'count'=>$this->count, 'start' => $this->start + $this->count
-    )); 
-    $x->link(array(
-        'rel'  => 'next',
-        'type' => 'application/atom+xml', 
-        'href' => $url_next
-    ));
-}
-
-// Add a last-page pagination link, if necessary. (RFC 5005)
-$url_last = $site_base . $this->queryUrl(array(
-    'count'=>$this->count, 'start' => $this->posts_count - $this->count
-)); 
-$x->link(array(
-    'rel'  => 'last',     
-    'type' => 'application/atom+xml', 
-    'href' => $url_last
-));
 
 // Now, finally, add all the posts as feed entries.
-foreach ($this->posts as $post) {
+foreach ($posts as $post) {
 
-    $home_url = $site_base . $this->url(
-        array( 'screen_name' => $post['screen_name']), 
-        'post_profile'
-    );
+    $home_url = $site_base . '/people/' . $post['screen_name'];
 
     $x->entry()
         ->title($post['title'])
         ->link(array( 'href'=>$post['url'] ))
-        ->id($site_base . $this->url(array('uuid'=>$post['uuid']), 'post_view'))
+        ->id($site_base . '/posts/' . out::U($post['uuid']))
         ->updated(gmdate('c', strtotime($post['user_date'])))
         ->published(gmdate('c', strtotime(empty($post['modified']) ? 
             $post['user_date'] : $post['modified'])))

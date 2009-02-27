@@ -1,15 +1,36 @@
 <?php
-/**
- * Filter that normalizes URLs, attempting to account for insignificant user 
- * input variations.  Used both in form validation and in model munging.
- *
- * TODO: Consider some site-specific normalizations, such as:
- *      * Stripping Amazon affiliate IDs
- *      * Cleaning up YouTube links
- *      * etc...
- */
 class url extends url_Core
 {
+    /**
+     * Produce a true absolute URL for the current request.
+     *
+     * @param boolean Whether or not to include the current query string.
+     * @param array Additional query param data
+     */
+    public static function current($qs=FALSE, $more=null) 
+    {
+        $data = $qs ? $_GET : array();
+        if (!empty($more))
+            $data = array_merge($data, $more);
+
+        $uri = $_SERVER['REQUEST_URI'];
+        if( ($qpos = strpos($uri,'?')) !== FALSE)
+            $uri = substr($uri, 0, $qpos);
+
+        return ( empty($_SERVER['HTTPS']) ? 'http' : 'https' ) . '://' .
+            $_SERVER['HTTP_HOST'] . 
+            $uri . (!empty( $data ) ? '?'.http_build_query($data) : '');
+    }
+
+    /**
+     * Filter that normalizes URLs, attempting to account for insignificant user 
+     * input variations.  Used both in form validation and in model munging.
+     *
+     * TODO: Consider some site-specific normalizations, such as:
+     *      * Stripping Amazon affiliate IDs
+     *      * Cleaning up YouTube links
+     *      * etc...
+     */
     public static function normalize($url)
     {
         // Bail if the URL is empty or null.

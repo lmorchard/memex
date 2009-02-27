@@ -110,32 +110,32 @@ class Post_Controller extends Controller
      */
     public function view()
     {
-        $identity  = Zend_Auth::getInstance()->getIdentity();
-        $request   = $this->getRequest();
-        $get_data  = $this->input->get();
-        $post_data = $request->getPost();
+        $params = $this->getParamsFromRoute(array(
+            'uuid' => ''
+        ));
 
-        $uuid = $request->getParam('uuid');
-        if (isset($get_data['uuid'])) {
-            $uuid = $get_data['uuid'];
-        } elseif (isset($post_data['uuid'])) {
-            $uuid = $post_data['uuid'];
+        $uuid = $params['uuid'];
+        if (isset($_GET['uuid'])) {
+            $uuid = $_GET['uuid'];
+        } elseif (isset($_POST['uuid'])) {
+            $uuid = $_POST['uuid'];
         }
 
-        $posts_model = $this->_helper->getModel('Posts');
+        $posts_model = new Posts_Model();
 
         if ($uuid) {
             $post = $posts_model->fetchOneByUUID($uuid);
         }
-        $this->view->post = $post;
+        $this->setViewData('post', $post);
 
         // Make sure the post exists, and belongs to the current profile
-        $profile_id = (!$identity) ? null : $identity->default_profile['id'];
+        $profile_id = ($this->auth_data) ? $this->auth_data['profile']['id'] : null;
         if (empty($post)) {
-            throw new Zend_Exception("Post '$uuid' not found.", 404);
+            return Event::run('system.404');
         } elseif ($post['profile_id'] != $profile_id && $post['visibility'] > 0) {
             // TODO: Need more work on the visibility / privacy thing.
-            throw new Zend_Exception("View of '$uuid' forbidden.", 403);
+            header('HTTP/1.1 403 Forbidden');
+            exit;
         }
 
     }
@@ -145,26 +145,30 @@ class Post_Controller extends Controller
      */
     public function delete()
     {
-        $identity  = Zend_Auth::getInstance()->getIdentity();
-        $request   = $this->getRequest();
-        $get_data  = $this->input->get();
-        $post_data = $request->getPost();
+        $params = $this->getParamsFromRoute(array(
+            'uuid' => ''
+        ));
 
-        $uuid = $request->getParam('uuid');
-        if (isset($get_data['uuid'])) {
-            $uuid = $get_data['uuid'];
-        } elseif (isset($post_data['uuid'])) {
-            $uuid = $post_data['uuid'];
+        $url = $this->input->get('url', null);
+
+        $uuid = $params['uuid'];
+        if (isset($_GET['uuid'])) {
+            $uuid = $_GET['uuid'];
+        } elseif (isset($_POST['uuid'])) {
+            $uuid = $_POST['uuid'];
         }
 
-        if (!isset($post_data['cancel'])) {
+        $posts_model = new Posts_Model();
 
-            $profile_id  = $identity->default_profile['id'];
-            $posts_model = $this->_helper->getModel('Posts');
+        if ($uuid) {
+            $post = $posts_model->fetchOneByUUID($uuid);
+        }
+        $this->setViewData('post', $post);
 
-            $form = $this->view->delete_form = $this->_helper->getForm(
-                'postDelete', array('action'  => $this->view->url())
-            );
+        if (!isset($_POST['cancel'])) {
+
+            $profile_id = $this->auth_data['profile']['id'];
+            $posts_model = new Posts_Model();
 
             // If we have a URL, try looking up existing post data.
             if ($uuid) {
@@ -172,38 +176,29 @@ class Post_Controller extends Controller
             } elseif ($url) {
                 $post = $posts_model->fetchOneByUrlAndProfile($url, $profile_id);
             }
-            $this->view->post = $post;
 
             // Make sure the post exists, and belongs to the current profile
             if (empty($post)) {
-                throw new Zend_Exception("Post '$uuid' not found.", 404);
+                return Event::run('system.404');
             } elseif ($post['profile_id'] != $profile_id) {
-                throw new Zend_Exception("Delete of '$uuid' forbidden.", 403);
+                header('HTTP/1.1 403 Forbidden'); exit;
             }
+            $this->setViewData('post', $post);
 
             // Allow pre-population from query string
-            if (!$this->getRequest()->isPost()) {
-                $get_data['uuid'] = $uuid;
-                $form->isValid($get_data);
+            if ('post' != request::method())
+                $_GET['uuid'] = $uuid;
                 return;
             }
 
             // Now, try validating the POST request.
-            $post_data['uuid'] = $uuid;
-            if (!$form->isValid($post_data)) {
-                return;
-            }
+            $_POST['uuid'] = $uuid;
 
             // Finally, perform the deletion.
             $posts_model->deleteByUUID($uuid);
         }
 
-        // Any other values for ?jump lead to the profile page.
-        return $this->_helper->redirector->gotoRoute(
-            array('screen_name' => $identity->default_profile['screen_name']),
-            'post_profile'
-        );
-
+        return url::redirect('people/'.$this->auth_data['profile']['screen_name']);
     }
 
     /**
@@ -212,33 +207,35 @@ class Post_Controller extends Controller
      */
     public function save()
     {
-        $identity  = Zend_Auth::getInstance()->getIdentity();
-        $request   = $this->getRequest();
-        $get_data  = $this->input->get();
-        $post_data = $request->getPost();
+        $params = $this->getParamsFromRoute(array(
+            'uuid' => '', 'submethod' => 'save'
+        ));
+        $this->setViewData($params);
 
         $have_url = false;
 
         // Try getting the in-progress post's URL from query or form.
         $url = null;
-        if (isset($get_data['url'])) {
-            $url = $get_data['url'];
-        } elseif (isset($post_data['url'])) {
-            $url = $post_data['url'];
+        if (isset($_GET['url'])) {
+            $url = $_GET['url'];
+        } elseif (isset($_POST['url'])) {
+            $url = $_POST['url'];
         }
         if ($url) $have_url = true;
 
-        $uuid = $request->getParam('uuid');
-        if (isset($get_data['uuid'])) {
-            $uuid = $get_data['uuid'];
-        } elseif (isset($post_data['uuid'])) {
-            $uuid = $post_data['uuid'];
+        $this->setViewData('have_url', $have_url);
+
+        $uuid = $params['uuid'];
+        if (isset($_GET['uuid'])) {
+            $uuid = $_GET['uuid'];
+        } elseif (isset($_POST['uuid'])) {
+            $uuid = $_POST['uuid'];
         }
 
-        if (!isset($post_data['cancel'])) {
+        if (!isset($_POST['cancel'])) {
 
-            $profile_id  = $identity->default_profile['id'];
-            $posts_model = $this->_helper->getModel('Posts');
+            $profile_id  = $this->auth_data['profile']['id'];
+            $posts_model = new Posts_Model();
 
             // If we have a URL, try looking up existing post data.
             $existing_post = null;
@@ -253,6 +250,7 @@ class Post_Controller extends Controller
                 $existing_post = array();
             } else {
                 $have_url = true;
+                $this->setViewData('have_url', $have_url);
                 if ($existing_post['profile_id'] != $profile_id) {
                     // If the logged in profile and the post profile ID don't 
                     // match, then this is a cross-profile copy and the UUID 
@@ -262,26 +260,34 @@ class Post_Controller extends Controller
                 }
             }
 
-            $form = $this->view->post_form = $this->_helper->getForm(
-                'post', array(
-                    'action'  => $this->view->url(),
-                    'have_url' => $have_url
-                )
-            );
+            if ('post' != request::method())
+                // For GET method, at least run the filters from the validator.
+                $validator = $posts_model->getValidator(array_merge(
+                    $existing_post,
+                    $this->input->get()
+                ));
+                $validator->validate();
+                $_GET = $validator->as_array();
+                return;
+            }
 
-            // Allow pre-population from query string
-            if (!$this->getRequest()->isPost()) {
-                $new_post_data = array_merge($existing_post, $get_data);
-                $form->populate($new_post_data);
+            $validator = $posts_model->getValidator(array_merge(
+                $existing_post,
+                $this->input->post()
+            ));
+            if (!$validator->validate()) {
+                $_POST = $validator->as_array();
+                $this->setViewData(
+                    'errors', $validator->errors('form_errors_post')
+                );
                 return;
             }
 
             // Now, try validating the POST request.
-            $new_post_data = array_merge($existing_post, $post_data);
-            if (!$form->isValid($new_post_data)) {
-                return;
-            }
-            $new_post_data = $form->getValues();
+            $new_post_data = array_merge(
+                $existing_post, 
+                $validator->as_array()
+            );
 
             $new_post_data['profile_id'] = $profile_id;
 
@@ -291,32 +297,19 @@ class Post_Controller extends Controller
 
         // The ?jump parameter indicates one of several post-save redirect 
         // options.
-        $jump = $post_data['jump'];
+        $jump = $this->input->post('jump', null);
         if ($jump == 'close') {
-
-            // jump=close should close the window, but we'll do it in a view script.
-            return $this->renderScript('post/save_doclose.phtml');
-
+            // jump=close should close the window, but we'll do it in a view
+            $this->auto_render = FALSE;
+            return View::factory('post/save_doclose')->render(true);
         } elseif ($jump == 'yes' && $url) {
-            
             // If there's a URL and ?jump=yes, then hop on over to the original URL.
             return $this->_helper->redirector->gotoUrl($url);
-
         } elseif (strpos($jump, '/') === 0) {
-            
             // This jump leads to somewhere within the site
-            return $this->_helper->redirector->gotoUrl($jump, array(
-                'prependBase' => true
-            ));
-
+            return url::redirect($jump);
         } else {
-
-            // Any other values for ?jump lead to the profile page.
-            return $this->_helper->redirector->gotoRoute(
-                array('screen_name' => $identity->default_profile['screen_name']),
-                'post_profile'
-            );
-
+            return url::redirect('people/'.$this->auth_data['profile']['screen_name']);
         }
 
     }
@@ -324,51 +317,49 @@ class Post_Controller extends Controller
     /**
      * Set up common pagination elements.
      */
-    private function setupPagination($posts_count)
+    private function setupPagination($total)
     {
-        $this->setViewData('posts_count', $posts_count);
-
         // Set up the count, page size, and page number parameters 
         // for paginator.
         $start = $this->input->get('start', null);
         $count = $this->input->get('count', null);
 
+        $page_number = $this->input->get('page', 1);
+
         if (null!=$start || null!=$count) {
             // If the ?start or ?count parameters have been supplied, honor 
             // them instead of pagination params.
-            if (null==$count) $count = 15; // TODO: Make ?count a configurable default?
+            if (null==$count) $count = 10; // TODO: Make ?count a configurable default?
             if ($count < 1) $count = 1;
             if ($count > 100) $count = 100;
             if ($start < 0 || null==$start) $start = 0;
-            if ($start > $posts_count) $start = $posts_count;
-            
+            if ($start > $total) $start = $total;
             $page_size = $count;
-            $page_number = round($start / $count);
         } else {
             // Otherwise, honor the ?page parameter and page_size cookie.
             $page_size = $this->input->cookie('page_size', 10);
-            $page_number = $this->input->get('page', 1);
-            
             $start = ($page_number - 1) * $page_size;
             $count = $page_size;
         }
 
-        $this->setViewData(array(
-            'start'       => $start,
-            'count'       => $count,
-            'page_size'   => $page_size,
-            'page_number' => $page_number
-        ));
+        $first    = 1;
+        $last     = (int)($total / $page_size) + 1;
+        $previous = ($page_number > 1) ? $page_number - 1 : null;
+        $next     = ($page_number < $last) ? $page_number + 1 : null;
 
-        /*
-        // Build the paginator for the view.
-        $paginator = new Zend_Paginator(
-            new Zend_Paginator_Adapter_Null($posts_count)
-        );
-        $this->view->paginator = $paginator
-            ->setCurrentPageNumber($page_number)
-            ->setItemCountPerPage($page_size);
-         */
+        $this->setViewData(array(
+            'pagination' => array(
+                'first'       => $first,
+                'last'        => $last,
+                'previous'    => $previous,
+                'next'        => $next,
+                'start'       => $start,
+                'count'       => $count,
+                'total'       => $total,
+                'page_size'   => $page_size,
+                'page_number' => $page_number
+            )
+        ));
 
         return array($start, $count);
     }
@@ -378,19 +369,16 @@ class Post_Controller extends Controller
      */
     private function renderFeed()
     {
-        $request = $this->getRequest();
-        $action  = $request->getActionName();
-        $format  = $request->getParam('format');
-
-        $alnum = new Zend_Validate_Alnum();
-        if (!$alnum->isValid($format)) {
+        $params = $this->getParamsFromRoute(array(
+            'format' => 'atom'
+        ));
+        $format = $params['format'];
+        if (!valid::alpha_numeric($format)) {
             $format = 'atom';
         }
-
-        $this->view->callback = 
-            $this->input->get('callback', '');
-
-        return $this->render('feed'.ucfirst($format));
+        $this->setViewData('callback', $this->input->get('callback', ''));
+        $this->layout = null;
+        $this->view = 'post/feed-'.strtolower($format);
     }
 
 } 

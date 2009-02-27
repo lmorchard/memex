@@ -1,29 +1,29 @@
 <?php
-/**
- * View script to render posts as JSON, with callback support.
- */
-$this->layout()->disableLayout();
-
 $out = array();
-foreach ($this->posts as $post) {
+foreach ($posts as $post) {
     $out[] = array(
         'u'  => $post['url'],
         'd'  => $post['title'],
         'n'  => $post['notes'],
         't'  => $post['tags_parsed'],
-        'dt' => gmdate('c', strtotime($this->posts[0]['user_date']))
+        'dt' => gmdate('c', strtotime($posts[0]['user_date']))
     );
 }
 
-if ($this->callback) {
+if ($callback) {
+    header('Content-Type: text/javascript');
     // Whitelist the callback to alphanumeric and a few mostly harmless
     // characters, none of which can be used to form HTML or escape a JSONP call
     // wrapper.
     $callback = preg_replace(
         '/[^0-9a-zA-Z\(\)\[\]\,\.\_\-\+\=\/\|\\\~\?\!\#\$\^\*\: \'\"]/', '', 
-        $this->callback
+        $callback
     );
     echo "$callback(";
+} else {
+    header('Content-Type: application/json');
 }
-echo $this->json($out);
+
+echo json_encode($out);
+
 if ($callback) echo ')';

@@ -7,13 +7,6 @@ class Tags_Model extends Model
     protected $_table_name = 'tags';
 
     /**
-     * Initialize model
-     */
-    public function init()
-    {
-    }
-
-    /**
      * Handle notification for an updated post
      */
     public function handlePostUpdated($topic, $post_data, $context)

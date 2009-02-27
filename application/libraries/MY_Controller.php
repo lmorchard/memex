@@ -181,26 +181,25 @@ class Controller extends Controller_Core {
         // Do nothing if auto_render is false at this point.
         if ($this->auto_render) {
 
-            if (!$this->view) {
+            if (FALSE === $this->view) {
+                // If no view set, auto-set one based on the controller and method.
                 $this->view = Router::$controller . '/' . Router::$method;
             }
 
-            // If there's a view set, render it first into .
-            if ($this->view) {
-                // $view = new View($this->view, $this->getViewData());
-                $view = new View($this->view);
-                $view->set_global($this->getViewData());
-                $this->setViewData('content', $view->render());
-            }
-
-            if ($this->layout) {
+            if (!empty($this->layout)) {
+                if (!empty($this->view)) { 
+                    // If a view is set, render it into the view data for layout.
+                    $this->setViewData('content', View::factory(
+                        $this->view, $this->getViewData()
+                    )->render());
+                }
                 // Finally, render the layout wrapper to the browser.
-                $layout = new View($this->layout);
-                $layout->set_global($this->getViewData());
-                $layout->render(TRUE);
+                View::factory($this->layout, $this->getViewData())->render(true);
             } else {
-                // No layout wrapper, so try outputting the rendered view.
-                echo $this->getViewData('content', '');
+                if (!empty($this->view)) { 
+                    // No layout wrapper, so try outputting the rendered view.
+                    View::factory($this->view, $this->getViewData())->render(true);
+                }
             }
 
         }
