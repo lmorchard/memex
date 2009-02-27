@@ -186,7 +186,7 @@ class Post_Controller extends Controller
             $this->setViewData('post', $post);
 
             // Allow pre-population from query string
-            if ('post' != request::method())
+            if ('post' != request::method()) {
                 $_GET['uuid'] = $uuid;
                 return;
             }
@@ -260,7 +260,7 @@ class Post_Controller extends Controller
                 }
             }
 
-            if ('post' != request::method())
+            if ('post' != request::method()) {
                 // For GET method, at least run the filters from the validator.
                 $validator = $posts_model->getValidator(array_merge(
                     $existing_post,
