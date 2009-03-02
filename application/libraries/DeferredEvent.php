@@ -14,15 +14,15 @@ class DeferredEvent
     private static $instance = null;
     private $proxies = array();
     private $mq = null;
-
+    
     /**
      * Deferred version of Kohana's Event::add(), with an extra parameter for 
      * deferred messages.
-	 *
-	 * @param   string   event name
-	 * @param   array    http://php.net/callback
+     * 
+     * @param   string   event name
+     * @param   array    http://php.net/callback
      * @param   array    optional parameters passed to MessageQueue_Model->subscribe
-	 * @return  boolean
+     * @return  boolean
      */
     public static function add($name, $callback, $params=null)
     {
