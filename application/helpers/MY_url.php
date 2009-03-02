@@ -1,4 +1,9 @@
 <?php
+/**
+ *
+ * @package Memex
+ * @author  l.m.orchard <l.m.orchard@pobox.com>
+ */
 class url extends url_Core
 {
     /**

@@ -17,7 +17,7 @@ echo form::build('save', array('class'=>'save'), @$errors, array(
             form::field('input',    'title',   'title'),
             form::field('textarea', 'notes',   'notes'),
             form::field('input',    'tags',    'tags'),
-            form::field('checkbox', 'private', 'do not share'),
+            form::field('checkbox', 'private', 'do not share', array('value'=>'private')),
         ),
         array(
             form::field('submit',   'save',    null, array('value'=>'save')),

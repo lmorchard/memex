@@ -7,22 +7,6 @@ class Tags_Model extends Model
     protected $_table_name = 'tags';
 
     /**
-     * Handle notification for an updated post
-     */
-    public function handlePostUpdated($topic, $post_data, $context)
-    {
-        return $this->updateTagsForPost($post_data);
-    }
-
-    /**
-     * Handle notification for a deleted post
-     */
-    public function handlePostDeleted($topic, $post_data, $context)
-    {
-        return $this->deleteTagsForPost($post_data['id']);
-    }
-
-    /**
      * Parse a string of user input input containing tags.
      *
      * TODO: More flexible parsing beyond space delimiting, including commas and quotes

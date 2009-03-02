@@ -2,12 +2,9 @@
 /**
  * Template text encoding / escaping shortcuts helper.
  *
- * @package OpenInterocitor
- * @author  l.m.orchard@pobox.com
- * @link    http://decafbad.com/
- * @license Share and Enjoy
+ * @package Memex
+ * @author  l.m.orchard <l.m.orchard@pobox.com>
  */
-
 class out_Core
 {
 

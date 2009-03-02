@@ -1,7 +1,11 @@
 <?php
+error_log("HOOK: " . __FILE__);
 /**
  * Autoloader class layered atop Kohana's default, allows organization of 
  * classes with an underscore-to-slash directory convention.
+ *
+ * @package Memex
+ * @author  l.m.orchard <l.m.orchard@pobox.com>
  */
 class Memex_Autoloader
 {
@@ -14,7 +18,7 @@ class Memex_Autoloader
         // If Kohana comes up empty, try replacing underscores with directory 
         // separators and look for a library.
         $file = str_replace('_', '/', $class);
-		if ($filename = Kohana::find_file('libraries', $file)) {
+        if ($filename = Kohana::find_file('libraries', $file)) {
             require $filename; return TRUE;
         } else if ($filename = Kohana::find_file('vendor', $file)) {
             require $filename; return TRUE;
@@ -33,4 +37,3 @@ $path = array(
     get_include_path()
 );
 set_include_path(implode(PATH_SEPARATOR, $path));
-

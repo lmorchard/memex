@@ -2,6 +2,9 @@
 /**
  * Controller handling all auth activities, including registration and 
  * login / logout
+ *
+ * @author l.m.orchard <l.m.orchard@pobox.com>
+ * @package Memex
  */
 class Auth_Controller extends Controller
 { 

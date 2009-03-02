@@ -2,9 +2,8 @@
 /**
  * Generate UUIDs
  *
- * @package OpenInterocitor
- * @author  l.m.orchard@pobox.com
- * @licence Share and Enjoy
+ * @package Memex
+ * @author  l.m.orchard <l.m.orchard@pobox.com>
  */
 class uuid_Core
 {
@@ -15,7 +14,7 @@ class uuid_Core
      */
     public static function uuid() 
     {
-        require_once('vendor/OmniTI/UUID.php');
+        require_once('application/vendor/OmniTI/UUID.php');
         $u = new OmniTI_UUID();
         return $u->toRFC4122String();
     }

@@ -65,29 +65,35 @@ class form extends form_Core
     {
         if (null == $params) $params = array();
 
-        $value = form::value($name, $params);
-
-        $li_attrs = array(
-            'class' => $type
-        );
+        if ('checkbox' == $type) {
+            $value = form::value($name, @$params['checked']);
+        } else {
+            $value = form::value($name, @$params['value']);
+        }
 
         if ('hidden' == $type) {
-            return join("\n", array(
-                form::hidden(array($name => $value))
-            ));
+            return form::hidden(array($name => $value));
         } else {
+
+            if ('checkbox' == $type) {
+                $field = form::checkbox(
+                    array_merge(array('name' => $name, 'class' => $type), $params),
+                    @$params['value'], $value, false
+                );
+            } else {
+                $field = call_user_func(
+                    array('form', $type), 
+                    array('name' => $name, 'class' => $type),
+                    $value, '', false
+                );
+            }
+
             return join("\n", array(
-                '<li ' . html::attributes($li_attrs) .'>',
+                '<li ' . html::attributes(array('class' => $type)) .'>',
                 ($label != null) ?
                     form::label($name, $label) : 
                     form::label(array('for'=>$name, 'class'=>'hidden'), ''),
-                call_user_func(
-                    array('form', $type), 
-                    array('name' => $name, 'class' => $type),
-                    $value,
-                    '',
-                    false
-                ),
+                $field,
                 '</li>'
             ));
         }
@@ -123,14 +129,14 @@ class form extends form_Core
      * @param  array  Field parameters
      * @return string
      */
-    public static function value($name, $params)
+    public static function value($name, $default=null)
     {
         if (!empty($_POST[$name]))
             $value = $_POST[$name];
         else if (!empty($_GET[$name]))
             $value = $_GET[$name];
-        else if (!empty($params['value']))
-            $value = $params['value'];
+        else if (!empty($default))
+            $value = $default;
         else
             $value = '';
         return $value;

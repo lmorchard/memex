@@ -2,8 +2,8 @@
 /**
  * Helpers to capture and include named slots for templates.
  *
- * @package    NotionalBucket
- * @author     l.m.orchard@pobox.com
+ * @package Memex
+ * @author  l.m.orchard <l.m.orchard@pobox.com>
  */
 class slot_Core
 {

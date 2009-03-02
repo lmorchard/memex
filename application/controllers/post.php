@@ -1,6 +1,9 @@
 <?php
 /**
  * Actions dealing with viewing and manipulating posts.
+ *
+ * @author l.m.orchard <l.m.orchard@pobox.com>
+ * @package Memex
  */
 class Post_Controller extends Controller 
 { 
@@ -255,6 +258,7 @@ class Post_Controller extends Controller
                     // If the logged in profile and the post profile ID don't 
                     // match, then this is a cross-profile copy and the UUID 
                     // should be nuked to force a copy instead of update.
+                    unset($existing_post['profile_id']);
                     unset($existing_post['uuid']);
                     unset($existing_post['id']);
                 }

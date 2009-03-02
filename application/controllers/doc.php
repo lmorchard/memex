@@ -1,6 +1,9 @@
 <?php
 /**
  * Markdown-based frontend to docs directory.
+ *
+ * @author l.m.orchard <l.m.orchard@pobox.com>
+ * @package Memex
  */
 class Doc_Controller extends Controller 
 {

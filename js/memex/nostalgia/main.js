@@ -19,6 +19,7 @@ $module('Memex.Nostalgia.Main', function() {
 
         onReady: function() {
             $$('p.hint').highlight();
+            $$('p.message').highlight();
             $$('p.highlight').highlight();
         },
 

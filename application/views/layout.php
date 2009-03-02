@@ -42,7 +42,7 @@
                                 <li><a href="<?= url::base() . 'register' ?>">register</a></li>
                             <?php else: ?>
                                 <li class="first">logged in as <a href="<?= url::base() . 'people/' . out::U($auth_profile['screen_name']) ?>"><?= out::H($auth_profile['screen_name']) ?></a></li>
-                                <li><a href="<?= url::base() . 'register' ?>">settings</a></li>
+                                <li><a href="<?= url::base() . 'profiles/' . out::U($auth_profile['screen_name']) . '/settings' ?>">settings</a></li>
                                 <li><a href="<?= url::base() . 'logout' ?>">logout</a></li>
                             <?php endif; ?>
                         </ul>
@@ -58,6 +58,9 @@
 
             <div id="middle">
                 <div id="content">
+                    <?php if (!empty($message)): ?>
+                        <p class="message"><?= out::H($message) ?></p>
+                    <?php endif ?>
                     <?php echo $content ?>
                 </div>
                 <?php if ( slot::exists('sidebar') ): ?>

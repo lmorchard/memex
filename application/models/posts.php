@@ -115,11 +115,7 @@ class Posts_Model extends Model
         $saved_post = $this->fetchOneById($row['id']);
 
         // Send out message that a post has been updated
-        //$mq = Zend_Registry::get('message_queue');
-        //$mq->publish("Memex_Model_Posts/postUpdated", $saved_post);
-
-        $tags_model = new Tags_Model();
-        $tags_model->updateTagsForPost($row);
+        Event::run('Memex.model_posts.post_updated', $saved_post);
 
         // Return the results of the save.
         return $saved_post;
@@ -453,12 +449,7 @@ class Posts_Model extends Model
 
         $this->db->delete($this->_table_name, array('id' => $post_id));
 
-        // $mq = Zend_Registry::get('message_queue');
-        // $mq->publish("Memex_Model_Posts/postDeleted", $data);
-
-        $tags_model = new Tags_Model();
-        $tags_model->deleteTagsForPost($post_id);
-
+        Event::run('Memex.model_posts.post_deleted', $data);
     }
 
     /**
@@ -474,11 +465,7 @@ class Posts_Model extends Model
 
         $this->db->delete($this->_table_name, array('uuid' => $uuid));
 
-        // $mq = Zend_Registry::get('message_queue');
-        // $mq->publish("Memex_Model_Posts/postDeleted", $data);
-
-        $tags_model = new Tags_Model();
-        $tags_model->deleteTagsForPost($data['id']);
+        Event::run('Memex.model_posts.post_deleted', $data);
     }
 
     /**
@@ -489,18 +476,13 @@ class Posts_Model extends Model
      */
     public function deleteByUrlAndProfile($url, $profile_id)
     {
-        if (empty($uuid) || empty($profile_id)) return false;
+        if (empty($url) || empty($profile_id)) return false;
         $data = $this->fetchOneByUrlAndProfile($url, $profile_id);
         if (null == $data) return null;
 
         $this->deleteById($data['id']);
         
-        // $mq = Zend_Registry::get('message_queue');
-        // $mq->publish("Memex_Model_Posts/postDeleted", $data);
-
-        $tags_model = new Tags_Model();
-        $tags_model->deleteTagsForPost($data['id']);
-
+        Event::run('Memex.model_posts.post_deleted', $data);
     }
 
     /**

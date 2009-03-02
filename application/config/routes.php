@@ -1,9 +1,14 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-$config['home']     = 'auth/home';
+$config['_allowed'] = '-a-z 0-9~%.,:;_/';
+
+$config['home'] = 'auth/home';
 $config['register'] = 'auth/register';
-$config['login']    = 'auth/login';
-$config['logout']   = 'auth/logout';
+$config['login'] = 'auth/login';
+$config['logout'] = 'auth/logout';
+
+$config['profiles/([^/]+)/settings'] = 'profile/settings/screen_name/$1';
+$config['profiles']                  = 'profile/index';
 
 $config['save']              = 'post/save';
 $config['posts/(.*);edit']   = 'post/save/uuid/$1/submethod/edit';
@@ -29,52 +34,9 @@ $config['feeds/(.*)']                        = 'post/tag/is_feed/true/format/$1'
 $config['tag/(.*)'] = 'post/tag/tags/$1';
 $config['recent']   = 'post/tag';
 
+$config['queue/runonce']      = 'messagequeue/runonce/format/json';
+$config['queue/runonce/(.*)'] = 'messagequeue/runonce/format/$1';
+
 $config['_default'] = 'post/tag';
 
-/*
-$config[';edit']     = 'main/edit';
-$config['(.*);edit'] = 'main/edit/$1';
-*/
-
-/*
-$config['signup'] = 'auth/signup';
-$config['login']  = 'auth/login';
-$config['logout'] = 'auth/logout';
-
-$config['home']   = 'profiles/home';
-
-$config['profiles/(.*);edit'] = 
-    'profiles/edit/$1';
-
-$config['profiles/(.*)/entries'] = 
-    'entries/index/$1';
-
-$config['profiles/(.*)/entries/(.*);delete'] = 
-    'entries/delete/$1/$2';
-
-$config['profiles/(.*)/entries/(.*)'] = 
-    'entries/view/$1/$2';
-
-$config['profiles/(.*)/avatars'] = 
-    'profiles/avatars/$1';
-$config['profiles/(.*)/avatars/current'] = 
-    'profiles/current_avatar/$1';
-
-$config['profiles/(.*)'] = 
-    'profiles/view/$1';
-$config['~(.*)'] = 
-    'profiles/view/$1';
- */
-
 $config['captcha/default'] = 'captcha/index';
-
-/**
- * Permitted URI characters. Note that "?", "#", and "=" are URL characters, and
- * should not be added here.
- */
-$config['_allowed'] = '-a-z 0-9~%.,:;_/';
-
-/**
- * Default route to use when no URI segments are available.
- */
-//$config['_default'] = 'main';

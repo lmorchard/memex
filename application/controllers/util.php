@@ -4,7 +4,6 @@
  *
  * @package Memex
  * @author  l.m.orchard <l.m.orchard@pobox.com>
- * @license http://creativecommons.org/licenses/BSD/
  */
 class Util_Controller extends Controller {
 

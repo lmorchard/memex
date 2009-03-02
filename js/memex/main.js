@@ -26,7 +26,7 @@ $module('Memex.Main', function() {
                 var req = new Request({
 
                     method: 'POST',
-                    url:    this.options.base_url + 'queue/run/json',
+                    url:    this.options.base_url + 'messagequeue/runonce/json',
 
                     onSuccess: function(txt, xml) {
                         this.log("MQ: success " + txt);

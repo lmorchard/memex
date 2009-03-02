@@ -8,21 +8,23 @@
  * @author l.m.orchard <l.m.orchard@pobox.com>
  * @package Memex
  */
-class MessageQueueController extends Zend_Controller_Action  
+class Messagequeue_Controller extends Controller
 { 
+    protected $auto_render = TRUE;
     
     /**
      * Run one processing loop on the queue and output status in JSON.
      */
-    public function runAction()
+    public function runonce()
     {
-        $request = $this->getRequest();
-        $format  = $request->getParam('format');
+        $params = $this->getParamsFromRoute(array(
+            'format' => 'json'
+        ));
 
-        if ($format == 'json') {
+        $mq = new MessageQueue_Model();
+        $msg = $mq->runOnce();
 
-            $mq = Zend_Registry::get('message_queue');
-            $msg = $mq->runOnce();
+        if ($params['format'] == 'json') {
 
             if ($msg) {
                 // Report the UUID of the message.
@@ -45,14 +47,20 @@ class MessageQueueController extends Zend_Controller_Action
                 );
             }
 
-            $this->_helper->layout()->disableLayout();
-            $this->_helper->viewRenderer->setNoRender(true);
-            header('Content-Type: application/json');
+            $this->auto_render = FALSE;
+            $this->view = null;
             if ($callback) {
+                header('Content-Type: text/javascript');
                 echo "$callback($out)";
             } else {
+                header('Content-Type: application/json');
                 echo $out;
             }
+
+        } else {
+
+            $this->auto_render = FALSE;
+            var_dump($msg);
 
         }
 
