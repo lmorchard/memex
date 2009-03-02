@@ -1,5 +1,4 @@
 <?php
-error_log("HOOK: " . __FILE__);
 /**
  * Initialization for the Memex main application.
  *
@@ -22,7 +21,7 @@ class Memex_Init {
     }
 
     /**
-     *
+     * Update tag indexing for updated posts.
      */
     public static function handlePostUpdated()
     {
@@ -31,7 +30,7 @@ class Memex_Init {
     }
 
     /**
-     *
+     * Delete indexed tags for updated posts.
      */
     public static function handlePostDeleted()
     {

@@ -1,5 +1,4 @@
 <?php
-error_log("HOOK: " . __FILE__);
 /**
  * Initialization for the Delicious module.
  */

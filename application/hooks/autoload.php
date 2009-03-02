@@ -1,5 +1,4 @@
 <?php
-error_log("HOOK: " . __FILE__);
 /**
  * Autoloader class layered atop Kohana's default, allows organization of 
  * classes with an underscore-to-slash directory convention.
