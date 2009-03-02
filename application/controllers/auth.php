@@ -26,7 +26,7 @@ class Auth_Controller extends Controller
         if (!$this->auth->isLoggedIn()) {
             url::redirect('login');
         } else {
-            url::redirect('profile/' . 
+            url::redirect('people/' . 
                 $this->auth_data['profile']['screen_name']);
         }
     }
@@ -96,7 +96,7 @@ class Auth_Controller extends Controller
             // interpreted as relatve to root of site.
             return url::redirect($data['jump']);
         } else {
-            return url::redirect();
+            return url::redirect('/home');
         }
     }
 
