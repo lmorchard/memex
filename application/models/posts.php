@@ -129,19 +129,13 @@ class Posts_Model extends Model
      */
     public function fetchHashesByProfile($profile_id)
     {
-        $table  = $this->getDbTable();
-        $select = $table->select();
-        $select
-            ->setIntegrityCheck(false)
-            ->from($table, array('signature'))
-            ->join(
-                'urls', 
-                'urls.id=posts.url_id', 
-                array('urls.hash')
-            )
-            ->orderby('user_date desc');
-        $rows = $table->fetchAll($select);
-        return $rows->toArray();
+        $select = $this->db
+            ->select('signature', 'urls.hash')
+            ->from($this->_table_name)
+            ->join('urls', 'urls.id=posts.url_id')
+            ->where('posts.profile_id', $profile_id)
+            ->orderby('user_date', 'desc');
+        return $select->get()->result_array();
     }
 
     /**
@@ -152,12 +146,11 @@ class Posts_Model extends Model
      */
     public function fetchLastModifiedDateByProfile($profile_id)
     {
-        $table  = $this->getDbTable();
-        $select = $table->select();
-        $select
-            ->where('posts.profile_id', $profile_id)
-            ->from($table, array('MAX(modified) as last_modified'));
-        $row = $table->fetchRow($select);
+        $select = $this->db
+            ->select('MAX(modified) as last_modified')
+            ->from($this->_table_name)
+            ->where('posts.profile_id', $profile_id);
+        $row = $select->get()->current();
         return gmdate('c', strtotime($row['last_modified']));
     }
 
@@ -170,41 +163,19 @@ class Posts_Model extends Model
      */
     public function fetchDatesByTagsAndProfile($tags, $profile_id)
     {
-        $table = $this->getDbTable();
-        $db = $table->getAdapter();
-        $select = $table->select();
-
-        $select
+        $select = $this->db
+            ->select(
+                'DATE_FORMAT(user_date, "%Y-%m-%d") date', 
+                'count(posts.id) as count'
+            )
+            ->from($this->_table_name)
             ->where('posts.profile_id', $profile_id)
-            ->orderby('date');
-
-        $adapter_name = strtolower(get_class($db));
-        if (strpos($adapter_name, 'mysql') !== false) {
-
-            // HACK: MySQL-specific query
-            $select
-                ->from($table, array(
-                    'DATE_FORMAT(user_date, "%Y-%m-%d") date', 
-                    'count(posts.id) as count'
-                ))
-                ->group('date');
-
-        } else {
-
-            // HACK: Everything else, assumed ISO8601 date strings like sqlite.
-            $select
-                ->from($table, array(
-                    'substr(user_date, 0, 10) as date', 
-                    'count(posts.id) as count'
-                ))
-                ->group('date');
-
-        }
+            ->orderby('date')
+            ->groupby('date');
 
         $this->_addWhereForTags($select, $tags);
 
-        $rows = $table->fetchAll($select);
-        return $rows->toArray();
+        return $select->get()->result_array();
     }
 
     /**
@@ -534,21 +505,21 @@ class Posts_Model extends Model
      */
     private function _addWhereForDates($select, $start_date=null, $end_date=null)
     {
-        $db = $this->getDbTable()->getAdapter();
-        $adapter_name = strtolower(get_class($db));
-        if (strpos($adapter_name, 'mysql') !== false) {
+        // $db = $this->getDbTable()->getAdapter();
+        // $adapter_name = strtolower(get_class($db));
+        // if (strpos($adapter_name, 'mysql') !== false) {
             // HACK: MySQL-specific query
             if (null != $start_date)
-                $select->where('user_date >= ?' , date('Y-m-d H:i:s', strtotime($start_date)));
+                $select->where('user_date >=' , date('Y-m-d H:i:s', strtotime($start_date)));
             if (null != $end_date)
-                $select->where('user_date <= ?' , date('Y-m-d H:i:s', strtotime($end_date)));
-        } else {
-            // HACK: Everything else, assumed ISO8601 date strings like sqlite.
-            if (null != $start_date)
-                $select->where('user_date >= ?', $start_date);
-            if (null != $end_date) 
-                $select->where('user_date <= ?', $end_date);
-        }
+                $select->where('user_date <=' , date('Y-m-d H:i:s', strtotime($end_date)));
+        // } else {
+        //    // HACK: Everything else, assumed ISO8601 date strings like sqlite.
+        //    if (null != $start_date)
+        //        $select->where('user_date >= ?', $start_date);
+        //    if (null != $end_date) 
+        //        $select->where('user_date <= ?', $end_date);
+        // }
     }
 
     /**

@@ -25,8 +25,6 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->bootstrap = array($this, 'appBootstrap');
-
         $this->logins_model = new Logins_Model();
         $this->logins_model->deleteAll();
 
@@ -120,15 +118,6 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Bootstrap the app
-     */
-    public function appBootstrap()
-    {
-        $init = new Memex_Initialize(APPLICATION_ENVIRONMENT, APPLICATION_PATH);
-        $init->init();
-    }
-
-    /**
      * This method is called after a test is executed.
      *
      * @return void
@@ -142,7 +131,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnauthorized()
     {
-        $this->performApiCall('/api/v1/posts/update', 'unauthorized', array(
+        $this->performApiCall('posts/update', 'unauthorized', array(
             'login_name' => 'dunno',
             'password'   => 'whothisis'
         ), array(), null);
@@ -158,14 +147,14 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
         $post = $this->test_posts[0];
 
         $this->performApiCall(
-            '/api/v1/posts/add', 'posts-add', $login, 
+            'posts/add', 'posts-add', $login, 
             array(
             ),
             '<result code="something went wrong" />'
         );
 
         $this->performApiCall(
-            '/api/v1/posts/add', 'posts-add', $login, 
+            'posts/add', 'posts-add', $login, 
             array(
                 'url' => 'this is not a URL'
             ),
@@ -173,7 +162,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
         );
 
         $this->performApiCall(
-            '/api/v1/posts/add', 'posts-add', $login, 
+            'posts/add', 'posts-add', $login, 
             array(
                 'url' => $post['url']
             ),
@@ -181,7 +170,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
         );
 
         $this->performApiCall(
-            '/api/v1/posts/add', 'posts-add', $login, 
+            'posts/add', 'posts-add', $login, 
             array(
                 'url'         => $post['url'],
                 'description' => $post['title']
@@ -202,7 +191,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
         $post = $this->test_posts[0];
 
         $this->performApiCall(
-            '/api/v1/posts/add', 'posts-add', $login, 
+            'posts/add', 'posts-add', $login, 
             array(
                 'url'         => $post['url'],
                 'description' => $post['title'],
@@ -219,7 +208,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($post['title'], $fetched_post['title']);
 
         $this->performApiCall(
-            '/api/v1/posts/add', 'posts-add', $login, 
+            'posts/add', 'posts-add', $login, 
             array(
                 'url'         => $post['url'],
                 'description' => $post['title'],
@@ -247,7 +236,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
             'tags'        => $post['tags']
         );
         $this->performApiCall(
-            '/api/v1/posts/add', 'posts-add', $login, $params
+            'posts/add', 'posts-add', $login, $params
         );
         $hash = md5($post['url']);
 
@@ -266,7 +255,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
             // Fetch post and assert a non-empty signature, add it to the list 
             // of known previous signatures.
             $doc = $this->performApiCall(
-                '/api/v1/posts/get', 'posts-get', $login,
+                'posts/get', 'posts-get', $login,
                 array( 'hash' => $hash ), null
             );
             $sig1 = (string)$doc->post['meta'];
@@ -275,12 +264,12 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
             // Change another part of the post.
             $params = array_merge($params, array($name => $value));
-            $this->performApiCall('/api/v1/posts/add', 'posts-add', $login, $params);
+            $this->performApiCall('posts/add', 'posts-add', $login, $params);
 
             // Fetch the post and assert that the signature has changed with 
             // respect to the previous.
             $doc = $this->performApiCall(
-                '/api/v1/posts/get', 'posts-get', $login,
+                'posts/get', 'posts-get', $login,
                 array( 'hash' => $hash ), null
             );
             $sig2 = (string)$doc->post['meta'];
@@ -309,7 +298,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
                 // Save a post.
                 $this->performApiCall(
-                    '/api/v1/posts/add', 'posts-add', $login, 
+                    'posts/add', 'posts-add', $login, 
                     array(
                         'url'         => $post['url'],
                         'description' => $post['title'],
@@ -321,7 +310,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
                 // Get the update time.
                 $doc = $this->performApiCall(
-                    '/api/v1/posts/update', 'posts-update', $login, 
+                    'posts/update', 'posts-update', $login, 
                     array(), null
                 );
 
@@ -378,7 +367,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
                 // Add this post using the API.
                 $this->performApiCall(
-                    '/api/v1/posts/add', 'posts-add', $login, 
+                    'posts/add', 'posts-add', $login, 
                     array(
                         'url'         => $post['url'],
                         'description' => $post['title'],
@@ -397,7 +386,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
                 // Look up dates for tag.
                 $doc = $this->performApiCall(
-                    '/api/v1/posts/dates', 'posts-dates', $login, 
+                    'posts/dates', 'posts-dates', $login, 
                     ($tag) ? array('tag'=>$tag) : array(),
                     null
                 );
@@ -435,7 +424,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
                     // Also try verifying post count when using 
                     // posts/get by date and tag.
                     $posts_doc = $this->performApiCall(
-                        '/api/v1/posts/get', 'posts-get', $login, array(
+                        'posts/get', 'posts-get', $login, array(
                             'dt'  => $test_date,
                             'tag' => $tag
                         ), null
@@ -479,7 +468,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
                     $params = array( 'url' => $post['url'] );
                 }
                 $doc = $this->performApiCall(
-                    '/api/v1/posts/get', 'posts-get', $login, $params, null
+                    'posts/get', 'posts-get', $login, $params, null
                 );
 
                 // First, there should be a well-formed doc in response.
@@ -500,7 +489,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
                 $hashes[] = md5($post['url']);
             }
             $doc = $this->performApiCall(
-                '/api/v1/posts/get', 'posts-get', $login, array(
+                'posts/get', 'posts-get', $login, array(
                     'hashes' => join(' ', $hashes)
                 ), null
             );
@@ -520,7 +509,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
                     $params = array( 'hash' => md5($post['url']) );
                 }
                 $this->performApiCall(
-                    '/api/v1/posts/delete', 'posts-delete', $login, $params
+                    'posts/delete', 'posts-delete', $login, $params
                 );
             }
 
@@ -540,7 +529,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
                     $params = array( 'url' => $post['url'] );
                 }
                 $this->performApiCall(
-                    '/api/v1/posts/delete', 'posts-delete', $login, $params, 
+                    'posts/delete', 'posts-delete', $login, $params, 
                     '<result code="something went wrong" />'
                 );
             }
@@ -563,7 +552,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
             for ($i=1; $i<count($this->sorted_test_posts); $i++) {
                 $doc = $this->performApiCall(
-                    '/api/v1/posts/recent', 'posts-recent', $login,
+                    'posts/recent', 'posts-recent', $login,
                     array( 'count' => $i ), null
                 );
                 $this->assertEquals($i, count($doc->post));
@@ -590,7 +579,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
             foreach ($this->sorted_test_posts as $post) {
                 $hash = md5($post['url']);
                 $doc = $this->performApiCall(
-                    '/api/v1/posts/get', 'posts-get', $login,
+                    'posts/get', 'posts-get', $login,
                     array( 'hash' => $hash ), null
                 );
                 $sigs[] = array(
@@ -599,7 +588,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
             }
 
             $hashes_doc = $this->performApiCall(
-                '/api/v1/posts/all', 'posts-all', $login,
+                'posts/all', 'posts-all', $login,
                 array( 'hashes' => 1 ), null
             );
             
@@ -634,7 +623,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
                     // Look up the posts for this start/results pair.
                     $doc = $this->performApiCall(
-                        '/api/v1/posts/all', 'posts-all', $login, array( 
+                        'posts/all', 'posts-all', $login, array( 
                             'start'   => $start,
                             'results' => $results
                         ), null
@@ -676,7 +665,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
                     // Look up the posts for this start/results pair.
                     $doc = $this->performApiCall(
-                        '/api/v1/posts/all', 'posts-all', $login, array( 
+                        'posts/all', 'posts-all', $login, array( 
                             'fromdt' => $start_time,
                             'todt'   => $end_time
                         ), null
@@ -714,7 +703,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
             foreach(array('get','all') as $path) {
                 $doc = $this->performApiCall(
-                    '/api/v1/tags/' . $path, 'tags-all', $login, array(), null
+                    'tags/' . $path, 'tags-all', $login, array(), null
                 );
 
                 foreach ($doc->tag as $ele) {
@@ -777,7 +766,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
     {
         foreach ($this->test_posts as $post) {
             $this->performApiCall(
-                '/api/v1/posts/add', 'posts-add', $login, 
+                'posts/add', 'posts-add', $login, 
                 array(
                     'url'         => $post['url'],
                     'description' => $post['title'],
@@ -832,43 +821,36 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
     /**
      * Perform an API call using test response and request.
      */
-    private function performApiCall($path, $action, $login, $query, $result='<result code="done" />')
+    private function performApiCall($path, $action, $login, $params, $result='<result code="done" />')
     {
-        $this->response->clearBody();
-        $this->response->clearAllHeaders();
+        // Build the API URL from the base, path, and query params.
+        $url = Kohana::config('tests.api_v1_base_url') . '/' . $path . '?' . 
+            http_build_query($params);
 
-        $this->request
-            ->clearHeaders()
-            ->clearQuery()
-            ->clearPost()
-            ->clearRawBody()
-            ->clearCookies()
-            ->setMethod('GET')
-            ->setHeader(
-                'Authorization',
-                'Basic ' . base64_encode(
-                    $login['login_name'].':'.$login['password']
-                )
-            )
-            ->setQuery($query);
+        // Attempt making an authenticated fetch against v1 del API
+        $ch = curl_init($url);
+        curl_setopt_array($ch, array(
+            CURLOPT_USERAGENT      => 'Memex/0.1',
+            CURLOPT_FAILONERROR    => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_USERPWD        => $login['login_name'].':'.$login['password']
+        ));
+        $resp = curl_exec($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
 
-        $this->dispatch($path);
+        // If the fetch wasn't successful, assume the username/password 
+        // was wrong.
+        //if (200 != $info['http_code']) {
+        //    throw new Exception('delicious API call failed');
+        //} 
 
         if (null != $result) {
-            $this->assertEquals( 
-                $result, 
-                $this->response->outputBody() 
-            );
+            $this->assertEquals($result, $resp);
         }
 
-        try {
-            $this->assertController('del-api');
-        } catch (Exception $e) {
-            throw new Exception($this->response->outputBody());
-        }
-        $this->assertAction($action);
-
-        $doc = simplexml_load_string($this->response->outputBody());
+        $doc = simplexml_load_string($resp);
         return $doc;
     }
 

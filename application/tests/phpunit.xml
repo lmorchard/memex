@@ -1,6 +1,11 @@
-<phpunit>
-    <testsuite name="Memex Test Suite">
+<phpunit bootstrap="bootstrap.php">
+
+    <testsuite name="application">
         <directory>./</directory>
+    </testsuite>
+
+    <testsuite name="module_delicious">
+        <directory>../../modules/delicious/tests</directory>
     </testsuite>
 
     <php>
@@ -12,15 +17,9 @@
             <directory suffix=".php">../libraries/</directory>
             <directory suffix=".php">../models/</directory>
             <directory suffix=".php">../controllers/</directory>
-            <!--
-            <directory suffix=".php">../application/</directory>
-            <exclude>
-                <directory suffix=".phtml">../application/</directory>
-            </exclude>
-            -->
+            <directory suffix=".php">../../modules/delicious/tests/controllers/</directory>
         </whitelist>
     </filter>
-
 
     <logging>
         <log type="coverage-html" target="./log/report" charset="UTF-8"
@@ -28,4 +27,5 @@
             lowUpperBound="50" highLowerBound="80"/>
         <log type="testdox-html" target="./log/testdox.html" />
     </logging>
+
 </phpunit>

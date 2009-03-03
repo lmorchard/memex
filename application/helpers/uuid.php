@@ -14,7 +14,7 @@ class uuid_Core
      */
     public static function uuid() 
     {
-        require_once('application/vendor/OmniTI/UUID.php');
+        require_once(dirname(dirname(__FILE__)).'/vendor/OmniTI/UUID.php');
         $u = new OmniTI_UUID();
         return $u->toRFC4122String();
     }

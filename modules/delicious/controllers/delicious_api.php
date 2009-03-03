@@ -3,55 +3,42 @@
  * Actions to support delicious.com v1 API
  * see: http://delicious.com/help/api
  */
-class DelApiController extends Zend_Controller_Action  
+class Delicious_Api_Controller extends Controller
 { 
+    protected $auto_render = FALSE;
+
     /**
      * Enforce HTTP basic auth for all API actions.
      */
-    public function preDispatch()
+    public function __construct()
     {
-        // Disable layout and view for API actions.
-        $this->_helper->layout()->disableLayout();
-        $this->_helper->viewRenderer->setNoRender(true);
+        parent::__construct();
 
         header('Content-Type: text/xml');
 
-        // Only the 'unauthorized' action gets a free ride...
-        if ($this->getRequest()->getActionName() != 'unauthorized') {
+        // This looks like an infinite loop, but it'll be escaped via break on 
+        // error or return on success.
+        while(1) {
 
-            $auth = new Memex_Auth_Adapter_Http(array(
-                'accept_schemes' => 'basic',
-                'realm'          => 'memex del v1 API'
-            ));
-            $auth->setRequest($this->getRequest());
-            $auth->setResponse($this->getResponse());
+            if (!isset($_SERVER['PHP_AUTH_USER'])) 
+                break;
 
-            $logins_model = $this->_helper->getModel('Logins');
-            $auth->setBasicResolver(
-                new Memex_Auth_Adapter_Http_Resolver_Logins($logins_model)
-            );
+            $logins_model = new Logins_Model();
+            $login = $logins_model->fetchByLoginName($_SERVER['PHP_AUTH_USER']);
 
-            $result = $auth->authenticate();
-            if (!$result->isValid()) {
-                return $this->_forward('unauthorized');
-            }
-
-            $identity   = $result->getIdentity();
-            $login_name = $identity['username'];
-            $login      = $logins_model->fetchByLoginName($login_name);
+            if ($login['password'] != md5($_SERVER['PHP_AUTH_PW']))
+                break;
 
             $this->profile = 
                 $logins_model->fetchDefaultProfileForLogin($login['id']);
 
+            // Auth success!
+            return;
         }
-    }
 
-    /**
-     * Dead end action reached when auth fails.
-     */
-    public function unauthorizedAction()
-    {
-        return $this->renderError('Authorization Required');
+        header('WWW-Authenticate: Basic realm="memex del v1 API"');
+        header('HTTP/1.0 401 Unauthorized');
+        exit;
     }
 
     /**
@@ -61,9 +48,9 @@ class DelApiController extends Zend_Controller_Action
      *  Use this before calling posts/all to see if the data has changed since 
      *  the last fetch.
      */
-    public function postsUpdateAction()
+    public function posts_update()
     {
-        $posts_model = $this->_helper->getModel('Posts');
+        $posts_model = new Posts_Model();
         
         $last_update = $posts_model->fetchLastModifiedDateByProfile(
             $this->profile['id']
@@ -95,12 +82,11 @@ class DelApiController extends Zend_Controller_Action
      *      (optional) Fetch multiple bookmarks by one or more URL MD5s 
      *      regardless of date, separated by URL-encoded spaces (ie. '+').
      */
-    public function postsGetAction()
+    public function posts_get()
     {
-        $request = $this->getRequest();
-        $posts_model = $this->_helper->getModel('Posts');
+        $posts_model = new Posts_Model();
 
-        $params = $request->getQuery();
+        $params = $_GET;
 
         if (!empty($params['url'])) {
 
@@ -139,8 +125,8 @@ class DelApiController extends Zend_Controller_Action
         $start_date = $date . "T00:00:00-00:00";
         $end_date   = $date . "T23:59:59-00:00";
 
-        $tags_model = $this->_helper->getModel('Tags');
-        $tags = $tags_model->parseTags($request->getQuery('tag', ''));
+        $tags_model = new Tags_Model();
+        $tags = $tags_model->parseTags($this->input->get('tag', ''));
 
         $posts = $posts_model->fetchBy(
             null, null, null, $this->profile['id'], 
@@ -159,17 +145,14 @@ class DelApiController extends Zend_Controller_Action
      *  &count={1..100}
      *      (optional) Number of items to retrieve (Default:15, Maximum:100). 
      */
-    public function postsRecentAction()
+    public function posts_recent()
     {
-        $request = $this->getRequest();
-        $params  = $request->getQuery();
+        $posts_model = new Posts_Model();
 
-        $posts_model = $this->_helper->getModel('Posts');
+        $tags_model = new Tags_Model();
+        $tags = $tags_model->parseTags($this->input->get('tag', ''));
 
-        $tags_model = $this->_helper->getModel('Tags');
-        $tags = $tags_model->parseTags($request->getQuery('tag', ''));
-
-        $count = $request->getQuery('count', 15);
+        $count = $this->input->get('count', 15);
         if ($count < 1) $count = 1;
         if ($count > 100) $count = 100;
 
@@ -196,14 +179,13 @@ class DelApiController extends Zend_Controller_Action
      *  &todt={CCYY-MM-DDThh:mm:ssZ}
      *      (optional) Filter for posts on this date or earlier
      */
-    public function postsAllAction()
+    public function posts_all()
     {
-        $request = $this->getRequest();
-        $params  = $request->getQuery();
+        $params  = $_GET;
 
-        $posts_model = $this->_helper->getModel('Posts');
+        $posts_model = new Posts_Model();
 
-        if ($request->getQuery('hashes', false) !== false) {
+        if ($this->input->get('hashes', false) !== false) {
             // If ?hashes parameter sent, switch to send hash manifest.
 
             $hashes = $posts_model->fetchHashesByProfile($this->profile['id']);
@@ -224,13 +206,13 @@ class DelApiController extends Zend_Controller_Action
         } else {
             // Otherwise, use supplied criteria to look up posts.
 
-            $tags_model = $this->_helper->getModel('Tags');
-            $tags = $tags_model->parseTags($request->getQuery('tag', ''));
+            $tags_model = new Tags_Model();
+            $tags = $tags_model->parseTags($this->input->get('tag', ''));
 
-            $start = (int)$request->getQuery('start', 0);
+            $start = (int)$this->input->get('start', 0);
             if ($start < 0) $start = 0;
 
-            $results = $request->getQuery('results', null);
+            $results = $this->input->get('results', null);
 
             $start_date = !empty($params['fromdt']) ?
                 date('c', strtotime($params['fromdt'])) : null;
@@ -267,12 +249,10 @@ class DelApiController extends Zend_Controller_Action
      *  &tag={TAG}
      *      (optional) Filter by this tag
      */
-    public function postsDatesAction()
+    public function posts_dates()
     {
-        $request = $this->getRequest();
-
-        $tags_model = $this->_helper->getModel('Tags');
-        $tags = $tags_model->parseTags($request->getQuery('tag', ''));
+        $tags_model = new Tags_Model();
+        $tags = $tags_model->parseTags($this->input->get('tag', ''));
         
         $x = new Memex_XmlWriter(array('parents' => array('dates')));
         $x->dates(array(
@@ -280,7 +260,7 @@ class DelApiController extends Zend_Controller_Action
             'tag'  => $tags_model->concatenateTags($tags)
         ));
 
-        $posts_model = $this->_helper->getModel('Posts');
+        $posts_model = new Posts_Model();
         $dates = $posts_model->fetchDatesByTagsAndProfile(
             $tags, $this->profile['id']
         );
@@ -317,21 +297,19 @@ class DelApiController extends Zend_Controller_Action
      *  &shared=no
      *      (optional) make the item private
      */
-    public function postsAddAction()
+    public function posts_add()
     {
-        $request = $this->getRequest();
-
-        $posts_model = $this->_helper->getModel('Posts');
+        $posts_model = new Posts_Model();
 
         $new_post_data = array(
-            'url'       => $request->getQuery('url', null),
-            'title'     => $request->getQuery('description', null),
-            'notes'     => $request->getQuery('extended', null),
-            'tags'      => $request->getQuery('tags', null),
-            'user_date' => $request->getQuery('dt', null)
+            'url'       => $this->input->get('url', null),
+            'title'     => $this->input->get('description', null),
+            'notes'     => $this->input->get('extended', null),
+            'tags'      => $this->input->get('tags', null),
+            'user_date' => $this->input->get('dt', null)
         );
 
-        if ($request->getQuery('replace', 'yes') == 'no') {
+        if ($this->input->get('replace', 'yes') == 'no') {
             $fetched_post = $posts_model->fetchOneByUrlAndProfile(
                 $new_post_data['url'], $this->profile['id']
             );
@@ -341,14 +319,8 @@ class DelApiController extends Zend_Controller_Action
         }
 
         // Use the post form to validate the incoming API data.
-        $form = $this->_helper->getForm(
-            'post', array(
-                'action'   => $this->view->url(),
-                'have_url' => true,
-                'csrf'     => false
-            )
-        );
-        if (!$form->isValid($new_post_data)) {
+        $validator = $posts_model->getValidator($new_post_data);
+        if (!$validator->validate()) {
             return $this->renderError();
         }
 
@@ -373,12 +345,11 @@ class DelApiController extends Zend_Controller_Action
      *  &hash={HASH}
      *      (optional) the URL MD5 of the item.
      */
-    public function postsDeleteAction()
+    public function posts_delete()
     {
-        $request = $this->getRequest();
-        $params  = $request->getQuery();
+        $params = $_GET;
 
-        $posts_model = $this->_helper->getModel('Posts');
+        $posts_model = new Posts_Model();
 
         if (!empty($params['url'])) {
             $post = $posts_model->fetchOneByUrlAndProfile(
@@ -401,12 +372,9 @@ class DelApiController extends Zend_Controller_Action
     /**
      * Return a list of tags and counts for a profile.
      */
-    public function tagsAllAction()
+    public function tags_all()
     {
-        $request = $this->getRequest();
-        $params  = $request->getQuery();
-
-        $tags_model = $this->_helper->getModel('Tags');
+        $tags_model = new Tags_Model();
         $tags = $tags_model->countByProfile(
             $this->profile['id'], 0, null
         );
@@ -431,7 +399,7 @@ class DelApiController extends Zend_Controller_Action
     private function renderPosts($posts, $tags=null, $date=null, 
         $last_update=null, $start=null, $results=null, $posts_count=null)
     {
-        $tags_model = $this->_helper->getModel('Tags');
+        $tags_model = new Tags_Model();
 
         $x = new Memex_XmlWriter(array('parents' => array('posts')));
 
@@ -474,139 +442,6 @@ class DelApiController extends Zend_Controller_Action
     public function renderError($msg='something went wrong')
     {
         echo '<result code="'.$msg.'" />';
-    }
-
-}
-
-/**
- * Auth adapter checking against the logins model.
- */
-class Memex_Auth_Adapter_Http_Resolver_Logins implements Zend_Auth_Adapter_Http_Resolver_Interface
-{
-    /**
-     * Constructor.
-     *
-     * @param Memex_Model_Logins logins model used to validate user/pass
-     */
-    public function __construct($logins_model)
-    {
-        $this->logins_model = $logins_model;
-    }
-
-    /**
-     * Check the given credentials against the logins model
-     *
-     * @param array User name, password pair
-     * @param string Authentication realm
-     * @param boolean Successful match or no
-     */
-    public function resolve($creds, $realm)
-    {
-        list($username, $password) = $creds;
-        
-        if ($username == 'cookie' && $password == 'cookie') {
-            // MAJOR HACK:
-            //
-            // Special-case auth loophole used by Delicious to submit the 
-            // website login cookie as a parameter for API authentication.
-            //
-            // This enables potential compatibility with the official
-            // Delicious browser extension, though some client-side hacking
-            // will be necessary.
-
-            // Get the cookie auth data from the _user parameter.
-            $request  = Zend_Controller_Front::getInstance()->getRequest();
-            $token    = rawurldecode(str_replace('+', ' ', $request->getParam('_user')));
-
-            // Use the cookie manager to decode the data serialized in the auth data.
-            $secret   = Zend_Registry::get('config')->auth->secret;
-            $manager  = new BigOrNot_CookieManager($secret);
-            $tok_data = $manager->decodeCookieValue($token);
-            if (null == $tok_data) return false;
-
-            // The decoded auth data should deserialize into an identity record.
-            $identity = unserialize($tok_data);
-            if (!empty($identity->login_name)) {
-                return $identity->login_name;
-            } else {
-                return false;
-            }
-        }
-
-        // All other username / password pairs are handled normally.
-        $login = $this->logins_model->fetchByLoginName($username);
-        if (null==$login) return false;
-        if (md5($password) != $login['password']) return false;
-
-        return $username;
-    }
-
-}
-
-/**
- * Monkey patched version of the Zend HTTP auth adapter that asks the resolver 
- * whether the password is correct, rather than checking for a correct password 
- * here.
- */
-class Memex_Auth_Adapter_Http extends Zend_Auth_Adapter_Http 
-{
-    /**
-     * Basic Authentication
-     *
-     * @param  string $header Client's Authorization header
-     * @throws Zend_Auth_Adapter_Exception
-     * @return Zend_Auth_Result
-     */
-    protected function _basicAuth($header)
-    {
-        if (empty($header)) {
-            /**
-             * @see Zend_Auth_Adapter_Exception
-             */
-            require_once 'Zend/Auth/Adapter/Exception.php';
-            throw new Zend_Auth_Adapter_Exception('The value of the client Authorization header is required');
-        }
-        if (empty($this->_basicResolver)) {
-            /**
-             * @see Zend_Auth_Adapter_Exception
-             */
-            require_once 'Zend/Auth/Adapter/Exception.php';
-            throw new Zend_Auth_Adapter_Exception('A basicResolver object must be set before doing Basic '
-                                                . 'authentication');
-        }
-
-        // Decode the Authorization header
-        $auth = substr($header, strlen('Basic '));
-        $auth = base64_decode($auth);
-        if (!$auth) {
-            /**
-             * @see Zend_Auth_Adapter_Exception
-             */
-            require_once 'Zend/Auth/Adapter/Exception.php';
-            throw new Zend_Auth_Adapter_Exception('Unable to base64_decode Authorization header value');
-        }
-
-        // See ZF-1253. Validate the credentials the same way the digest
-        // implementation does. If invalid credentials are detected,
-        // re-challenge the client.
-        if (!ctype_print($auth)) {
-            return $this->_challengeClient();
-        }
-        // Fix for ZF-1515: Now re-challenges on empty username or password
-        $creds = array_filter(explode(':', $auth));
-        if (count($creds) != 2) {
-            return $this->_challengeClient();
-        }
-
-        // HACK for ZF-5402: Passing full creds to resolver so that it can
-        // match the password and alter username, rather than checking it here.
-        $username_match = $this->_basicResolver->resolve($creds, $this->_realm);
-        if (false !== $username_match) {
-            $identity = array('username'=>$username_match, 'realm'=>$this->_realm);
-            return new Zend_Auth_Result(Zend_Auth_Result::SUCCESS, $identity);
-        } else {
-            return $this->_challengeClient();
-        }
     }
 
 }
