@@ -27,7 +27,7 @@ class Logins_Model extends Model
             'login_name' => $data['login_name'],
             'email'      => $data['email'],
             'password'   => md5($data['password']),
-            'created'    => date('Y-m-d H:i:s', time())
+            'created'    => gmdate('Y-m-d H:i:s', time())
         );
         $data['id'] = $this->db
             ->insert($this->_table_name, $data)

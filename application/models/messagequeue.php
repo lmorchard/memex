@@ -223,13 +223,13 @@ class MessageQueue_Model extends Model
 
         // Finally insert a new message.
         $row = array(
-            'created'       => date('c'),
-            'modified'      => date('c'),
+            'created'       => gmdate('c'),
+            'modified'      => gmdate('c'),
             'uuid'          => uuid::uuid(),
             'batch_uuid'    => $this->_batch_uuid,
             'batch_seq'     => ($this->_batch_seq++),
             'priority'      => $priority,
-            'scheduled_for' => $scheduled_for,
+            'scheduled_for' => gmdate('c', strtotime($scheduled_for)),
             'topic'         => $topic,
             'object'        => $object,
             'method'        => $method,
@@ -254,7 +254,7 @@ class MessageQueue_Model extends Model
 
             // Start building query to find an unreserved message.  Account for 
             // priority and FIFO.
-            $now = date('c');
+            $now = gmdate('c');
             $msg = $this->db->query("
                 SELECT * FROM {$this->_table_name}
                 WHERE
@@ -282,11 +282,11 @@ class MessageQueue_Model extends Model
                 $msg['body']    = json_decode($msg['body'], true);
 
                 // Update the timestamp to reserve the message.
-                $msg['reserved_at'] = date('c');
+                $msg['reserved_at'] = gmdate('c');
                 $this->db->update(
                     $this->_table_name,
                     array(
-                        'modified'    => date('c'),
+                        'modified'    => gmdate('c'),
                         'reserved_at' => $msg['reserved_at']
                     ),
                     array('uuid' => $msg['uuid'])
@@ -323,8 +323,8 @@ class MessageQueue_Model extends Model
         $this->db->update(
             $this->_table_name,
             array(
-                'modified'    => date('c'),
-                'finished_at' => date('c')
+                'modified'    => gmdate('c'),
+                'finished_at' => gmdate('c')
             ),
             array('uuid' => $msg['uuid'])
         );

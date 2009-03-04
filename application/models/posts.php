@@ -32,12 +32,10 @@ class Posts_Model extends Model
             throw new Exception('profile_id required');
         
         if (!empty($post_data['user_date'])) {
-            $date_in = strtotime($post_data['user_date'], time());
+            $date_in = strtotime($post_data['user_date']);
             if (!$date_in)
                 throw new Exception('valid optional date required');
-            $post_data['user_date'] = date('c', $date_in);
-        } else {
-            $post_data['user_date'] = date('c');
+            $post_data['user_date'] = gmdate('c', $date_in);
         }
 
         // Get an ID for the post's URL and set the ID in post data
@@ -71,14 +69,15 @@ class Posts_Model extends Model
                 'uuid'       => uuid::uuid(),
                 'url_id'     => $url_data['id'],
                 'profile_id' => $post_data['profile_id'],
-                'created'    => date('c'),
+                'created'    => gmdate('c'),
+                'user_date'  => gmdate('c'),
                 'tags'       => '',
                 'notes'      => ''
             );
         } else {
             $update = true;
         }
-        $row['modified'] = date('c');
+        $row['modified'] = gmdate('c');
 
         // Has the URL been changed in an existing post?
         if ($row['url_id'] != $url_data['id']) {
@@ -481,7 +480,7 @@ class Posts_Model extends Model
             $row['tags_parsed'] = 
                 $tags_model->parseTags($row['tags']);
             foreach(array('user_date', 'created', 'modified') as $field)
-                $row[$field] = date('c', strtotime($row[$field]));
+                $row[$field] = gmdate('c', strtotime($row[$field] . ' GMT'));
             $posts_out[] = $row;
         }
         return $posts_out;
@@ -510,9 +509,9 @@ class Posts_Model extends Model
         // if (strpos($adapter_name, 'mysql') !== false) {
             // HACK: MySQL-specific query
             if (null != $start_date)
-                $select->where('user_date >=' , date('Y-m-d H:i:s', strtotime($start_date)));
+                $select->where('user_date >=' , gmdate('c', strtotime($start_date)));
             if (null != $end_date)
-                $select->where('user_date <=' , date('Y-m-d H:i:s', strtotime($end_date)));
+                $select->where('user_date <=' , gmdate('c', strtotime($end_date)));
         // } else {
         //    // HACK: Everything else, assumed ISO8601 date strings like sqlite.
         //    if (null != $start_date)

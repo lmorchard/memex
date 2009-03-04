@@ -87,7 +87,7 @@ class Urls_Model extends Model
                 'hash'             => md5($url),
                 'hostname'         => empty($url_parts['host']) ? '' : $url_parts['host'],
                 'first_profile_id' => $profile_id,
-                'created'          => date('Y-m-d H:i:s', time())
+                'created'          => gmdate('c')
             )
         )->insert_id();
         return $this->db->select()

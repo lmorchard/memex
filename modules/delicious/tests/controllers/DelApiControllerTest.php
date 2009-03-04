@@ -706,7 +706,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
                     'tags/' . $path, 'tags-all', $login, array(), null
                 );
 
-                foreach ($doc->tag as $ele) {
+                if (!empty($doc->tag)) foreach ($doc->tag as $ele) {
                     $this->assertEquals(
                         $tag_counts[(string)$ele['tag']],
                         (string)$ele['count']

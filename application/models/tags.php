@@ -165,8 +165,8 @@ class Tags_Model extends Model
                     'post_id'    => $post_data['id'], 
                     'profile_id' => $post_data['profile_id'], 
                     'url_id'     => $post_data['url_id'],
-                    'created'    => date('c'),
-                    'modified'   => date('c')
+                    'created'    => gmdate('c'),
+                    'modified'   => gmdate('c')
                 )
             );
         }
@@ -177,7 +177,7 @@ class Tags_Model extends Model
                 $this->_table_name,
                 array( 
                     'position' => $position,
-                    'modified' => date('c')
+                    'modified' => gmdate('c')
                 ),
                 array(
                     'post_id'  => $post_data['id'],

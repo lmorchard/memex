@@ -26,7 +26,7 @@ class Profiles_Model extends Model
             'screen_name' => $data['screen_name'],
             'full_name'   => $data['full_name'],
             'bio'         => empty($data['bio']) ? '' : $data['bio'],
-            'created'     => date('Y-m-d H:i:s', time())
+            'created'     => gmdate('c')
         );
         $data['id'] = $this->db
             ->insert('profiles', $data)
