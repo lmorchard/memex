@@ -73,5 +73,4 @@ class Memex_Init {
         );
     }
 }
-
-Memex_Init::init();
+Event::add('LocalConfig.ready', array('Memex_Init','init'));

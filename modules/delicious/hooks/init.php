@@ -180,5 +180,4 @@ class Memex_Delicious {
         return $settings;
     }
 }
-
-Memex_Delicious::init();
+Event::add('LocalConfig.ready', array('Memex_Delicious','init'));
