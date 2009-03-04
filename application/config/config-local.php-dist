@@ -1,0 +1,25 @@
+<?php
+/**
+ * Local installation config overrides.
+ */
+$config['model.database'] = 'default';
+
+$config['database.local'] = array(
+	'benchmark'     => FALSE,
+	'persistent'    => FALSE,
+	'connection'    => array
+	(
+		'type'     => 'mysql',
+		'user'     => 'memex',
+		'pass'     => 'memex',
+		'host'     => 'localhost',
+		'port'     => FALSE,
+		'socket'   => FALSE,
+		'database' => 'memex_local'
+	),
+	'character_set' => 'utf8',
+	'table_prefix'  => '',
+	'object'        => FALSE,
+	'cache'         => FALSE,
+	'escape'        => TRUE
+);

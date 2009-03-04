@@ -834,7 +834,8 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
             CURLOPT_FAILONERROR    => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_USERPWD        => $login['login_name'].':'.$login['password']
+            CURLOPT_USERPWD        => $login['login_name'].':'.$login['password'],
+            CURLOPT_HTTPHEADER     => array( 'X-Use-Env: testing' )
         ));
         $resp = curl_exec($ch);
         $info = curl_getinfo($ch);

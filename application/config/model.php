@@ -1,4 +1,8 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+/**
+ *
+ */
 
+$config['database'] = 'default';
 $config['enable_delete_all'] = false;
 

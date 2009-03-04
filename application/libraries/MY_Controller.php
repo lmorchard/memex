@@ -26,6 +26,16 @@ class Controller extends Controller_Core {
     {
         parent::__construct();
 
+        switch ($this->input->server('HTTP_X_USE_ENV','production')) {
+            case 'testing':
+                Kohana::config_set('model.enable_delete_all', true);
+                Kohana::config_set('model.database', 'testing');
+                break; 
+            default:
+                // no-op
+                break;
+        }
+
         // Start with empty set of view vars.
         $this->view_data = array(
             'auth_profile' => null,
