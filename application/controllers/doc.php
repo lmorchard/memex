@@ -5,22 +5,22 @@
  * @author l.m.orchard <l.m.orchard@pobox.com>
  * @package Memex
  */
-class Doc_Controller extends Controller 
+class Doc_Controller extends Local_Controller 
 {
     protected $auto_render = TRUE;
 
     public function index() 
     {
         $params = $this->getParamsFromRoute(array(
-            'doc_path' => 'README'
+            'path' => 'README'
         ));
 
         $root_docs = array( 'README', 'TODO' );
 
-        if (in_array($params['doc_path'], $root_docs)) {
-            $path = dirname(APPPATH) . '/' . $params['doc_path'] . '.md';
+        if (in_array($params['path'], $root_docs)) {
+            $path = dirname(APPPATH) . '/' . $params['path'] . '.md';
         } else {
-            $path = dirname(APPPATH) . '/docs/' . $params['doc_path'] . '.md';
+            $path = dirname(APPPATH) . '/docs/' . $params['path'] . '.md';
         }
 
         if (!is_file($path)) {
@@ -31,9 +31,8 @@ class Doc_Controller extends Controller
             return;
         }
 
-        require_once 'Markdown.php';
-        $this->setViewData(array(
-            'doc_path'    => $params['doc_path'],
+        $this->view->set(array(
+            'doc_path'    => $params['path'],
             'doc_content' => Markdown(file_get_contents($path))
         ));
     }

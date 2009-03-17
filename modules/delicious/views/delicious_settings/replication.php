@@ -14,7 +14,7 @@
 <?php slot::end() ?>
 
 <?php
-    echo form::build(url::current(), array('class'=>'replication'), @$errors, array(
+    echo form::build(url::current(), array('class'=>'replication'), array(
         form::fieldset('activity replication', array(), array(
             form::field('checkbox', Memex_Delicious::ENABLED,   'Enabled', array('value'=>'enabled')),
             form::field('input',    Memex_Delicious::USER_NAME, 'User name'),

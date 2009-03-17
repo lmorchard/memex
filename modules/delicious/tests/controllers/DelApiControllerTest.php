@@ -824,7 +824,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
     private function performApiCall($path, $action, $login, $params, $result='<result code="done" />')
     {
         // Build the API URL from the base, path, and query params.
-        $url = Kohana::config('tests.api_v1_base_url') . '/' . $path . '?' . 
+        $url = Kohana::config('config.api_v1_base_url') . '/' . $path . '?' . 
             http_build_query($params);
 
         // Attempt making an authenticated fetch against v1 del API

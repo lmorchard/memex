@@ -1,14 +1,7 @@
 <?php slot::start('head') ?>
     <?php
-        $feed_url = url::base() . 'feeds/atom/'
-        /*$url(
-            array(
-                'format' => 'atom', 
-                'screen_name' => $screen_name,
-                'tags' => ($tags) ? join(' ', $tags) : ''
-            ), 
-            ($tags) ? 'feeds_post_tag' : 'feeds_site_home'
-        );*/
+        $feed_url = url::base() . 'feeds/atom/tag' . 
+            ( !empty($tags) ? '/' . out::U(join(' ', $tags)) : '' ) ; 
     ?>
     <link rel="alternate" type="application/atom+xml" title="Atom feed" href="<?= out::H($feed_url) ?>"> 
 <?php slot::end() ?>
@@ -17,7 +10,7 @@
     <?php if (empty($tags)): ?>
     / <a href="<?= url::base() ?>">recent</a>
     <?php else: ?>
-        / tag / <a href="<?= url::current() ?>"><?= join(' + ', $tags) ?></a>
+        / tag / <a href="<?= url::full_current() ?>"><?= join(' + ', $tags) ?></a>
     <?php endif ?>
 <?php slot::end() ?>
 

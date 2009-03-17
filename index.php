@@ -14,6 +14,7 @@
  *
  * @see http://docs.kohanaphp.com/installation/deployment
  */
+// define('IN_PRODUCTION', TRUE);
 define('IN_PRODUCTION', FALSE);
 
 /**

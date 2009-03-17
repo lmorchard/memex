@@ -3,7 +3,7 @@
  * Actions to support delicious.com v1 API
  * see: http://delicious.com/help/api
  */
-class Delicious_Api_Controller extends Controller
+class Delicious_Api_Controller extends Local_Controller
 { 
     protected $auto_render = FALSE;
 
@@ -26,8 +26,9 @@ class Delicious_Api_Controller extends Controller
             $logins_model = new Logins_Model();
             $login = $logins_model->fetchByLoginName($_SERVER['PHP_AUTH_USER']);
 
-            if ($login['password'] != md5($_SERVER['PHP_AUTH_PW']))
+            if ($login['password'] != md5($_SERVER['PHP_AUTH_PW'])) {
                 break;
+            }
 
             $this->profile = 
                 $logins_model->fetchDefaultProfileForLogin($login['id']);

@@ -5,7 +5,7 @@
  * @author l.m.orchard <l.m.orchard@pobox.com>
  * @package Memex
  */
-class Post_Controller extends Controller 
+class Post_Controller extends Local_Controller
 { 
     protected $auto_render = TRUE;
 
@@ -65,7 +65,7 @@ class Post_Controller extends Controller
             $profile['id'], $tags, $start, $count
         );
 
-        $this->setViewData(array(
+        $this->view->set(array(
             'tag_counts'  => $tag_counts,
             'tags'        => $tags,
             'posts'       => $posts,
@@ -97,7 +97,7 @@ class Post_Controller extends Controller
         list($start, $count) = $this->setupPagination($posts_count);
         $posts = $posts_model->fetchByTags($tags, $start, $count);
 
-        $this->setViewData(array(
+        $this->view->set(array(
             'tags'    => $tags,
             'posts'   => $posts,
             'profile' => null
@@ -129,7 +129,7 @@ class Post_Controller extends Controller
         if ($uuid) {
             $post = $posts_model->fetchOneByUUID($uuid);
         }
-        $this->setViewData('post', $post);
+        $this->view->set('post', $post);
 
         // Make sure the post exists, and belongs to the current profile
         $profile_id = ($this->auth_data) ? $this->auth_data['profile']['id'] : null;
@@ -166,7 +166,7 @@ class Post_Controller extends Controller
         if ($uuid) {
             $post = $posts_model->fetchOneByUUID($uuid);
         }
-        $this->setViewData('post', $post);
+        $this->view->set('post', $post);
 
         if (!isset($_POST['cancel'])) {
 
@@ -186,7 +186,7 @@ class Post_Controller extends Controller
             } elseif ($post['profile_id'] != $profile_id) {
                 header('HTTP/1.1 403 Forbidden'); exit;
             }
-            $this->setViewData('post', $post);
+            $this->view->set('post', $post);
 
             // Allow pre-population from query string
             if ('post' != request::method()) {
@@ -213,7 +213,7 @@ class Post_Controller extends Controller
         $params = $this->getParamsFromRoute(array(
             'uuid' => '', 'submethod' => 'save'
         ));
-        $this->setViewData($params);
+        $this->view->set($params);
 
         $have_url = false;
 
@@ -226,7 +226,7 @@ class Post_Controller extends Controller
         }
         if ($url) $have_url = true;
 
-        $this->setViewData('have_url', $have_url);
+        $this->view->set('have_url', $have_url);
 
         $uuid = $params['uuid'];
         if (isset($_GET['uuid'])) {
@@ -253,7 +253,7 @@ class Post_Controller extends Controller
                 $existing_post = array();
             } else {
                 $have_url = true;
-                $this->setViewData('have_url', $have_url);
+                $this->view->set('have_url', $have_url);
                 if ($existing_post['profile_id'] != $profile_id) {
                     // If the logged in profile and the post profile ID don't 
                     // match, then this is a cross-profile copy and the UUID 
@@ -281,7 +281,7 @@ class Post_Controller extends Controller
             ));
             if (!$validator->validate()) {
                 $_POST = $validator->as_array();
-                $this->setViewData(
+                $this->view->set(
                     'errors', $validator->errors('form_errors_post')
                 );
                 return;
@@ -351,7 +351,7 @@ class Post_Controller extends Controller
         $previous = ($page_number > 1) ? $page_number - 1 : null;
         $next     = ($page_number < $last) ? $page_number + 1 : null;
 
-        $this->setViewData(array(
+        $this->view->set(array(
             'pagination' => array(
                 'first'       => $first,
                 'last'        => $last,
@@ -380,9 +380,9 @@ class Post_Controller extends Controller
         if (!valid::alpha_numeric($format)) {
             $format = 'atom';
         }
-        $this->setViewData('callback', $this->input->get('callback', ''));
         $this->layout = null;
-        $this->view = 'post/feed-'.strtolower($format);
+        $this->view->callback = $this->input->get('callback', '');
+        $this->view->set_filename('post/feed-'.strtolower($format));
     }
 
 } 

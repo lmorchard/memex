@@ -5,7 +5,7 @@
  * @author l.m.orchard <l.m.orchard@pobox.com>
  * @package Memex
  */
-class Profile_Controller extends Controller  
+class Profile_Controller extends Local_Controller  
 { 
     protected $auto_render = TRUE;
 
@@ -48,7 +48,7 @@ class Profile_Controller extends Controller
             'sections'   => array()
         );
         Event::run('Memex.pre_settings_menu', $data);
-        $this->setViewData('sections', $data['sections']);
+        $this->view->sections = $data['sections'];
     }
 
 } 

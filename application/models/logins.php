@@ -137,11 +137,11 @@ class Logins_Model extends Model
      *
      * @param array Form data to validate.
      */
-    public function getRegistrationValidator($data)
+    public function validateRegistration(&$data)
     {
         $profiles_model = new Profiles_Model();
 
-        $valid = Validation::factory($data)
+        $data = Validation::factory($data)
             ->pre_filter('trim')
             ->add_rules('login_name',       
                 'required', 'length[3,64]', 'valid::alpha_dash', 
@@ -160,7 +160,9 @@ class Logins_Model extends Model
             ->add_rules('captcha',          
                 'required', 'Captcha::valid')
             ;
-        return $valid;
+        $is_valid = $data->validate();
+
+        return $is_valid;
     }
 
     /**
@@ -168,15 +170,17 @@ class Logins_Model extends Model
      *
      * @param array Form data to validate
      */
-    public function getLoginValidator($data)
+    public function validateLogin(&$data)
     {
-        $valid = Validation::factory($data)
+        $data = Validation::factory($data)
             ->pre_filter('trim')
             ->add_rules('login_name', 'required', 'length[3,64]', 'valid::alpha_dash')
             ->add_rules('password', 'required')
             ->add_callbacks('password', array($this, 'isPasswordValid'))
             ;
-        return $valid;
+        $is_valid = $data->validate();
+
+        return $is_valid;
     }
 
     /**

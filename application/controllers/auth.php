@@ -6,7 +6,7 @@
  * @author l.m.orchard <l.m.orchard@pobox.com>
  * @package Memex
  */
-class Auth_Controller extends Controller
+class Auth_Controller extends Local_Controller
 { 
     protected $auto_render = TRUE;
 
@@ -23,10 +23,11 @@ class Auth_Controller extends Controller
      */
     public function home()
     {
+        $this->auto_render = false;
         if (!$this->auth->isLoggedIn()) {
-            url::redirect('login');
+            return url::redirect('login');
         } else {
-            url::redirect('people/' . 
+            return url::redirect('people/' . 
                 $this->auth_data['profile']['screen_name']);
         }
     }
@@ -39,25 +40,19 @@ class Auth_Controller extends Controller
         if ('post' != request::method())
             return;
 
-        $logins = new Logins_Model();
-        $validator = $logins->getRegistrationValidator(
-            $this->input->post()
-        );
+        $logins    = new Logins_Model();
+        $form_data = $this->input->post();
+        $is_valid  = $logins->validateRegistration($form_data);
 
-        if (!$validator->validate()) {
-            $this->setViewData(
-                'errors', $validator->errors('form_errors_auth')
-            );
+        $this->view->form_data = $form_data;
+
+        if (!$is_valid) {
+            $this->view->form_errors = 
+                $form_data->errors('form_errors_auth');
             return;
         }
 
-        $data = $validator->as_array();
-        $new_login = $logins->registerWithProfile($data);
-
-        $this->setViewData(array(
-            'errors' => NULL,
-            'form'   => $data
-        ));
+        $new_login = $logins->registerWithProfile($form_data);
 
         return url::redirect('login');
     }
@@ -70,31 +65,29 @@ class Auth_Controller extends Controller
         if ('post' != request::method())
             return;
 
-        $logins = new Logins_Model();
-        $validator = $logins->getLoginValidator(
-            $this->input->post()
-        );
+        $logins    = new Logins_Model();
+        $form_data = $this->input->post();
+        $is_valid  = $logins->validateLogin($form_data);
 
-        if (!$validator->validate()) {
-            $this->setViewData(
-                'errors', $validator->errors('form_errors_auth')
-            );
+        $this->view->form_data = $form_data;
+
+        if (!$is_valid) {
+            $this->view->form_errors = 
+                $form_data->errors('form_errors_auth');
             return;
         }
 
-        $data = $validator->as_array();
-
-        $login   = $logins->fetchByLoginName($data['login_name']);
+        $login   = $logins->fetchByLoginName($form_data['login_name']);
         $profile = $logins->fetchDefaultProfileForLogin($login['id']);
 
-        $this->auth->login($data['login_name'], array(
+        $this->auth->login($form_data['login_name'], array(
             'login' => $login, 'profile' => $profile
         ));
 
-        if (isset($data['jump']) && substr($data['jump'], 0, 1) == '/') {
+        if (isset($form_data['jump']) && substr($form_data['jump'], 0, 1) == '/') {
             // Allow post-login redirect only if the param starts with '/', 
             // interpreted as relatve to root of site.
-            return url::redirect($data['jump']);
+            return url::redirect($form_data['jump']);
         } else {
             return url::redirect('/home');
         }
@@ -105,7 +98,7 @@ class Auth_Controller extends Controller
      */
     public function logout()
     {
-        $this->setViewData(array(
+        $this->view->set_global(array(
             'auth_login'   => null,
             'auth_profile' => null
         ));

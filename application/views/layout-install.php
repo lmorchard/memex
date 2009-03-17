@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"> 
     <head>  
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-        <title>memex<?= slot::output('head_title') ?></title>
+        <title>memex</title>
         <link href="<?= url::base() . 'css/nostalgia/main.css' ?>" media="screen" rel="stylesheet" type="text/css" />
         <link href="<?= url::base() . 'css/nostalgia/' . $controller_name . '.css' ?>" media="screen" rel="stylesheet" type="text/css" />
         <?= slot::output('head') ?>
@@ -25,26 +25,12 @@
                 </div>
 
                 <div class="main">
-                    <?php if (null != $auth_profile): ?>
-                        <ul class="nav">
-                            <li class="first"><a href="<?= url::base() . 'people/' . out::U($auth_profile['screen_name']) ?>">your bookmarks</a></li> 
-                            <li><a href="<?= url::base() . 'save' ?>">save new</a></li>
-                        </ul>
-                    <?php endif ?>
                 </div>
 
                 <div class="sub">
 
                     <div class="auth">
                         <ul class="nav">
-                            <?php if (null === $auth_profile): ?>
-                                <li class="first"><a href="<?= url::base() . 'login' ?>">login</a></li>
-                                <li><a href="<?= url::base() . 'register' ?>">register</a></li>
-                            <?php else: ?>
-                                <li class="first">logged in as <a href="<?= url::base() . 'people/' . out::U($auth_profile['screen_name']) ?>"><?= out::H($auth_profile['screen_name']) ?></a></li>
-                                <li><a href="<?= url::base() . 'profiles/' . out::U($auth_profile['screen_name']) . '/settings' ?>">settings</a></li>
-                                <li><a href="<?= url::base() . 'logout' ?>">logout</a></li>
-                            <?php endif; ?>
                         </ul>
                     </div>
 
@@ -71,9 +57,6 @@
             <div id="footer">
                 <ul class="nav">
                     <li class="first"><a href="/">memex</a></li>
-                    <li><a href="<?= url::base() . 'docs/README' ?>">about</a></li>
-                    <li><a href="<?= url::base() . 'docs/TODO' ?>">todo</a></li>
-                    <li><a href="<?= url::base() . 'docs/FAQ' ?>">faq</a></li>
                     <?= slot::output('footer_nav') ?>
                 </ul>
 
@@ -83,18 +66,6 @@
 
         </div>
 
-        <script type="text/javascript">
-            if (typeof window.Memex == 'undefined') window.Memex = {};
-            Memex.Config = {
-                global: {
-                    debug: true,
-                    base_url: <?= json_encode(url::base()) ?>
-                },
-                'Memex.Main' : {
-                },
-                EOF: null
-            };
-        </script>
         <script src="<?= url::base() . 'js/mootools-1.2.1-core-yc.js' ?>" type="text/javascript"></script>
         <script src="<?= url::base() . 'js/mootools-1.2-more.js' ?>" type="text/javascript"></script>
         <script src="<?= url::base() . 'js/memex/utils.js' ?>" type="text/javascript"></script>

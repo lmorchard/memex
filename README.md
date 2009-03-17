@@ -26,7 +26,6 @@ application.
 ### Credits / Colophon
 
 * Leslie Michael Orchard - <http://decafbad.com/> - <mailto:l.m.orchard@pobox.com>
-* Liberal portions stolen from <http://github.com/weierophinney/bugapp/tree/master>
 * Using [Kohana Framework][kf] v2.3.1
 * Using [MooTools][mootools] [1.2.1][moodownload]
 * Using [Markdown PHP][markdown] for documentation.

@@ -1,12 +1,12 @@
 <?php
     foreach (array('first', 'previous', 'next', 'last') as $pos) {
-        ${"url_$pos"} = url::current(true, array('page' => ${$pos})); 
+        ${"url_$pos"} = url::full_current(true, array('page' => ${$pos})); 
     }
 
     function pagination_page($current, $n) { ?>
         <li class="page">
           <?php if ($current != $n): ?>
-            <a href="<?= url::current(true, array('page' => $n)); ?>"><?= $n ?></a>
+            <a href="<?= url::full_current(true, array('page' => $n)); ?>"><?= $n ?></a>
           <?php else: ?>
             <span class="current"><?= $n ?></span>
           <?php endif; ?>
@@ -88,7 +88,7 @@
                             </li>
                         <?php else: ?>
                             <li class="<?= ($first) ? 'first' : '' ?>">
-                                <a href="<?= url::current(false, array('set_page_size' => $size)) ?>"><?= $size ?></a>
+                                <a href="<?= url::full_current(false, array('set_page_size' => $size)) ?>"><?= $size ?></a>
                             </li>
                         <?php endif ?>
                     <?php

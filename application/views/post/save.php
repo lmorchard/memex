@@ -7,7 +7,7 @@
 <?php slot::end() ?>
 
 <?php
-echo form::build('save', array('class'=>'save'), @$errors, array(
+echo form::build('save', array('class'=>'save'), array(
     form::field('hidden', 'jump', ''),
     form::fieldset($submethod . ' post', array('class'=>'save'), array_merge( 
         array(

@@ -1,6 +1,6 @@
 <?php
     foreach (array('first', 'previous', 'next', 'last') as $pos) {
-        ${"url_$pos"} = url::current(true, array('page' => ${$pos})); 
+        ${"url_$pos"} = url::full_current(true, array('page' => ${$pos})); 
     }
 ?>
 <ul class="pagination_mini">

@@ -1,9 +1,14 @@
-<?php slot::start('crumbs') ?>
-    / <span>register</span>
-<?php slot::end() ?>
+<?php
+form::$data   = $form_data;
+form::$errors = $form_errors;
+
+slot::set('head_title', ' / register');
+?>
+
+<?php slot::start('crumbs') ?> / <span>register</span> <?php slot::end() ?>
 
 <?php
-    echo form::build('register', array('class'=>'register'), @$errors, array(
+    echo form::build('register', array('class'=>'register'), array(
         form::fieldset('login details', array('class'=>'login'), array(
             form::field('input',    'login_name',       'Login name'),
             form::field('input',    'email',            'Email address'),

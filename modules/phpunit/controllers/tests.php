@@ -1,23 +1,19 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 /**
  * PHPUnit test integration
- *
- * @package Memex
- * @author  l.m.orchard <l.m.orchard@pobox.com>
  */
 class Tests_Controller extends Controller {
 
     function __construct()
     {
-        // Turn off safties and switch database to test
-        Kohana::config_set('model.enable_delete_all', true);
-        Kohana::config_set('model.database', 'testing');
     }
 
 	function index()
 	{
         if ('cli' !== PHP_SAPI)
             die("For command-line use only.");
+
+        DecafbadUtils_EnvConfig::apply('testing');
 
         // Undo most of Kohana's helpful error handling so PHPUnit can take over.
         error_reporting( E_ALL | E_STRICT );

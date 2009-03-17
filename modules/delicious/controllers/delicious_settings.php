@@ -2,7 +2,7 @@
 /**
  *
  */
-class Delicious_Settings_Controller extends Controller 
+class Delicious_Settings_Controller extends Local_Controller 
 {
     protected $auto_render = TRUE;
 

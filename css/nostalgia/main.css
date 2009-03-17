@@ -29,9 +29,55 @@ form p.hint {
     padding: 0.25em 1em;
     font-weight: bold;
 }
+
 form {
     margin: 0; padding: 0;
 }
+
+form ul {
+    list-style-type: none;
+}
+form ul li {
+    clear: both;
+}
+form ul li label {
+    width: 10ex;
+    text-align: right;
+    float: left;
+    display: block;
+    padding: 0.5em 0.5em 0.5em 0;
+}
+form ul li label:after {
+    content: ': ';
+}
+form ul li label.hidden:after {
+    content: '';
+}
+form ul li.hidden {
+    display: none;
+}
+form ul li.input input,
+form ul li.password input {
+    margin: 0.5em 0em;
+    width: 75ex;
+}
+form ul li.submit input {
+    margin: 0.5em 0em;
+}
+form ul textarea {
+    font-family: arial, sans-serif;
+    font-size: 100%; 
+    width: 75ex;
+}
+form ul li.captcha input {
+    width: 10ex;
+    clear: right;
+    display: block;
+}
+form ul li.captcha img {
+}
+
+
 form fieldset {
     margin: 0.25em;
     padding: 0.25em;
