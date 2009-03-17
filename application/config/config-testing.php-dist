@@ -1,0 +1,8 @@
+<?php
+
+$config['model.enable_delete_all'] = true;
+$config['model.database'] = 'testing';
+
+$config['config.base_url'] = 'http://dev.memex.decafbad.com';
+$config['config.api_v1_base_url']  = 'http://dev.memex.decafbad.com/api/v1';
+

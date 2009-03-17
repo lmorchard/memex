@@ -12,7 +12,7 @@ application/cache/
 application/tests/log/
 logs/
 logs/*log
-application/config/config.php
-application/config/database.php
+application/config/config-local.php
+application/config/config-testing.php
 httpd.conf
 .htaccess
