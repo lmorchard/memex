@@ -10,6 +10,7 @@ Thumbs.db
 xfers/
 application/cache/
 application/tests/log/
+docs/api/
 logs/
 logs/*log
 application/config/config-local.php
