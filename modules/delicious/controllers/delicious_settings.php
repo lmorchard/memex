@@ -1,6 +1,10 @@
 <?php
 /**
+ * Delicious settings controller.
  *
+ * @package    Memex_Delicious
+ * @subpackage controllers
+ * @author     l.m.orchard@pobox.com
  */
 class Delicious_Settings_Controller extends Local_Controller 
 {

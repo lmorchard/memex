@@ -9,7 +9,7 @@
  * In order to rely on the selected configs, other hooks must register handlers 
  * with Event::add('EnvConfig.ready')
  *
- * @TODO: Load config overrides per hostname / environment
+ * @TODO Load config overrides per hostname / environment
  *
  * @package    DecafbadUtils
  * @subpackage hooks

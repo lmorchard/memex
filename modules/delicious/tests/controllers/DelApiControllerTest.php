@@ -2,8 +2,11 @@
 /**
  * Test class for DelApiControllerTest.
  *
- * @group Models
+ * @package    Memex_Delicious
+ * @subpackage tests
+ * @author     l.m.orchard@pobox.com
  */
+
 // class DelApiControllerTest extends Zend_Test_PHPUnit_ControllerTestCase //PHPUnit_Framework_TestCase 
 class DelApiControllerTest extends PHPUnit_Framework_TestCase 
 {

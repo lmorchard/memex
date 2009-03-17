@@ -1,6 +1,10 @@
 <?php
 /**
  * This is the DbTable class for the profiles table.
+ *
+ * @package    Memex
+ * @subpackage models
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Profiles_Model extends Model
 {

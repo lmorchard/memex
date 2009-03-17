@@ -1,6 +1,10 @@
 <?php
 /**
  * Initialization for the Delicious module.
+ *
+ * @package    Memex_Delicious
+ * @subpackage hooks
+ * @author     l.m.orchard@pobox.com
  */
 class Memex_Delicious {
 

@@ -1,9 +1,10 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
 /**
  * Collection of mostly command line utilities.
  *
- * @package Memex
- * @author  l.m.orchard <l.m.orchard@pobox.com>
+ * @package    Memex
+ * @subpackage controllers
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Util_Controller extends Controller {
 

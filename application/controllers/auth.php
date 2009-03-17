@@ -3,8 +3,9 @@
  * Controller handling all auth activities, including registration and 
  * login / logout
  *
- * @author l.m.orchard <l.m.orchard@pobox.com>
- * @package Memex
+ * @package    Memex
+ * @subpackage controllers
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Auth_Controller extends Local_Controller
 { 

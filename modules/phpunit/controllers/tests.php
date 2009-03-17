@@ -1,6 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 /**
  * PHPUnit test integration
+ *
+ * @package    PHPUnit
+ * @subpackage controllers
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Tests_Controller extends Controller {
 

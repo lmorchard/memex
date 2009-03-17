@@ -3,6 +3,10 @@
  * Test class for Memex_Model_TagsTest.
  *
  * @group Models
+ *
+ * @package    Memex
+ * @subpackage tests
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class TagsTest extends PHPUnit_Framework_TestCase 
 {

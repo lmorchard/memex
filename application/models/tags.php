@@ -1,6 +1,10 @@
 <?php
 /**
  * Model managing known URLs
+ *
+ * @package    Memex
+ * @subpackage models
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Tags_Model extends Model
 {

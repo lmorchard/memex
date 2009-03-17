@@ -3,6 +3,10 @@
  * Test class for Memex_Model_UrlsTest.
  *
  * @group Models
+ *
+ * @package    Memex
+ * @subpackage tests
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Memex_Model_UrlsTest extends PHPUnit_Framework_TestCase 
 {

@@ -1,6 +1,10 @@
 <?php
 /**
  * Model managing posts
+ *
+ * @package    Memex
+ * @subpackage models
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Posts_Model extends Model
 {

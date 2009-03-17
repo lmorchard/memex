@@ -2,8 +2,9 @@
 /**
  * Actions dealing with viewing and manipulating posts.
  *
- * @author l.m.orchard <l.m.orchard@pobox.com>
- * @package Memex
+ * @package    Memex
+ * @subpackage controllers
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Post_Controller extends Local_Controller
 { 

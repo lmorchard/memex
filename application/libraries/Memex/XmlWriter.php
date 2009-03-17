@@ -5,8 +5,9 @@
  * See: http://simonwillison.net/2003/Apr/29/xmlWriter/
  * See: http://www.xml.com/pub/a/2003/04/09/py-xml.html
  *
- * @author l.m.orchard <l.m.orchard@pobox.com>
- * @package Memex
+ * @package    Memex
+ * @subpackage libraries
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Memex_XmlWriter {
 

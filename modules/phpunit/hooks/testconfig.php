@@ -1,6 +1,10 @@
 <?php
 /**
  *
+ *
+ * @package    PHPUnit
+ * @subpackage hooks
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class TestConfig 
 {

@@ -1,6 +1,10 @@
 <?php
 /**
  * Authentication cookie manager.
+ *
+ * @package    Memex
+ * @subpackage libraries
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Memex_Auth {
 

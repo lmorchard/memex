@@ -3,6 +3,10 @@
  * Test class for ProfilesTest
  *
  * @group Models
+ *
+ * @package    Memex
+ * @subpackage tests
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class ProfilesTest extends PHPUnit_Framework_TestCase 
 {

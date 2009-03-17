@@ -10,7 +10,7 @@ class html extends html_Core
 {
 
     /**
-     * Wrap an array of items in <li> tags inside a <ul>
+     * Wrap an array of items in li tags inside a ul
      */
     public static function ul($arr, $attrs=null, $li=false)
     {

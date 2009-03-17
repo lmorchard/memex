@@ -2,8 +2,9 @@
 /**
  * Initialization for the Memex main application.
  *
- * @author l.m.orchard <l.m.orchard@pobox.com>
- * @package Memex
+ * @package    Memex
+ * @subpackage hooks
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Memex_Init {
 

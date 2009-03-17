@@ -2,6 +2,10 @@
 /**
  * Actions to support delicious.com v1 API
  * see: http://delicious.com/help/api
+ *
+ * @package    Memex_Delicious
+ * @subpackage controllers
+ * @author     l.m.orchard@pobox.com
  */
 class Delicious_Api_Controller extends Local_Controller
 { 

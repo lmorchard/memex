@@ -1,6 +1,9 @@
 <?php
 /**
- * This is the DbTable class for the logins table.
+ *
+ * @package    Memex
+ * @subpackage models
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Logins_Model extends Model
 {

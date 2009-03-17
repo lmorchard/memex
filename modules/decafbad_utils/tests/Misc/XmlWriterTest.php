@@ -3,6 +3,10 @@
  * Test class for XmlWriter
  *
  * @group Models
+ *
+ * @package    DecafbadUtils
+ * @subpackage tests
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class XmlWriterTest extends PHPUnit_Framework_TestCase 
 {

@@ -2,8 +2,9 @@
 /**
  * Markdown-based frontend to docs directory.
  *
- * @author l.m.orchard <l.m.orchard@pobox.com>
- * @package Memex
+ * @package    Memex
+ * @subpackage controllers
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Doc_Controller extends Local_Controller 
 {

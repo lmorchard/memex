@@ -4,9 +4,9 @@
  *
  * @TODO ensure combination of batch, sequence, priority
  *
- * @group Models
- * @author l.m.orchard <l.m.orchard@pobox.com>
- * @package Memex
+ * @package    DecafbadUtils
+ * @subpackage tests
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class MessageQueueTest extends PHPUnit_Framework_TestCase 
 {

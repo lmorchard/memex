@@ -2,8 +2,9 @@
 /**
  * Methods to support profile settings.
  *
- * @author l.m.orchard <l.m.orchard@pobox.com>
- * @package Memex
+ * @package    Memex
+ * @subpackage controllers
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Profile_Controller extends Local_Controller  
 { 

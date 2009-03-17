@@ -1,6 +1,10 @@
 <?php
 /**
  * Application-local controller customizations.
+ *
+ * @package    Memex
+ * @subpackage controllers
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class Local_Controller extends Layout_Controller 
 {

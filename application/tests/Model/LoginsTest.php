@@ -3,6 +3,10 @@
  * Test class for Model_User.
  *
  * @group Models
+ *
+ * @package    Memex
+ * @subpackage tests
+ * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class LoginsTest extends PHPUnit_Framework_TestCase 
 {
