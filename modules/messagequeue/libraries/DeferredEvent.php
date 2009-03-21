@@ -4,14 +4,16 @@
  * deferred messages.  The calling styles differ, but this allows plain
  * Kohana Event::run() calls to be routed through the message queue.
  *
- * It can also be switched to immediate events via config.deferred_events
+ * It can also be switched to immediate events via messagequeue.deferred_events
  *
- * @package    DecafbadUtils
+ * @package    MessageQueue
  * @subpackage libraries
  * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class DeferredEvent 
 {
+    public static $owner = null;
+
     private static $instance = null;
     private $proxies = array();
     private $mq = null;
@@ -28,7 +30,7 @@ class DeferredEvent
     public static function add($name, $callback, $params=null)
     {
         // If deferred events disabled, fall back to plain vanilla events.
-        if (!Kohana::config('config.deferred_events'))
+        if (!Kohana::config('messagequeue.deferred_events'))
             return Event::add($name, $callback);
 
         if (!is_array($callback) || !is_string($callback[0]))
@@ -74,7 +76,7 @@ class DeferredEvent
             Event::$data['scheduled_for'] : null;
 
         // Finally, publish the event as a message.
-        $this->mq->publish($name, Event::$data, $scheduled_for);
+        $this->mq->publish($name, Event::$data, $scheduled_for, self::$owner);
     }
 
     /**

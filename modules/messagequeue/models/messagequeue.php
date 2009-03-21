@@ -11,7 +11,7 @@
  * @TODO implement dependent batches that are processed in sequence
  * @TODO somehow exercise the lock on fetching a new message?
  *
- * @package    DecafbadUtils
+ * @package    MessageQueue
  * @subpackage models
  * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
@@ -102,7 +102,7 @@ class MessageQueue_Model extends Model
      * @param string message topic
      * @param mixed message data
      */
-    public function publish($topic, $data=null, $scheduled_for=null) {
+    public function publish($topic, $data=null, $scheduled_for=null, $owner=null) {
 
         if (isset($this->_subscriptions[$topic])) {
             
@@ -120,7 +120,7 @@ class MessageQueue_Model extends Model
                     $this->handle($topic, $object, $method, $context, $data);
                 } else {
                     // Queue deferred messages.
-                    $this->queue($topic, $object, $method, $context, $data, $priority, $scheduled_for, $duplicate);
+                    $this->queue($topic, $object, $method, $context, $data, $priority, $scheduled_for, $duplicate, $owner);
                 }
 
             }
@@ -173,10 +173,11 @@ class MessageQueue_Model extends Model
      * @param integer message priority
      * @param string scheduled time for message
      * @param integer duplicate message handling behavior
+     * @param string optional ownership info
      *
      * @return array queued message data
      */
-    public function queue($topic, $object, $method, $context, $data, $priority, $scheduled_for, $duplicate=self::DUPLICATE_IGNORE)
+    public function queue($topic, $object, $method, $context, $data, $priority, $scheduled_for, $duplicate=self::DUPLICATE_IGNORE, $owner=null)
     {
         if (!is_string($object)) {
             throw new Exception(
@@ -210,7 +211,7 @@ class MessageQueue_Model extends Model
                     // In replace case, delete the existing message.
                     $this->db->delete(
                         $this->_table_name,
-                        array('uuid' => $row['uuid'])
+                        array('uuid' => $row->uuid)
                     );
                     $this->unlock();
                 } else if ($duplicate == self::DUPLICATE_DISCARD) {
@@ -224,6 +225,7 @@ class MessageQueue_Model extends Model
 
         // Finally insert a new message.
         $row = array(
+            'owner'         => $owner,
             'created'       => gmdate('c'),
             'modified'      => gmdate('c'),
             'uuid'          => uuid::uuid(),
@@ -272,7 +274,7 @@ class MessageQueue_Model extends Model
                 ORDER BY
                     priority ASC, created ASC, batch_seq ASC
                 LIMIT 1
-            ")->current();
+            ")->result(FALSE)->current();
 
             if (!$msg) {
                 $msg = null;
@@ -413,4 +415,17 @@ class MessageQueue_Model extends Model
         $this->db->query('DELETE FROM ' . $this->_table_name);
     }
 
+    /**
+     * Find queued messages by owner.
+     *
+     * @param string Ownership key
+     */
+    public function findByOwner($owner)
+    {
+        $rows = $this->db->select()
+            ->from($this->_table_name)
+            ->where('owner', $owner)
+            ->get();
+        return $rows;
+    }
 }

@@ -1,10 +1,10 @@
 <?php
 /**
- * Test class for Memex_MessageQueue
+ * Test class for MessageQueue
  *
  * @TODO ensure combination of batch, sequence, priority
  *
- * @package    DecafbadUtils
+ * @package    MessageQueue
  * @subpackage tests
  * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
@@ -227,11 +227,11 @@ class MessageQueueTest extends PHPUnit_Framework_TestCase
         // Publish some messages scheduled in reverse order, each 2 
         // seconds apart.
         $start = time();
-        $mq->publish('t1', 'd1', date('c', $start + 10)); 
-        $mq->publish('t1', 'd2', date('c', $start + 8)); 
-        $mq->publish('t1', 'd3', date('c', $start + 6)); 
-        $mq->publish('t1', 'd4', date('c', $start + 4)); 
-        $mq->publish('t1', 'd5', date('c', $start + 2));
+        $mq->publish('t1', 'd1', gmdate('c', $start + 10)); 
+        $mq->publish('t1', 'd2', gmdate('c', $start + 8)); 
+        $mq->publish('t1', 'd3', gmdate('c', $start + 6)); 
+        $mq->publish('t1', 'd4', gmdate('c', $start + 4)); 
+        $mq->publish('t1', 'd5', gmdate('c', $start + 2));
         
         // Loop for 12 seconds, repeatedly attempting to reserve message every 
         // 1/2 second.  Ensure the proper number of messages are processed.
@@ -316,10 +316,10 @@ class MessageQueueTest extends PHPUnit_Framework_TestCase
         // object/method with identical context/data will push the scheduled 
         // time forward.
         $start = time();
-        $mq->publish('t0', 'd1', date('c', $start + 2));
-        $mq->publish('t1', 'd1', date('c', $start + 4));
-        $mq->publish('t1', 'd1', date('c', $start + 6)); 
-        $mq->publish('t1', 'd1', date('c', $start + 8)); 
+        $mq->publish('t0', 'd1', gmdate('c', $start + 2));
+        $mq->publish('t1', 'd1', gmdate('c', $start + 4));
+        $mq->publish('t1', 'd1', gmdate('c', $start + 6)); 
+        $mq->publish('t1', 'd1', gmdate('c', $start + 8)); 
 
         $last = $start;
         while ( ($now=time()) - $start < 10) {
@@ -341,10 +341,10 @@ class MessageQueueTest extends PHPUnit_Framework_TestCase
         // object/method with identical context/data will be discarded
         // so that the original scheduled time stands.
         $start = time();
-        $mq->publish('t0', 'd1', date('c', $start + 2));
-        $mq->publish('t2', 'd1', date('c', $start + 4));
-        $mq->publish('t2', 'd1', date('c', $start + 6)); 
-        $mq->publish('t2', 'd1', date('c', $start + 8)); 
+        $mq->publish('t0', 'd1', gmdate('c', $start + 2));
+        $mq->publish('t2', 'd1', gmdate('c', $start + 4));
+        $mq->publish('t2', 'd1', gmdate('c', $start + 6)); 
+        $mq->publish('t2', 'd1', gmdate('c', $start + 8)); 
 
         $last = $start;
         while ( ($now=time()) - $start < 10) {
