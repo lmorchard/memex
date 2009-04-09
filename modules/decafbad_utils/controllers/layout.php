@@ -79,7 +79,7 @@ class Layout_Controller extends Controller {
             } else if (!empty($this->layout)) {
                 // Only render the layout, since core view emptied.
                 $this->layout->render(true);
-            } else {
+            } else if (!empty($this->view)) {
                 // Only render the core view, since the layout emptied.
                 $this->view->render(true);
             }
