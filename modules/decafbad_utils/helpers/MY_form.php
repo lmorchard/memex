@@ -25,7 +25,7 @@ class form extends form_Core
         $out = array_merge($out, array(
             form::open($url, $attrs),
             form::errors(),
-            join("\n", $arr),
+            (!empty($arr)) ? join("\n", $arr) : '',
             form::close()
         ));
 

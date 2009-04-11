@@ -20,7 +20,7 @@ class Delicious_Settings_Controller extends Local_Controller
         return Validation::factory($data)
             ->pre_filter('trim')
             ->add_rules(Memex_Delicious::ENABLED,
-                'true')
+                'required')
             ->add_rules(Memex_Delicious::USER_NAME,       
                 'required', 'length[3,64]', 'valid::alpha_dash')
             ->add_rules(Memex_Delicious::PASSWORD,         
@@ -61,7 +61,7 @@ class Delicious_Settings_Controller extends Local_Controller
         $is_valid = $valid->validate();
         $_POST = $valid->as_array();
         if (!$is_valid) {
-            $this->setViewData(
+            $this->view->set(
                 'errors', $valid->errors('form_errors_delicious_settings')
             );
             return;
@@ -87,15 +87,15 @@ class Delicious_Settings_Controller extends Local_Controller
             // If the fetch wasn't successful, assume the username/password 
             // was wrong.
             if (200 != $info['http_code']) {
-                $this->setViewData('errors', array(
+                $this->view->set('errors', array(
                     'User name and password invalid for delicious.com'
                 ));
                 return;
             } 
 
-            $this->setViewData('message', 
+            $this->view->message =
                 'Settings updated, user name and password accepted '.
-                'at delicious.com');
+                'at delicious.com';
         }
 
         // Update the profile settings.

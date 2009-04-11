@@ -9,6 +9,7 @@ Thumbs.db
 *.swo
 xfers/
 application/cache/
+application/logs/
 application/tests/log/
 docs/api/
 logs/
