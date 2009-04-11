@@ -26,6 +26,8 @@ class Util_Controller extends Controller {
         // the end of the import.
         Kohana::config_set('core.log_threshold', 0);
 
+        Kohana::config_set('messagequeue.deferred_events', FALSE);
+
         $args   = $_SERVER['argv'];
         $script = array_shift($args);
         $route  = array_shift($args);
