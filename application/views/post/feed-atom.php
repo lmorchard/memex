@@ -19,7 +19,7 @@ if (!empty($screen_name)) {
     if ($tags) {
         // Tags given, so this is a tag feed.
         $title .= 'tag / ' . join(' / ', $tags);
-        $page_home_url = $site_base . '/tag/' . out::U(join(' ', $tags));
+        $page_home_url = $site_base . '/tag/' . rawurlencode(join(' ', $tags));
     } else {
         // No tags, so this is overall recent.
         $title .= 'recent';
@@ -72,7 +72,7 @@ foreach ($posts as $post) {
     $x->entry()
         ->title($post['title'])
         ->link(array( 'href'=>$post['url'] ))
-        ->id($site_base . '/posts/' . out::U($post['uuid']))
+        ->id($site_base . '/posts/' . rawurlencode($post['uuid']))
         ->updated(gmdate('c', strtotime($post['user_date'])))
         ->published(gmdate('c', strtotime(empty($post['modified']) ? 
             $post['user_date'] : $post['modified'])))

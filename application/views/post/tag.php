@@ -1,9 +1,9 @@
 <?php slot::start('head') ?>
     <?php
         $feed_url = url::base() . 'feeds/atom/tag' . 
-            ( !empty($tags) ? '/' . out::U(join(' ', $tags)) : '' ) ; 
+            ( !empty($tags) ? '/' . rawurlencode(join(' ', $tags)) : '' ) ; 
     ?>
-    <link rel="alternate" type="application/atom+xml" title="Atom feed" href="<?= out::H($feed_url) ?>"> 
+    <link rel="alternate" type="application/atom+xml" title="Atom feed" href="<?= html::specialchars($feed_url) ?>"> 
 <?php slot::end() ?>
 
 <?php slot::start('crumbs') ?>
@@ -19,7 +19,7 @@
         Recent items (<?= $pagination['total'] ?>)
     <?php else: ?>
         Recent items tagged <?php foreach ($tags as $tag): ?>
-            <a href="<?= url::base() . 'tag/' . out::U($tag) ?>"><?= out::H($tag) ?></a>
+            <a href="<?= url::base() . 'tag/' . rawurlencode($tag) ?>"><?= html::specialchars($tag) ?></a>
         <?php endforeach ?> (<?= $pagination['total'] ?>)
     <?php endif ?>
 <?php slot::end() ?>
@@ -36,7 +36,7 @@
                     Why not start by <a href="<?= url::base() . 'save' ?>">saving a new bookmark</a>?
                 </p>
             <?php else: ?>
-                <h2>You have no bookmarks tagged <?php foreach ($tags as $tag): ?><?= out::H($tag) ?><?php endforeach ?>.</h2>
+                <h2>You have no bookmarks tagged <?php foreach ($tags as $tag): ?><?= html::specialchars($tag) ?><?php endforeach ?>.</h2>
             <?php endif ?>
         <?php endif ?>
     </div>

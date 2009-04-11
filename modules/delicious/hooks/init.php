@@ -48,7 +48,7 @@ class Memex_Delicious {
             'items' => array(
                 array(
                     'url' => 
-                        'profiles/' . out::U($name) . '/settings/delicious/import',
+                        'profiles/' . rawurlencode($name) . '/settings/delicious/import',
                     'title' => 
                         'delicious.com item import',
                     'description' => 
@@ -56,7 +56,7 @@ class Memex_Delicious {
                 ),
                 array(
                     'url' => 
-                        'profiles/' . out::U($name) . '/settings/delicious/replication',
+                        'profiles/' . rawurlencode($name) . '/settings/delicious/replication',
                     'title' => 
                         'delicious.com activity replication',
                     'description' => 

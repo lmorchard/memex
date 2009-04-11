@@ -45,7 +45,7 @@
             <div id="middle">
                 <div id="content">
                     <?php if (!empty($message)): ?>
-                        <p class="message"><?= out::H($message) ?></p>
+                        <p class="message"><?= html::specialchars($message) ?></p>
                     <?php endif ?>
                     <?php echo $content ?>
                 </div>

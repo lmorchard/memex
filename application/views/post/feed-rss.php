@@ -15,7 +15,7 @@ if (!empty($screen_name)) {
     if ($tags) {
         // Tags given, so this is a tag feed.
         $title .= 'tag / ' . join(' / ', $tags);
-        $page_home_url = $site_base . '/tag/' . out::U(join(' ', $tags));
+        $page_home_url = $site_base . '/tag/' . rawurlencode(join(' ', $tags));
     } else {
         // No tags, so this is overall recent.
         $title .= 'recent';
@@ -45,7 +45,7 @@ foreach ($posts as $post) {
     $x->item()
         ->title($post['title'])
         ->link($post['url'])
-        ->guid($site_base . '/posts/' . out::U($post['uuid']))
+        ->guid($site_base . '/posts/' . rawurlencode($post['uuid']))
         ->pubDate(date('r', strtotime($post['user_date'])));
 
     if (!empty($post['notes'])) {
