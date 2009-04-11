@@ -13,6 +13,14 @@
     copy item updates and deletions to a delicious.com account
 <?php slot::end() ?>
 
+<?php if (!empty($message)): ?>
+<p class="message"><?= $message ?></p>
+<?php endif ?>
+
+<?php if (!empty($errors)): ?>
+<p class="errors"><?= join("\n", $errors) ?></p>
+<?php endif ?>
+
 <?php
     echo form::build(url::current(), array('class'=>'replication'), array(
         form::fieldset('activity replication', array(), array(
