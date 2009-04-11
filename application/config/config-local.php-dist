@@ -2,6 +2,8 @@
 /**
  * Local installation config overrides.
  */
+$config['core.needs_installation'] = false;
+
 $config['model.database'] = 'default';
 
 $config['database.local'] = array(
