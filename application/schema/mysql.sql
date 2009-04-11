@@ -109,6 +109,7 @@ CREATE TABLE updates (
 DROP TABLE IF EXISTS message_queue;
 CREATE TABLE message_queue (
     uuid VARCHAR(40) NOT NULL,
+    owner VARCHAR(255) DEFAULT NULL,
     batch_uuid VARCHAR(40) DEFAULT NULL,
     batch_seq INTEGER DEFAULT 0,
     created DATETIME,
