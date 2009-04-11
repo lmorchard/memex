@@ -8,6 +8,8 @@
  */
 class Memex_Init {
 
+    private static $tags_model;
+
     /**
      * Initialize the application.
      */
@@ -19,6 +21,8 @@ class Memex_Init {
             array('Memex_Init', 'handlePostUpdated'));
         Event::add('Memex.model_posts.post_deleted', 
             array('Memex_Init', 'handlePostDeleted'));
+
+        self::$tags_model = new Tags_Model();
     }
 
     /**
@@ -26,8 +30,7 @@ class Memex_Init {
      */
     public static function handlePostUpdated()
     {
-        $tags_model = new Tags_Model();
-        $tags_model->updateTagsForPost(Event::$data);
+        self::$tags_model->updateTagsForPost(Event::$data);
     }
 
     /**
@@ -35,8 +38,7 @@ class Memex_Init {
      */
     public static function handlePostDeleted()
     {
-        $tags_model = new Tags_Model();
-        $tags_model->deleteTagsForPost(Event::$data['id']);
+        self::$tags_model->deleteTagsForPost(Event::$data['id']);
     }
 
     /**
@@ -74,4 +76,5 @@ class Memex_Init {
         );
     }
 }
-Event::add('LocalConfig.ready', array('Memex_Init','init'));
+Memex_Init::init();
+// Event::add('EnvConfig.ready', array('Memex_Init','init'));

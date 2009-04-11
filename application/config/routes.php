@@ -40,9 +40,6 @@ if (Kohana::config('core.needs_installation')) {
     $config['tag/(.*)'] = 'post/tag/tags/$1';
     $config['recent']   = 'post/tag';
 
-    $config['queue/runonce']      = 'messagequeue/runonce/format/json';
-    $config['queue/runonce/(.*)'] = 'messagequeue/runonce/format/$1';
-
     $config['_default'] = 'post/tag';
 
     $config['captcha/default'] = 'captcha/index';

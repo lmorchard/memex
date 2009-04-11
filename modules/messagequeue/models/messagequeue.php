@@ -22,6 +22,9 @@ class MessageQueue_Model extends Model
     protected $_subscriptions;
     protected $_objs;
 
+    // Flag allowing global disabling of deferred messages.
+    public $disable_deferred = false;
+
     const DUPLICATE_IGNORE  = 0;
     const DUPLICATE_REPLACE = 1;
     const DUPLICATE_DISCARD = 2;
@@ -114,6 +117,10 @@ class MessageQueue_Model extends Model
 
                 // Unpack the subscription array.
                 list($object, $method, $context, $deferred, $priority, $duplicate) = $subscription;
+
+                // Check if deferred jobs have been disabled for this message queue instance.
+                if ($this->disable_deferred)
+                    $deferred = false;
 
                 if (!$deferred) {
                     // Handle non-deferred messages immediately.

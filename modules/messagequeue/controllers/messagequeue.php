@@ -62,6 +62,7 @@ class Messagequeue_Controller extends Controller
                 'uuid'  => $msg['uuid'] 
             ));
         } else {
+            header('HTTP/1.1 304 Not Modified');
             $out = json_encode(array(
                 'empty' => true
             ));

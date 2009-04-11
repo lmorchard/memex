@@ -133,7 +133,6 @@ class Tags_Model extends Model
      */
     public function updateTagsForPost($post_data)
     {
-        $posts    = new Posts_Model();
         $new_tags = $this->parseTags($post_data['tags']);
 
         // Look up all existing tags for the post.

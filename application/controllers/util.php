@@ -27,6 +27,7 @@ class Util_Controller extends Controller {
         Kohana::config_set('core.log_threshold', 0);
 
         Kohana::config_set('messagequeue.deferred_events', FALSE);
+        Kohana::config_set('model.batch_mode', TRUE);
 
         $args   = $_SERVER['argv'];
         $script = array_shift($args);

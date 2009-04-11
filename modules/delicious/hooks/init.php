@@ -175,7 +175,7 @@ class Memex_Delicious {
     /**
      * Get settings for the plugin from the current profile.
      */
-    private function _getProfileSettings($profile_id)
+    private static function _getProfileSettings($profile_id)
     {
         $profiles_model = new Profiles_Model();
         $settings = $profiles_model->getAttributes($profile_id, array(

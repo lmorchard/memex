@@ -71,6 +71,9 @@ class DeferredEvent
             throw new Exception('Unknown method ' . $name);
         $name = substr($name, strlen('proxy_'));
 
+        $this->mq->disable_deferred = 
+            !Kohana::config('messagequeue.deferred_events');
+
         // HACK: Accept a scheduled_for parameter in Event::run() data.
         $scheduled_for = !empty(Event::$data['scheduled_for']) ?
             Event::$data['scheduled_for'] : null;
@@ -85,13 +88,8 @@ class DeferredEvent
      */
     public static function handleMessage($topic, $data, $context)
     {
-        Event::$data = $data;
+        Event::$data =& $data;
         call_user_func(array($context['object'], $context['method']));
-        $clear_data = '';
-        Event::$data =& $clear_data;
-         
-        // The event has been run! (can't do this, alas)
-        // self::$has_run[$name] = $name;
     }
 
     /**
