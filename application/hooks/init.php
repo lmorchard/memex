@@ -51,22 +51,22 @@ class Memex_Init {
             'priority' => 999,
             'items' => array(
                 array(
-                    'url' => 'profiles/' . out::U($name) . '/settings/basics/details',
+                    'url' => 'profiles/' . rawurlencode($name) . '/settings/basics/details',
                     'title' => 'Edit profile details',
                     'description' => 'change screen name, bio, etc.'
                 ),
                 array(
-                    'url' => 'profiles/' . out::U($name) . '/settings/basics/password',
+                    'url' => 'profiles/' . rawurlencode($name) . '/settings/basics/password',
                     'title' => 'Change login password',
                     'description' => 'change current login password'
                 ),
                 array(
-                    'url' => 'profiles/' . out::U($name) . '/settings/basics/logins',
+                    'url' => 'profiles/' . rawurlencode($name) . '/settings/basics/logins',
                     'title' => 'Manage profile logins',
                     'description' => 'create and remove logins for this profile'
                 ),
                 array(
-                    'url' => 'profiles/' . out::U($name) . '/settings/basics/delete',
+                    'url' => 'profiles/' . rawurlencode($name) . '/settings/basics/delete',
                     'title' => 'Delete profile',
                     'description' => 'delete this profile altogether'
                 ),

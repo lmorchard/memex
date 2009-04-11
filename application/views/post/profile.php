@@ -1,19 +1,19 @@
 <?php
-    $profile_home_url = url::base() . 'people/' . out::U($screen_name);
+    $profile_home_url = url::base() . 'people/' . rawurlencode($screen_name);
 ?>
 
 <?php slot::start('head') ?>
     <?php
-        $feed_url = url::base() . 'feeds/atom/people/' . out::U($screen_name) . 
-            ( !empty($tags) ? '/' . out::U(join(' ', $tags)) : '' ) ; 
+        $feed_url = url::base() . 'feeds/atom/people/' . rawurlencode($screen_name) . 
+            ( !empty($tags) ? '/' . rawurlencode(join(' ', $tags)) : '' ) ; 
     ?>
     <link rel="alternate" type="application/atom+xml" title="Atom feed" href="<?= $feed_url ?>"> 
 <?php slot::end() ?>
 
 <?php slot::start('crumbs') ?>
-    / people / <a href="<?= $profile_home_url ?>"><?= out::H($screen_name) ?></a>
+    / people / <a href="<?= $profile_home_url ?>"><?= html::specialchars($screen_name) ?></a>
     <?php if ($tags): ?>
-        / <a href="<?= url::base() . url::current() ?>"><?= out::H(join(' + ', $tags)) ?></a>
+        / <a href="<?= url::base() . url::current() ?>"><?= html::specialchars(join(' + ', $tags)) ?></a>
     <?php endif ?>
 <?php slot::end() ?>
 
@@ -26,7 +26,7 @@
         All <?= $whose_items ?> (<?= $pagination['total'] ?>)
     <?php else: ?>
         <?= $whose_items ?> tagged <?php foreach ($tags as $tag): ?>
-            <a href="<?= $profile_home_url . '/' . out::U($tag) ?>"><?= out::H($tag) ?></a>
+            <a href="<?= $profile_home_url . '/' . rawurlencode($tag) ?>"><?= html::specialchars($tag) ?></a>
         <?php endforeach ?> (<?= $pagination['total'] ?>)
     <?php endif ?>
 <?php slot::end() ?>
@@ -38,8 +38,8 @@
             <ul>
                 <?php foreach ($tag_counts as $tag_ct): ?>
                     <li>
-                        <span class="count"><?= out::H($tag_ct['count']) ?></span>
-                        <a href="<?= $profile_home_url . '/' . out::U($tag_ct['tag']) ?>" class="tag"><?= out::H($tag_ct['tag']) ?></a>
+                        <span class="count"><?= html::specialchars($tag_ct['count']) ?></span>
+                        <a href="<?= $profile_home_url . '/' . rawurlencode($tag_ct['tag']) ?>" class="tag"><?= html::specialchars($tag_ct['tag']) ?></a>
                     </li>
                 <?php endforeach ?>
             </ul>
@@ -59,7 +59,7 @@
                     Why not start by <a href="<?= url::base() . 'save' ?>">saving a new bookmark</a>?
                 </p>
             <?php else: ?>
-                <h2>You have no bookmarks tagged <?php foreach ($tags as $tag): ?><?= out::H($tag) ?><?php endforeach ?>.</h2>
+                <h2>You have no bookmarks tagged <?php foreach ($tags as $tag): ?><?= html::specialchars($tag) ?><?php endforeach ?>.</h2>
             <?php endif ?>
         <?php endif ?>
     </div>

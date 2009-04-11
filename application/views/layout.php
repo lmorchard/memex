@@ -27,7 +27,7 @@
                 <div class="main">
                     <?php if (null != $auth_profile): ?>
                         <ul class="nav">
-                            <li class="first"><a href="<?= url::base() . 'people/' . out::U($auth_profile['screen_name']) ?>">your bookmarks</a></li> 
+                            <li class="first"><a href="<?= url::base() . 'people/' . rawurlencode($auth_profile['screen_name']) ?>">your bookmarks</a></li> 
                             <li><a href="<?= url::base() . 'save' ?>">save new</a></li>
                         </ul>
                     <?php endif ?>
@@ -41,8 +41,8 @@
                                 <li class="first"><a href="<?= url::base() . 'login' ?>">login</a></li>
                                 <li><a href="<?= url::base() . 'register' ?>">register</a></li>
                             <?php else: ?>
-                                <li class="first">logged in as <a href="<?= url::base() . 'people/' . out::U($auth_profile['screen_name']) ?>"><?= out::H($auth_profile['screen_name']) ?></a></li>
-                                <li><a href="<?= url::base() . 'profiles/' . out::U($auth_profile['screen_name']) . '/settings' ?>">settings</a></li>
+                                <li class="first">logged in as <a href="<?= url::base() . 'people/' . rawurlencode($auth_profile['screen_name']) ?>"><?= html::specialchars($auth_profile['screen_name']) ?></a></li>
+                                <li><a href="<?= url::base() . 'profiles/' . rawurlencode($auth_profile['screen_name']) . '/settings' ?>">settings</a></li>
                                 <li><a href="<?= url::base() . 'logout' ?>">logout</a></li>
                             <?php endif; ?>
                         </ul>
@@ -59,7 +59,7 @@
             <div id="middle">
                 <div id="content">
                     <?php if (!empty($message)): ?>
-                        <p class="message"><?= out::H($message) ?></p>
+                        <p class="message"><?= html::specialchars($message) ?></p>
                     <?php endif ?>
                     <?php echo $content ?>
                 </div>

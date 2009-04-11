@@ -3,10 +3,10 @@
 ?>
 <?php slot::start('crumbs') ?>
     / profiles 
-    / <a href="<?= url::base() . 'people/' . out::U($screen_name) ?>"><?= out::H($screen_name) ?></a>
-    / <a href="<?= url::base() . 'profiles/' . out::U($screen_name) . '/settings' ?>">settings</a>
+    / <a href="<?= url::base() . 'people/' . rawurlencode($screen_name) ?>"><?= html::specialchars($screen_name) ?></a>
+    / <a href="<?= url::base() . 'profiles/' . rawurlencode($screen_name) . '/settings' ?>">settings</a>
     / delicious
-    / <a href="<?= url::base() . 'profiles/' . out::U($screen_name) . '/settings/delicious/replication' ?>">replication</a>
+    / <a href="<?= url::base() . 'profiles/' . rawurlencode($screen_name) . '/settings/delicious/replication' ?>">replication</a>
 <?php slot::end() ?>
 
 <?php slot::start('infobar') ?>
