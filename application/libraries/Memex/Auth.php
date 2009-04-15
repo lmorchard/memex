@@ -45,10 +45,14 @@ class Memex_Auth {
      */
     public function login($user_name, $user_data)
     {
+        $duration = Kohana::config('auth.login_duration');
+        if (empty($duration)) 
+            $duration = ( 52 * 7 * 24 * 60 * 60 );
         $this->cm->setCookie(
             $this->cookie_name, 
             serialize($user_data),
-            $user_name
+            $user_name,
+            time() + $duration
         );
     }
 
