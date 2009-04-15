@@ -11,10 +11,6 @@ class Memex_Autoloader
 {
     public static function auto_load($class)
     {
-        // Call Kohana's autoloader first.
-        if ( Kohana::auto_load($class) )
-            return TRUE;
-
         // If Kohana comes up empty, try replacing underscores with directory 
         // separators and look for a library.
         $file = str_replace('_', '/', $class);
