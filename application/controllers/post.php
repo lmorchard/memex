@@ -309,7 +309,7 @@ class Post_Controller extends Local_Controller
             return View::factory('post/save_doclose')->render(true);
         } elseif ($jump == 'yes' && $url) {
             // If there's a URL and ?jump=yes, then hop on over to the original URL.
-            return $this->_helper->redirector->gotoUrl($url);
+            return url::redirect($url);
         } elseif (strpos($jump, '/') === 0) {
             // This jump leads to somewhere within the site
             return url::redirect($jump);
