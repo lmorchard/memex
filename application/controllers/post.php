@@ -25,7 +25,7 @@ class Post_Controller extends Local_Controller
             if (in_array(Router::$method, array('save', 'delete'))) {
                 return url::redirect(
                     url::base() . '/login' .
-                    '?jump=' . rawurlencode( url::current(TRUE) )
+                    '?jump=/' . rawurlencode( url::current(TRUE) )
                 );
             }
         }
