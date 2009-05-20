@@ -7,9 +7,12 @@
     <head>  
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
         <title>memex</title>
-        <link href="<?= url::base() . 'css/nostalgia/main.css' ?>" media="screen" rel="stylesheet" type="text/css" />
-        <link href="<?= url::base() . 'css/nostalgia/' . $controller_name . '.css' ?>" media="screen" rel="stylesheet" type="text/css" />
-        <?= slot::output('head') ?>
+        <?=html::stylesheet(array(
+            'css/main.css', 
+            'css/nostalgia/main.css',
+            'css/nostalgia/' . $controller_name . '.css'
+        ))?>
+        <?= slot::get('head_end') ?>
     </head> 
     <body id="<?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>" 
             class="<?= 'ctrl_' . $controller_name ?> <?= 'act_' . $action_name ?> <?= 'ctrl_' . $controller_name . '_act_' . $action_name ?>">
@@ -21,7 +24,7 @@
 
                 <div class="crumbs">
                     <span class="title"><a href="/">memex</a></span>
-                    <?= slot::output('crumbs') ?>
+                    <?= slot::get('crumbs') ?>
                 </div>
 
                 <div class="main">
@@ -39,7 +42,7 @@
             </div>
 
             <div id="infobar">
-                <?= slot::output('infobar') ?>
+                <?= slot::get('infobar') ?>
             </div>
 
             <div id="middle">
@@ -50,14 +53,14 @@
                     <?php echo $content ?>
                 </div>
                 <?php if ( slot::exists('sidebar') ): ?>
-                    <div id="sidebar"><?php slot::output('sidebar') ?></div>
+                    <div id="sidebar"><?php slot::get('sidebar') ?></div>
                 <?php endif ?>
             </div>
 
             <div id="footer">
                 <ul class="nav">
                     <li class="first"><a href="/">memex</a></li>
-                    <?= slot::output('footer_nav') ?>
+                    <?= slot::get('footer_nav') ?>
                 </ul>
 
                 <a class="license" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="This work is licensed under a Creative Commons Attribution-Share Alike 3.0 Unported License"><img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a>
@@ -66,12 +69,14 @@
 
         </div>
 
-        <script src="<?= url::base() . 'js/mootools-1.2.1-core-yc.js' ?>" type="text/javascript"></script>
-        <script src="<?= url::base() . 'js/mootools-1.2-more.js' ?>" type="text/javascript"></script>
-        <script src="<?= url::base() . 'js/memex/utils.js' ?>" type="text/javascript"></script>
-        <script src="<?= url::base() . 'js/memex/main.js' ?>" type="text/javascript"></script>
-        <script src="<?= url::base() . 'js/memex/nostalgia/main.js' ?>" type="text/javascript"></script>
-        <script src="<?= url::base() . 'js/memex/nostalgia/'.$controller_name.'.js' ?>" type="text/javascript"></script>
+        <?=html::script(array(
+            'js/mootools-1.2.1-core-yc.js',
+            'js/mootools-1.2-more.js',
+            'js/memex/utils.js',
+            'js/memex/main.js',
+            'js/memex/nostalgia/main.js',
+            'js/memex/nostalgia/'.$controller_name.'.js'
+        ))?>
 
     </body>
 </html>
