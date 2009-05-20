@@ -4,7 +4,10 @@ RewriteEngine On
 # Installation directory
 RewriteBase /
 
-# Protect application and system files from being viewed
+# Allow the public directory in a module to be served up
+RewriteRule ^modules/.*/public - [L]
+
+# Otherwise, protect application and system files from being viewed
 RewriteRule ^(application|modules|system) - [F,L]
 
 # Allow any files or directories that exist to be displayed directly

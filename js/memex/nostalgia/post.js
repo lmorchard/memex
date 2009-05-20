@@ -9,10 +9,10 @@ $module('Memex.Nostalgia.Post', function() {
         },
         onReady: function() {
 
-            $$('#post #title').each(function(el) {
+            $$('.ctrl_post_act_save .save #title').each(function(el) {
                 if (el.get('value')) {
                     // Focus tags if there's a title.
-                    $$('#post #tags')[0].focus();
+                    $$('.save #tags')[0].focus();
                 } else {
                     // Otherwise, focus the title.
                     el.focus();

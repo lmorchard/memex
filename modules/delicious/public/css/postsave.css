@@ -1,0 +1,24 @@
+.delicious_tag_suggestions {
+}
+.delicious_tag_suggestions ul.tags {
+    list-style-type: none;
+    padding: 0.5em 0.5em 0.5em 0;
+    margin-left: 20ex;
+}
+.delicious_tag_suggestions ul.tags li.tag {
+    display: inline;
+    line-height: 1.5em;
+    padding: 0.25em 0.125em 0.25em 0;
+}
+.delicious_tag_suggestions ul.tags li.tag a {
+    padding: 0.25em 0.5em;
+}
+.delicious_tag_suggestions ul.tags li.tag a:hover {
+    background-color: #0000ff;
+    color: #ffffff;
+    text-decoration: none;    
+}
+.delicious_tag_suggestions ul.tags li.template {
+    display: none;
+}
+

@@ -23,6 +23,9 @@ class Memex_Delicious {
         Event::add('Memex.pre_settings_menu', 
             array('Memex_Delicious', 'buildSettingsMenu'));
 
+        Event::add('system.post_controller_constructor',
+            array('Memex_Delicious', 'dispatchControllerHook'));
+
         /*
         Event::add('Memex.model_posts.post_updated', 
             array('Memex_Delicious', 'handlePostUpdated'));
@@ -67,6 +70,26 @@ class Memex_Delicious {
     }
 
     /**
+     *
+     */
+    public static function dispatchControllerHook()
+    {
+        slot::append('head_end', 
+            html::stylesheet('modules/delicious/public/css/main.css'));
+        slot::append('body_end', 
+            html::script('modules/delicious/public/js/main.js'));
+
+        if ('post' == Router::$controller && 'save' == Router::$method) {
+            slot::append('head_end', 
+                html::stylesheet('modules/delicious/public/css/postsave.css'));
+            slot::append('body_end', 
+                html::script('modules/delicious/public/js/postsave.js'));
+            slot::append('form_end',
+                View::factory('delicious_util/tag_suggestions')->render());
+        }
+    }
+
+    /**
      * Replicate post updates to delicious.com, if enabled.
      */
     public static function handlePostUpdated()
@@ -79,7 +102,7 @@ class Memex_Delicious {
         if (Kohana::config('model.batch_mode'))
             return;
 
-        $settings = self::_getProfileSettings($post_data['profile_id']);
+        $settings = self::getProfileSettings($post_data['profile_id']);
         if (null == $settings || !$settings[self::ENABLED]) 
             return;
 
@@ -97,7 +120,7 @@ class Memex_Delicious {
         }
 
         try {
-            self::_callDeliciousV1API(
+            self::callDeliciousV1API(
                 'posts/add', 
                 $settings[self::USER_NAME],
                 $settings[self::PASSWORD],
@@ -119,12 +142,12 @@ class Memex_Delicious {
         if (Kohana::config('model.batch_mode'))
             return;
 
-        $settings = self::_getProfileSettings($post_data['profile_id']);
+        $settings = self::getProfileSettings($post_data['profile_id']);
         if (null == $settings || !$settings[self::ENABLED]) 
             return;
         
         try {
-            self::_callDeliciousV1API(
+            self::callDeliciousV1API(
                 'posts/delete', 
                 $settings[self::USER_NAME],
                 $settings[self::PASSWORD],
@@ -144,7 +167,7 @@ class Memex_Delicious {
      * @param array API call parameters
      * @return array cURL request info and response
      */
-    private static function _callDeliciousV1API($path='posts/update', $user_name, $password, $params)
+    public static function callDeliciousV1API($path='posts/update', $user_name, $password, $params)
     {
         // Build the API URL from the base, path, and query params.
         $url = self::$delicious_v1_api_base_url . '/' . $path . '?' . 
@@ -175,7 +198,7 @@ class Memex_Delicious {
     /**
      * Get settings for the plugin from the current profile.
      */
-    private static function _getProfileSettings($profile_id)
+    public static function getProfileSettings($profile_id)
     {
         $profiles_model = new Profiles_Model();
         $settings = $profiles_model->getAttributes($profile_id, array(

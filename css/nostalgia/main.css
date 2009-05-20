@@ -469,7 +469,7 @@ form fieldset ul li.captcha img {
 }
 
 #ctrl_post_act_save form {
-    width: 110ex;
+    /* width: 110ex; */
 }
 #ctrl_post_act_save form fieldset dl dt {
     width: 11ex;

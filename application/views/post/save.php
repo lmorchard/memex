@@ -6,8 +6,10 @@
     / people / <a href="<?= $profile_home_url ?>"><?= html::specialchars($auth_profile['screen_name']) ?></a>
 <?php slot::end() ?>
 
+<?=slot::get('form_before')?>
 <?php
 echo form::build('save', array('class'=>'save'), array(
+    slot::get('form_start'),
     form::field('hidden', 'jump', ''),
     form::fieldset($submethod . ' post', array('class'=>'save'), array_merge( 
         array(
@@ -23,6 +25,8 @@ echo form::build('save', array('class'=>'save'), array(
             form::field('submit',   'save',    null, array('value'=>'save')),
             form::field('submit',   'cancel',  null, array('value'=>'cancel'))
         )
-    ))
+    )),
+    slot::get('form_end')
 ));
 ?>
+<?=slot::get('form_after')?>

@@ -19,8 +19,8 @@ class Delicious_Settings_Controller extends Local_Controller
     {
         return Validation::factory($data)
             ->pre_filter('trim')
-            ->add_rules(Memex_Delicious::ENABLED,
-                'required')
+            /*->add_rules(Memex_Delicious::ENABLED,
+                'required')*/
             ->add_rules(Memex_Delicious::USER_NAME,       
                 'required', 'length[3,64]', 'valid::alpha_dash')
             ->add_rules(Memex_Delicious::PASSWORD,         

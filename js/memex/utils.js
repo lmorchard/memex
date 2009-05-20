@@ -45,7 +45,7 @@ $module.base = new Class({
             window.addEvent('domready', this.onReady.bind(this));
         }
 
-        // Set up logging, or dummy handler in absense of Firebug
+        // Set up logging, or dummy handler in absence of Firebug
         if ("console" in window && "log" in window.console) {
             this.log = function (msg, lvl) { 
                 console.log(this.log_format.substitute({

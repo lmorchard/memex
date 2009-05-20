@@ -5,6 +5,9 @@ $config['profiles/([^/]+)/settings/delicious/import'] =
 $config['profiles/([^/]+)/settings/delicious/replication'] = 
     'delicious_settings/replication/screen_name/$1';
 
+$config['delicious/tag_suggestions'] = 
+    'delicious_util/tag_suggestions';
+
 $config['api/v1/posts/update'] = 'delicious_api/posts_update';
 $config['api/v1/posts/all']    = 'delicious_api/posts_all';
 $config['api/v1/posts/recent'] = 'delicious_api/posts_recent';
