@@ -45,14 +45,27 @@ class slot_Core
     }
 
     /**
-     * Set content for a named slot
+     * Set content for a named slot, replacing anything already present.
      *
      * @param string name of the slot
      * @param string content for the slot
      */
     public static function set($name, $value)
     {
-        self::$slots[$name] = $value;
+        self::$slots[$name] = array(trim($value));
+    }
+
+    /**
+     * Append content to a named slot.
+     *
+     */
+    public static function append($name, $value)
+    {
+        if (empty(self::$slots[$name])) {
+            return self::set($name, $value);
+        } else {
+            self::$slots[$name][] = trim($value);
+        }
     }
 
     /**
@@ -66,7 +79,7 @@ class slot_Core
         if (!$name) $name = self::end();
 
         return isset(self::$slots[$name]) ? 
-            trim(self::$slots[$name]) : $default;
+            join('', self::$slots[$name]) : $default;
     }
 
     /**
