@@ -2,7 +2,10 @@
  * CSS for autotag module
  */
 .posts .post .tags .tag_system {
-    display: none;
+    /*display: none;*/   
+}
+.posts .post .tags .tag_system a {
+    color: #bbddbb;
 }
 .posts .post .tags .tag_system_unfiled {
     display: inline;
