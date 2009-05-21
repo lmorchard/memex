@@ -26,13 +26,6 @@ class Memex_Delicious {
         Event::add('system.post_controller_constructor',
             array('Memex_Delicious', 'dispatchControllerHook'));
 
-        /*
-        Event::add('Memex.model_posts.post_updated', 
-            array('Memex_Delicious', 'handlePostUpdated'));
-        Event::add('Memex.model_posts.post_deleted', 
-            array('Memex_Delicious', 'handlePostDeleted'));
-        */
-
         DeferredEvent::add('Memex.model_posts.post_updated', 
             array('Memex_Delicious', 'handlePostUpdated'));
         DeferredEvent::add('Memex.model_posts.post_deleted', 
