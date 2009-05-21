@@ -59,6 +59,8 @@ class Layout_Controller extends Controller {
     {
         if (TRUE === $this->auto_render) {
 
+            Event::run('DecafbadUtils.layout.before_auto_render', $this);
+
             if ($this->layout && !$this->layout->get_filename()) {
                 // If no filename set for layout, use "layout"
                 $this->layout->set_filename('layout');
@@ -83,6 +85,8 @@ class Layout_Controller extends Controller {
                 // Only render the core view, since the layout emptied.
                 $this->view->render(true);
             }
+
+            Event::run('DecafbadUtils.layout.auto_rendered', $this);
 
         }
     }

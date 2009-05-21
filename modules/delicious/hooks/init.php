@@ -23,8 +23,8 @@ class Memex_Delicious {
         Event::add('Memex.pre_settings_menu', 
             array('Memex_Delicious', 'buildSettingsMenu'));
 
-        Event::add('system.post_controller_constructor',
-            array('Memex_Delicious', 'dispatchControllerHook'));
+        Event::add('DecafbadUtils.layout.before_auto_render',
+            array('Memex_Delicious', 'beforeAutoRender'));
 
         DeferredEvent::add('Memex.model_posts.post_updated', 
             array('Memex_Delicious', 'handlePostUpdated'));
@@ -63,9 +63,9 @@ class Memex_Delicious {
     }
 
     /**
-     *
+     * Perform customizations just before layout auto-render.
      */
-    public static function dispatchControllerHook()
+    public static function beforeAutoRender()
     {
         slot::append('head_end', 
             html::stylesheet('modules/delicious/public/css/main.css'));
