@@ -1,0 +1,12 @@
+/**
+ * CSS for autotag module
+ */
+.posts .post .tags .tag_system {
+    display: none;
+}
+.posts .post .tags .tag_system_unfiled {
+    display: inline;
+}
+.reveal_system .post .tags .tag_system {
+    display: inline;
+}

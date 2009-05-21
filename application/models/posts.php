@@ -92,14 +92,21 @@ class Posts_Model extends Model
         // Update the post's data and save it.  Note that only a select set of 
         // fields are used, which prevents changes in UUID and others
         $accepted_post_fields = array(
-            'profile_id', 'url_id', 'title', 'notes', 'tags', 
-            'visibility', 'user_date', 'visibility'
+            'profile_id', 'url', 'url_id', 'title', 'notes', 'tags', 
+            'visibility', 'user_date'
         );
         foreach ($accepted_post_fields as $key) {
             if (isset($post_data[$key]))
                 $row[$key] = $post_data[$key];
         }
         $row['signature'] = $this->buildPostSignature($post_data);
+
+        // Allow modules the chance to munge post data before finally saving.
+        Event::run('Memex.model_posts.before_post_update', $row);
+
+        // URL was included in the row for the event's sake, but not needed for 
+        // actual update. 
+        unset($row['url']);
 
         if ($update) {
             $this->db->update(
@@ -421,8 +428,8 @@ class Posts_Model extends Model
         $data = $this->fetchOneById($post_id);
         if (!$data) return false;
 
+        Event::run('Memex.model_posts.before_post_delete', $data);
         $this->db->delete($this->_table_name, array('id' => $post_id));
-
         Event::run('Memex.model_posts.post_deleted', $data);
     }
 
@@ -437,8 +444,8 @@ class Posts_Model extends Model
         $data = $this->fetchOneByUUID($uuid);
         if (!$data) return false;
 
+        Event::run('Memex.model_posts.before_post_delete', $data);
         $this->db->delete($this->_table_name, array('uuid' => $uuid));
-
         Event::run('Memex.model_posts.post_deleted', $data);
     }
 
@@ -455,8 +462,6 @@ class Posts_Model extends Model
         if (null == $data) return null;
 
         $this->deleteById($data['id']);
-        
-        Event::run('Memex.model_posts.post_deleted', $data);
     }
 
     /**

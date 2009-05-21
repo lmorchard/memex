@@ -1,13 +1,6 @@
 ## TODO
 
-* Dog-food Annoyances
-    * No tag recommendations
 * Basic stuff
-    * Tag suggestions on save form
-    * All tags per profile
-        * ..and do not forget feeds.
-    * Top tags site-wide
-    * Related tags?
     * Implement automatically applied system:* tags. (plugin?)
         * system:unfiled where no other tags present
         * for:*
@@ -16,6 +9,10 @@
         * foo:* to system:has:foo
         * system:media:* and system:filetype:*
         * system:host=*
+    * All tags per profile
+        * ..and do not forget feeds.
+    * Top tags site-wide
+    * Related tags?
 * Logins / Profiles
     * Email password recovery
     * Prefs, login password change, screen name, bio, etc.
@@ -76,6 +73,8 @@
     * [Message / work queues and deferred processing][queues]
     * Maybe change license to BSD?  MIT?
     * Make it scale
+
+    * Tag suggestions from co-current tags?
 
 [oembed]: http://oohembed.com/
 [v1api]: http://delicious.com/help/api

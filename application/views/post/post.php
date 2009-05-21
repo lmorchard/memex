@@ -13,7 +13,18 @@
     <div class="meta">
         <ul class="tags">
             <?php foreach ($post['tags_parsed'] as $tag): ?>
-                <li class="tag"><a href="<?= $profile_home_url . '/' . html::specialchars(rawurlencode($tag)) ?>"><?= html::specialchars($tag) ?></a></li>
+                <?php
+                    // Assemble tag classes based on rough tag namespaces.
+                    $tag_classes = array('tag');
+                    $tmp   = explode('=', $tag);
+                    $parts = explode(':', $tmp[0]);
+                    if (count($parts) > 1) {
+                        $tag_classes[] = " tag_{$parts[0]} tag_{$parts[0]}_{$parts[1]}";
+                    }
+                ?>
+                <li class="<?=html::specialchars(join(' ', $tag_classes))?>">
+                    <a href="<?= $profile_home_url . '/' . html::specialchars(rawurlencode($tag)) ?>"><?= html::specialchars($tag) ?></a>
+                </li>
             <?php endforeach; ?>
         </ul>
         <span class="author"><a href="<?= $profile_home_url ?>"><?= html::specialchars($post['screen_name']) ?></a></span>

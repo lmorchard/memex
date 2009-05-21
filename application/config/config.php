@@ -103,8 +103,9 @@ $config['modules'] = array
 (
     MODPATH.'decafbad_utils',
     MODPATH.'messagequeue',
-    MODPATH.'delicious',
     MODPATH.'phpunit',
+    MODPATH.'delicious',
+    MODPATH.'autotags',
 	// MODPATH.'auth',      // Authentication
 	// MODPATH.'forge',     // Form generation
 	// MODPATH.'kodoc',     // Self-generating documentation
