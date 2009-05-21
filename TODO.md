@@ -1,14 +1,6 @@
 ## TODO
 
 * Basic stuff
-    * Implement automatically applied system:* tags. (plugin?)
-        * system:unfiled where no other tags present
-        * for:*
-            * make for:* tags (optionally?) invisible
-            * how might this work between sites?
-        * foo:* to system:has:foo
-        * system:media:* and system:filetype:*
-        * system:host=*
     * All tags per profile
         * ..and do not forget feeds.
     * Top tags site-wide
@@ -40,7 +32,14 @@
     * Tag bundles
     * Item privacy / visibility
     * [oohembed][oembed] for tumble-log-like media integration?
+    * autotags
+        * Switch to reveal/hide system tags.
+    * delicious tag suggestions
+        * ajax loading indicator
 * Federation
+    * for:* 
+        * tags between sites?
+        * make for: tags private?
     * Daily blog poster
     * Carbon-copy posts to other services (eg. magnolia, twitter, friendfeed)
     * Import from other services
