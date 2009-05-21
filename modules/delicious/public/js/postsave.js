@@ -31,7 +31,6 @@ $module('Memex.Delicious.PostSave', function() {
             $$('.delicious_tag_suggestions').addEvents({
                 click: this.handleTagSuggestionsClick.bindWithEvent(this)
             });
-            this.fetchSuggestions();
         },
 
         /**
