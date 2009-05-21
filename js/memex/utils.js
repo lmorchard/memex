@@ -3,7 +3,7 @@
  */
 $module = function(name, obj) {
 
-    // Build the hash namespace based on module name.
+    // Build the object namespace based on module name.
     var root  = window,
         parts = name.split('.'),
         last  = parts.pop();
