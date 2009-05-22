@@ -9,7 +9,15 @@
 class Install_Controller extends Local_Controller
 {
     protected $auto_render = TRUE;
-    protected $layout = 'layout-install';
+
+    /**
+     * Set up the installation controller, set the layout
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->layout->set_filename('layout-install');
+    }
 
     /**
      *
