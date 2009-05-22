@@ -15,7 +15,7 @@ class Memex_Autotags {
      */
     public static $autotag_prefixes = array(
         'system:filetype:', 'system:media:', 'system:has:', 
-        'system:host:', 'system:scheme:'
+        'system:host', 'system:scheme', 'system:unfiled'
     );
 
     /**
@@ -51,9 +51,9 @@ class Memex_Autotags {
     public static function init()
     {
         Event::add('DecafbadUtils.layout.before_auto_render',
-            array('Memex_Autotags', 'beforeAutoRender'));
+            array(get_class(), 'beforeAutoRender'));
         Event::add('Memex.model_posts.before_post_update',
-            array('Memex_Autotags', 'applyAutoTags'));
+            array(get_class(), 'applyAutoTags'));
     }
 
     /**
@@ -62,14 +62,18 @@ class Memex_Autotags {
     public static function beforeAutoRender()
     {
         slot::append('head_end', 
-            html::stylesheet('modules/autotags/public/css/main.css'));
+            html::stylesheet('modules/autotags/public/css/autotags.css'));
         slot::append('body_end', 
-            html::script('modules/autotags/public/js/main.js'));
+            html::script('modules/autotags/public/js/autotags.js'));
+
+        if ('post' == Router::$controller && 'profile' == Router::$method) {
+            slot::append('sidebar_options',
+                View::factory('autotags/options')->render());
+        }
     }
 
     /**
-     * Modify tags of a post before updating to inject autotags based on 
-     * implemented rules.
+     * Modify tags of a post before updating to inject tags based on rules.
      *
      * Intended to respond to Memex.model_posts.before_post_update event.
      */
@@ -85,7 +89,7 @@ class Memex_Autotags {
         // Prepare outgoing tags by stripping known autotags from list to have 
         // a clean slate.
         $tags_out = array_filter($tags_in, 
-            array('Memex_Autotags', 'isNotAutoTag'));
+            array(get_class(), 'isNotAutoTag'));
 
         // Apply system:unfiled, if no tags are left after system tags are 
         // stripped.
@@ -101,7 +105,7 @@ class Memex_Autotags {
         }
 
         // Apply system:{host,scheme}={data} tags
-        foreach (array('host','scheme') as $part) {
+        foreach (array('host'/*,'scheme'*/) as $part) {
             if (!empty($url_parsed[$part])) {
                 $tags_out[] = "system:{$part}={$url_parsed[$part]}";
             }

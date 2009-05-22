@@ -31,9 +31,10 @@
     <?php endif ?>
 <?php slot::end() ?>
 
-<?php if (!empty($tag_counts)): ?>
-    <?php slot::start('sidebar') ?>
-        <div class="top_tags">
+<?php slot::start('sidebar') ?>
+
+    <?php if (!empty($tag_counts)): ?>
+        <div class="section top_tags">
             <h4>top tags</h4>
             <ul>
                 <?php foreach ($tag_counts as $tag_ct): ?>
@@ -44,8 +45,14 @@
                 <?php endforeach ?>
             </ul>
         </div>
-    <?php slot::end() ?>
-<?php endif ?>
+    <?php endif ?>
+
+    <div class="section options">
+        <h4>options</h4>
+        <?=slot::get('sidebar_options')?>
+    </div>
+
+<?php slot::end() ?>
 
 <?php if (empty($posts)): ?>
 

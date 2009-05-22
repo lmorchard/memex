@@ -69,7 +69,7 @@
                     <?php echo $content ?>
                 </div>
                 <?php if ( slot::exists('sidebar') ): ?>
-                    <div id="sidebar"><?php slot::get('sidebar') ?></div>
+                    <div id="sidebar"><?=slot::get('sidebar')?></div>
                 <?php endif ?>
             </div>
 

@@ -492,20 +492,20 @@ form fieldset ul li.captcha img {
     width: 110ex;
 }
 
-#sidebar .top_tags {
-    margin: 0 0 0 0;
+#sidebar .section {
+    margin: 0 0 1.5em 0;
     padding: 1em;
 }
-#sidebar .top_tags h4 {
+#sidebar .section h4 {
     font-size: 120%;
     margin: 0em 0 0.5em 0;
     padding: 0 0 0 0;
 }
-#sidebar .top_tags ul {
+#sidebar .section ul {
     margin: 0 0 0 0;
     padding: 0 0 0 0;
 }
-#sidebar .top_tags ul li {
+#sidebar .section ul li {
     list-style: none;
     line-height: 1.5em;
 }
