@@ -10,9 +10,11 @@ application.
 * PHP 5+
 * MySQL 5+
 
-
 ### Installation
 
+* Make sure the following subdirectories exist and are writable by the web server:
+    * `application/logs`
+    * `application/cache`
 * Visiting `index.php` should present a quick installer that will create the database tables and attempt to create a configuration file.
 * Or, manually edit `system/config/local.php` to reflect your environment.
     * There is an example `system/config/local.php-dist` you can use as a starting point.
