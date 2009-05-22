@@ -44,6 +44,7 @@
     * Carbon-copy posts to other services (eg. magnolia, twitter, friendfeed)
     * Import from other services
     * Implement network / subscriptions based on RSS/Atom aggregation to login-less local proxy profiles
+    * Twitter links to bookmarks scraper
     * [FeedSync?](http://dev.live.com/feedsync/spec/spec.aspx)
 * Misc
     * Message queue
