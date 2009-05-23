@@ -10,6 +10,7 @@ class form extends form_Core
 {
     public static $errors = array();
     public static $data = array();
+    public static $defaults = array();
 
     /**
      * Build a form from an array of lines.
@@ -173,16 +174,19 @@ class form extends form_Core
      */
     public static function value($name, $default=null)
     {
-        if (!empty(self::$data[$name]))
+        if (isset(self::$data[$name])) {
             $value = self::$data[$name];
-        else if (!empty($_POST[$name]))
+        } else if (isset($_POST[$name])) {
             $value = $_POST[$name];
-        else if (!empty($_GET[$name]))
+        } else if (isset($_GET[$name])) {
             $value = $_GET[$name];
-        else if (!empty($default))
+        } else if (null!==$default) {
             $value = $default;
-        else
+        } else if (isset(self::$defaults[$name])) {
+            $value = self::$defaults[$name];
+        } else {
             $value = '';
+        }
         return $value;
     }
 

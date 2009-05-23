@@ -23,7 +23,7 @@
                 <div class="logo"><span></span></div>
 
                 <div class="crumbs">
-                    <span class="title"><a href="/">memex</a></span>
+                <span class="title"><a href="<?=url::base()?>">memex</a></span>
                     <?= slot::get('crumbs') ?>
                 </div>
 
