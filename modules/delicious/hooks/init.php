@@ -167,7 +167,7 @@ class Memex_Delicious {
                 array( 'url' => $post_data['url'] )
             );
         } catch (Exception $e) {
-            Kohana::log('err', "delicious delete for " . $post_data['uuid'] . "failed");
+            Kohana::log('error', "delicious delete for " . $post_data['uuid'] . "failed");
         }
     }
 
