@@ -83,6 +83,17 @@ class Memex_Delicious {
     }
 
     /**
+     * Used to filter out system: tags before posting bookmark to delicious.
+     *
+     * @param  string  tag
+     * @return boolean whether or not tag starts with system:
+     */
+    private static function _isNotSystem($tag)
+    {
+        return !( 0 === strpos($tag, 'system:') );
+    }
+
+    /**
      * Replicate post updates to delicious.com, if enabled.
      */
     public static function handlePostUpdated()
@@ -108,6 +119,15 @@ class Memex_Delicious {
         );
         $params = array();
         foreach ($post_data as $name=>$value) {
+            if ('tags' == $name) {
+                $tags_model = new Tags_Model();
+                $value = $tags_model->concatenateTags(
+                    array_filter(
+                        $tags_model->parseTags($value), 
+                        array(get_class(), '_isNotSystem')
+                    )
+                );
+            }
             if ($value && isset($data_params_map[$name]))
                 $params[$data_params_map[$name]] = $value;
         }
@@ -119,9 +139,9 @@ class Memex_Delicious {
                 $settings[self::PASSWORD],
                 $params
             );
-            Kohana::log('debug', "delicious post for " . $post_data['uuid'] . " success");
+            Kohana::log('debug', "delicious post for {$post_data['uuid']} success");
         } catch (Exception $e) {
-            Kohana::log('err', "delicious post for " . $post_data['uuid'] . "failed");
+            Kohana::log('error', "delicious post for {$post_data['uuid']} failed");
         }
     }
 
@@ -176,6 +196,7 @@ class Memex_Delicious {
             CURLOPT_USERPWD        => $user_name . ':' . $password
         ));
         $resp = curl_exec($ch);
+        Kohana::log('debug', 'del API resp: ' . $resp);
         $info = curl_getinfo($ch);
         curl_close($ch);
 
@@ -184,6 +205,9 @@ class Memex_Delicious {
         if (200 != $info['http_code']) {
             throw new Exception('delicious API call failed');
         } 
+        if (FALSE !== strpos($resp, 'something went wrong')) {
+            throw new Exception('delicious API call failed');
+        }
 
         return array($info, $resp);
     }
