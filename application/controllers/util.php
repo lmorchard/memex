@@ -53,10 +53,10 @@ class Util_Controller extends Controller {
             echo "Registering account for '$user_name'\n";
             $login = $logins_model->registerWithProfile(array(
                 'login_name'  => $user_name,
-                'email'       => 'l.m.orchard@pobox.com',
+                'email'       => "{$user_name}@memex",
                 'password'    => 'password',
-                'screen_name' => 'deusx',
-                'full_name'   => 'l.m.orchard',
+                'screen_name' => $user_name,
+                'full_name'   => $user_name,
                 'bio'         => ''
             ));
         }
