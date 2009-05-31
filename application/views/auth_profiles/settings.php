@@ -1,14 +1,15 @@
 <?php
-    $screen_name = $auth_profile['screen_name'];
+    $screen_name = AuthProfiles::get_profile('screen_name');
+    $u_screen_name = rawurlencode($screen_name);
 ?>
 <?php slot::start('crumbs') ?>
     / profiles 
-    / <a href="<?= url::base() . 'people/' . rawurlencode($screen_name) ?>"><?= html::specialchars($screen_name) ?></a>
-    / <a href="<?= url::base() . 'profiles/' . rawurlencode($screen_name) . '/settings' ?>">settings</a>
+    / <a href="<?= url::base() . 'people/' . $u_screen_name ?>"><?= html::specialchars($screen_name) ?></a>
+    / <a href="<?= url::base() . 'profiles/' . $u_screen_name . '/settings' ?>">settings</a>
 <?php slot::end() ?>
 
 <?php slot::start('infobar') ?>
-    profile settings for <a href=""><?= html::specialchars($auth_profile['screen_name']) ?></a>
+    profile settings for <a href=""><?= html::specialchars($screen_name) ?></a>
 <?php slot::end() ?>
 
 <?php

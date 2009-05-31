@@ -1,6 +1,7 @@
 <?php
-    $auth_post = ($auth_profile && 
-        $post['profile_id'] == $auth_profile['id']);
+    $auth_screen_name = AuthProfiles::get_profile('screen_name');
+    $u_auth_screen_name = rawurlencode($auth_screen_name);
+    $auth_post = ($post['profile_id'] == AuthProfiles::get_profile('id'));
     $profile_home_url = url::base() . 'people/' . rawurlencode($post['screen_name']);
 ?>
 <li class="post" id="post-<?= $post['hash'] ?>">

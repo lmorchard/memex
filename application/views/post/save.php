@@ -1,9 +1,10 @@
 <?php
+    $screen_name = AuthProfiles::get_profile('screen_name');
     $profile_home_url = url::base() . 'people/' . rawurlencode($screen_name);
 ?>
 
 <?php slot::start('crumbs') ?>
-    / people / <a href="<?= $profile_home_url ?>"><?= html::specialchars($auth_profile['screen_name']) ?></a>
+    / people / <a href="<?= $profile_home_url ?>"><?= html::specialchars($screen_name) ?></a>
 <?php slot::end() ?>
 
 <?=slot::get('form_before')?>

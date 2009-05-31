@@ -2,6 +2,9 @@
 <?php
     $action_name     = Router::$method;
     $controller_name = Router::$controller;
+
+    $screen_name = AuthProfiles::get_profile('screen_name');
+    $u_screen_name = rawurlencode($screen_name);
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml"> 
 
@@ -30,9 +33,9 @@
                 </div>
 
                 <div class="main">
-                    <?php if (null != $auth_profile): ?>
+                    <?php if (AuthProfiles::is_logged_in()): ?>
                         <ul class="nav">
-                            <li class="first"><a href="<?= url::base() . 'people/' . rawurlencode($auth_profile['screen_name']) ?>">your bookmarks</a></li> 
+                            <li class="first"><a href="<?= url::base() . 'people/' . $u_screen_name ?>">your bookmarks</a></li> 
                             <li><a href="<?= url::base() . 'save' ?>">save new</a></li>
                         </ul>
                     <?php endif ?>
@@ -42,12 +45,12 @@
 
                     <div class="auth">
                         <ul class="nav">
-                            <?php if (null === $auth_profile): ?>
+                            <?php if (!AuthProfiles::is_logged_in()): ?>
                                 <li class="first"><a href="<?= url::base() . 'login' ?>">login</a></li>
                                 <li><a href="<?= url::base() . 'register' ?>">register</a></li>
                             <?php else: ?>
-                                <li class="first">logged in as <a href="<?= url::base() . 'people/' . rawurlencode($auth_profile['screen_name']) ?>"><?= html::specialchars($auth_profile['screen_name']) ?></a></li>
-                                <li><a href="<?= url::base() . 'profiles/' . rawurlencode($auth_profile['screen_name']) . '/settings' ?>">settings</a></li>
+                                <li class="first">logged in as <a href="<?= url::base() . 'people/' . $u_screen_name ?>"><?= html::specialchars($screen_name) ?></a></li>
+                                <li><a href="<?= url::base() . 'profiles/' . $u_screen_name . '/settings' ?>">settings</a></li>
                                 <li><a href="<?= url::base() . 'logout' ?>">logout</a></li>
                             <?php endif; ?>
                         </ul>

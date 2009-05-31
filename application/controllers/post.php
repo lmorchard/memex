@@ -21,7 +21,7 @@ class Post_Controller extends Local_Controller
             setcookie('page_size',  $_COOKIE['page_size'], time()+60*60*24*365*5);
         }
 
-        if (!$this->auth->isLoggedIn()) {
+        if (!AuthProfiles::is_logged_in()) {
             if (in_array(Router::$method, array('save', 'delete'))) {
                 return url::redirect(
                     url::base() . '/login' .
@@ -133,7 +133,7 @@ class Post_Controller extends Local_Controller
         $this->view->set('post', $post);
 
         // Make sure the post exists, and belongs to the current profile
-        $profile_id = ($this->auth_data) ? $this->auth_data['profile']['id'] : null;
+        $profile_id = AuthProfiles::get_profile('id');
         if (empty($post)) {
             return Event::run('system.404');
         } elseif ($post['profile_id'] != $profile_id && $post['visibility'] > 0) {
@@ -171,7 +171,7 @@ class Post_Controller extends Local_Controller
 
         if (!isset($_POST['cancel'])) {
 
-            $profile_id = $this->auth_data['profile']['id'];
+            $profile_id = AuthProfiles::get_profile('id');
             $posts_model = new Posts_Model();
 
             // If we have a URL, try looking up existing post data.
@@ -202,7 +202,7 @@ class Post_Controller extends Local_Controller
             $posts_model->deleteByUUID($uuid);
         }
 
-        return url::redirect('people/'.$this->auth_data['profile']['screen_name']);
+        return url::redirect('people/'.AuthProfiles::get_profile('screen_name'));
     }
 
     /**
@@ -238,7 +238,7 @@ class Post_Controller extends Local_Controller
 
         if (!isset($_POST['cancel'])) {
 
-            $profile_id  = $this->auth_data['profile']['id'];
+            $profile_id  = AuthProfiles::get_profile('id');
             $posts_model = new Posts_Model();
 
             // If we have a URL, try looking up existing post data.
@@ -314,7 +314,8 @@ class Post_Controller extends Local_Controller
             // This jump leads to somewhere within the site
             return url::redirect($jump);
         } else {
-            return url::redirect('people/'.$this->auth_data['profile']['screen_name']);
+            return url::redirect('people/'.
+                AuthProfiles::get_profile('screen_name'));
         }
 
     }

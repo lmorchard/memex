@@ -1,5 +1,5 @@
 <?php
-    $screen_name = $auth_profile['screen_name'];
+    $screen_name = AuthProfiles::get_profile('screen_name');
 ?>
 <?php slot::start('crumbs') ?>
     / profiles 

@@ -32,7 +32,7 @@ class Delicious_Settings_Controller extends Local_Controller
     {
         $params = $this->getParamsFromRoute(array());
 
-        $profile_id = $this->auth_data['profile']['id'];
+        $profile_id = AuthProfiles::get_profile('id');
 
         $profiles_model = new Profiles_Model();
 

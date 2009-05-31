@@ -1,3 +1,7 @@
+<?php
+    $auth_screen_name = AuthProfiles::get_profile('screen_name');
+    $u_auth_screen_name = rawurlencode($auth_screen_name);
+?>
 <?php slot::start('head') ?>
     <?php
         $feed_url = url::base() . 'feeds/atom/tag' . 
@@ -27,7 +31,7 @@
 <?php if (empty($posts)): ?>
 
     <div class="message">
-        <?php if (!$auth_profile || $screen_name != $auth_profile['screen_name']): ?>
+        <?php if ($screen_name != $auth_screen_name): ?>
             <h2>No items found.</h2>
         <?php else: ?>
             <?php if (!$tags): ?>
@@ -48,8 +52,7 @@
     <ul class="posts">
         <?php foreach ($posts as $post): ?>
             <?php View::factory('post/post', array(
-                'auth_profile' => $auth_profile,
-                'post'         => $post
+                'post' => $post
             ))->render(true) ?>
         <?php endforeach; ?>
     </ul>

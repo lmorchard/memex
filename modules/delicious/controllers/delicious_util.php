@@ -15,7 +15,7 @@ class Delicious_Util_Controller extends Local_Controller
         if (is_array($url)) $url = $url[0];
 
         $settings = Memex_Delicious::getProfileSettings(
-            $this->auth_data['profile']['id']
+            AuthProfiles::get_profile('id')
         );
 
         if (empty($settings)) {

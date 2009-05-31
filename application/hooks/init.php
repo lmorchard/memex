@@ -15,7 +15,7 @@ class Memex_Init {
      */
     public static function init()
     {
-        Event::add('Memex.pre_settings_menu', 
+        Event::add('auth_profiles.before_settings_menu', 
             array('Memex_Init', 'buildSettingsMenu'));
         Event::add('Memex.model_posts.post_updated', 
             array('Memex_Init', 'handlePostUpdated'));
@@ -46,29 +46,29 @@ class Memex_Init {
      */
     public static function buildSettingsMenu()
     {
-        $name = Event::$data['auth_data']['profile']['screen_name'];
+        $u_name = rawurlencode(AuthProfiles::get_profile('screen_name'));
 
         Event::$data['sections'][] = array(
             'title' => 'Basics',
             'priority' => 999,
             'items' => array(
                 array(
-                    'url' => 'profiles/' . rawurlencode($name) . '/settings/basics/details',
+                    'url' => "profiles/{$u_name}/settings/basics/details",
                     'title' => 'Edit profile details',
                     'description' => 'change screen name, bio, etc.'
                 ),
                 array(
-                    'url' => 'profiles/' . rawurlencode($name) . '/settings/basics/password',
+                    'url' => "profiles/{$u_name}/settings/basics/password",
                     'title' => 'Change login password',
                     'description' => 'change current login password'
                 ),
                 array(
-                    'url' => 'profiles/' . rawurlencode($name) . '/settings/basics/logins',
+                    'url' => "profiles/{$u_name}/settings/basics/logins",
                     'title' => 'Manage profile logins',
                     'description' => 'create and remove logins for this profile'
                 ),
                 array(
-                    'url' => 'profiles/' . rawurlencode($name) . '/settings/basics/delete',
+                    'url' => "profiles/{$u_name}/settings/basics/delete",
                     'title' => 'Delete profile',
                     'description' => 'delete this profile altogether'
                 ),

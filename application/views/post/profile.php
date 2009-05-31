@@ -19,7 +19,7 @@
 
 <?php slot::start('infobar') ?>
     <?php
-        $whose_items = ($auth_profile && $screen_name == $auth_profile['screen_name']) ?
+        $whose_items = ($screen_name == AuthProfiles::get_profile('screen_name')) ?
             'your items' : $screen_name . "'s items";
     ?>
     <?php if (!$tags): ?>
@@ -57,7 +57,7 @@
 <?php if (empty($posts)): ?>
 
     <div class="message">
-        <?php if (!$auth_profile || $screen_name != $auth_profile['screen_name']): ?>
+        <?php if ($screen_name != AuthProfiles::get_profile('screen_name')): ?>
             <h2>No items found.</h2>
         <?php else: ?>
             <?php if (!$tags): ?>
@@ -78,8 +78,7 @@
     <ul class="posts">
         <?php foreach ($posts as $post): ?>
             <?php View::factory('post/post', array(
-                'auth_profile' => $auth_profile,
-                'post'         => $post
+                'post' => $post
             ))->render(true) ?>
         <?php endforeach; ?>
     </ul>

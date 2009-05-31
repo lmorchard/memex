@@ -104,6 +104,8 @@ $config['modules'] = array
     MODPATH.'decafbad_utils',
     MODPATH.'messagequeue',
     MODPATH.'phpunit',
+    MODPATH.'auth_profiles',
+
     MODPATH.'delicious',
     MODPATH.'autotags',
 	// MODPATH.'auth',      // Authentication

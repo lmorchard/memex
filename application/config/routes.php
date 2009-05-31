@@ -8,13 +8,7 @@ if (Kohana::config('core.needs_installation')) {
 
     $config['_allowed'] = '-a-z 0-9~%.,:;_/';
 
-    $config['home'] =     'auth/home';
-    $config['register'] = 'auth/register';
-    $config['login'] =    'auth/login';
-    $config['logout'] =   'auth/logout';
-
-    $config['profiles/([^/]+)/settings'] = 'profile/settings/screen_name/$1';
-    $config['profiles']                  = 'profile/index';
+    $config['profiles/([^/]+)/settings'] = 'auth_profiles/settings/screen_name/$1';
 
     $config['save']              = 'post/save';
     $config['posts/(.*);edit']   = 'post/save/uuid/$1/submethod/edit';

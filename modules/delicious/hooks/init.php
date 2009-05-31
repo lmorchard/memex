@@ -20,7 +20,7 @@ class Memex_Delicious {
      */
     public static function init()
     {
-        Event::add('Memex.pre_settings_menu', 
+        Event::add('auth_profiles.before_settings_menu', 
             array('Memex_Delicious', 'buildSettingsMenu'));
 
         Event::add('DecafbadUtils.layout.before_auto_render',
@@ -37,26 +37,20 @@ class Memex_Delicious {
      */
     public static function buildSettingsMenu()
     {
-        $name = Event::$data['auth_data']['profile']['screen_name'];
+        $u_name = rawurlencode(AuthProfiles::get_profile('screen_name'));
 
         Event::$data['sections'][] = array(
             'title' => 'Delicious',
             'items' => array(
                 array(
-                    'url' => 
-                        'profiles/' . rawurlencode($name) . '/settings/delicious/import',
-                    'title' => 
-                        'delicious.com item import',
-                    'description' => 
-                        'import items from a delicious.com account'
+                    'url' => "profiles/{$u_name}/settings/delicious/import",
+                    'title' => 'delicious.com item import',
+                    'description' => 'import items from a delicious.com account'
                 ),
                 array(
-                    'url' => 
-                        'profiles/' . rawurlencode($name) . '/settings/delicious/replication',
-                    'title' => 
-                        'delicious.com activity replication',
-                    'description' => 
-                        'copy item updates and deletions to a delicious.com account'
+                    'url' => "profiles/{$u_name}/settings/delicious/replication",
+                    'title' => 'delicious.com activity replication',
+                    'description' => 'copy item updates and deletions to a delicious.com account'
                 )
             )
         );

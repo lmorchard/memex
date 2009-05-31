@@ -7,7 +7,7 @@
  * @subpackage controllers
  * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
-class Auth_Controller extends Local_Controller
+class Auth_Profiles_Controller extends Local_Controller
 { 
     protected $auto_render = TRUE;
 
@@ -25,11 +25,14 @@ class Auth_Controller extends Local_Controller
     public function home()
     {
         $this->auto_render = false;
-        if (!$this->auth->isLoggedIn()) {
+        if (!AuthProfiles::is_logged_in()) {
             return url::redirect('login');
         } else {
-            return url::redirect('people/' . 
-                $this->auth_data['profile']['screen_name']);
+            $auth_data = AuthProfiles::get_user_data();
+            return url::redirect(sprintf(
+                Kohana::config('auth_profiles.home_url'),
+                AuthProfiles::get_profile('screen_name')
+            ));
         }
     }
 
@@ -81,9 +84,7 @@ class Auth_Controller extends Local_Controller
         $login   = $logins->fetchByLoginName($form_data['login_name']);
         $profile = $logins->fetchDefaultProfileForLogin($login['id']);
 
-        $this->auth->login($form_data['login_name'], array(
-            'login' => $login, 'profile' => $profile
-        ));
+        AuthProfiles::login($form_data['login_name'], $login, $profile);
 
         if (isset($form_data['jump']) && substr($form_data['jump'], 0, 1) == '/') {
             // Allow post-login redirect only if the param starts with '/', 
@@ -103,7 +104,29 @@ class Auth_Controller extends Local_Controller
             'auth_login'   => null,
             'auth_profile' => null
         ));
-        $this->auth->logout();
+        AuthProfiles::logout();
+    }
+
+    /**
+     * Profiles settings.
+     */
+    public function settings()
+    {
+        $params = $this->getParamsFromRoute(array());
+
+        if ($params['screen_name'] != AuthProfiles::get_profile('screen_name')) {
+            header("HTTP/1.1 403 Forbidden"); 
+            exit;
+        }
+
+        // Set up initial whiteboard, fire off event to gather content from 
+        // interested listeners.
+        $data = array(
+            'controller' => $this, 
+            'sections'   => array()
+        );
+        Event::run('auth_profiles.before_settings_menu', $data);
+        $this->view->sections = $data['sections'];
     }
          
 } 
