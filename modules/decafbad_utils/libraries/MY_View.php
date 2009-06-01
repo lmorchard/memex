@@ -16,7 +16,7 @@ class View extends View_Core
      */
     function get_filename()
     {
-        return $this->kohana_filetype;
+        return $this->kohana_filename;
     }
 
 }
