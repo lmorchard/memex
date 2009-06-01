@@ -7,7 +7,7 @@
  * @subpackage hooks
  * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
-class Memex_Autoloader
+class DecafbadUtils_Autoloader
 {
     public static function auto_load($class)
     {
@@ -24,7 +24,7 @@ class Memex_Autoloader
     }
 }
 
-spl_autoload_register(array('Memex_Autoloader', 'auto_load'));
+spl_autoload_register(array('DecafbadUtils_Autoloader', 'auto_load'));
 
 $path = array(
     APPPATH,
