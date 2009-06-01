@@ -6,7 +6,7 @@
  * @subpackage controllers
  * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
-class Local_Controller extends Layout_Controller 
+class Local_Controller extends Controller 
 {
     protected $auto_render = TRUE;
 

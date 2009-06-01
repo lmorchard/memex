@@ -5,7 +5,7 @@
  * @subpackage controllers
  * @author     l.m.orchard@pobox.com
  */
-class Layout_Controller extends Controller {
+class Controller extends Controller_Core {
 
     // Wrapper layout for current view
     protected $layout = NULL;
