@@ -1,6 +1,8 @@
 ## TODO
 
 * Basic stuff
+    * Move local config to its own module? 
+        * Somehow have module conf override app conf?
     * All tags per profile
         * ..and do not forget feeds.
     * Top tags site-wide
