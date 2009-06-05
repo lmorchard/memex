@@ -46,34 +46,10 @@ class Memex_Init {
      */
     public static function buildSettingsMenu()
     {
-        $u_name = rawurlencode(AuthProfiles::get_profile('screen_name'));
-
+        /*
         Event::$data['sections'][] = array(
-            'title' => 'Basics',
-            'priority' => 999,
-            'items' => array(
-                array(
-                    'url' => "profiles/{$u_name}/settings/basics/details",
-                    'title' => 'Edit profile details',
-                    'description' => 'change screen name, bio, etc.'
-                ),
-                array(
-                    'url' => "profiles/{$u_name}/settings/basics/password",
-                    'title' => 'Change login password',
-                    'description' => 'change current login password'
-                ),
-                array(
-                    'url' => "profiles/{$u_name}/settings/basics/logins",
-                    'title' => 'Manage profile logins',
-                    'description' => 'create and remove logins for this profile'
-                ),
-                array(
-                    'url' => "profiles/{$u_name}/settings/basics/delete",
-                    'title' => 'Delete profile',
-                    'description' => 'delete this profile altogether'
-                ),
-            )
-        );
+            );
+         */
     }
 }
 Memex_Init::init();

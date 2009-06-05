@@ -77,7 +77,7 @@ class form extends form_Core
      * @param string Field label text
      * @param array  Field attributes
      */
-    public static function field($type, $name, $label, $params=null)
+    public static function field($type, $name, $label=null, $params=null)
     {
         if (null == $params) $params = array();
 

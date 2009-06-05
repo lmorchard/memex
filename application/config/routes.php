@@ -8,8 +8,6 @@ if (Kohana::config('core.needs_installation')) {
 
     $config['_allowed'] = '-a-z 0-9~%.,:;_/';
 
-    $config['profiles/([^/]+)/settings'] = 'auth_profiles/settings/screen_name/$1';
-
     $config['save']              = 'post/save';
     $config['posts/(.*);edit']   = 'post/save/uuid/$1/submethod/edit';
     $config['posts/(.*);copy']   = 'post/save/uuid/$1/submethod/copy';

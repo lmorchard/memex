@@ -44,7 +44,7 @@ class Post_Controller extends Local_Controller
         // Try to match the screen name to a profile, or bail with a 404.
         $profiles_model = new Profiles_Model();
         $profile = 
-            $profiles_model->fetchByScreenName($params['screen_name']);
+            $profiles_model->fetch_by_screen_name($params['screen_name']);
         if (!$profile) {
             return Event::run('system.404');
         }

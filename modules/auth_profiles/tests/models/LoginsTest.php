@@ -4,23 +4,13 @@
  *
  * @group Models
  *
- * @package    Memex
+ * @package    auth_profiles
+ * @group      auth_profiles
  * @subpackage tests
  * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class LoginsTest extends PHPUnit_Framework_TestCase 
 {
-    /**
-     * Runs the test methods of this class.
-     *
-     * @return void
-     */
-    public static function main()
-    {
-        $suite  = new PHPUnit_Framework_TestSuite("Memex_Model_LoginsTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
-    }
-
     /**
      * This method is called before a test is executed.
      *
@@ -28,11 +18,13 @@ class LoginsTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
+        DecafbadUtils_EnvConfig::apply('testing');
+
         $this->model = new Logins_Model();
-        $this->model->deleteAll();
+        $this->model->delete_all();
 
         $this->profiles_model = new Profiles_Model();
-        $this->profiles_model->deleteAll();
+        $this->profiles_model->delete_all();
     }
 
     /**
@@ -94,7 +86,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
             'password'   => 'tester_password',
         ));
 
-        $login = $this->model->fetchByLoginName('tester1');
+        $login = $this->model->fetch_by_login_name('tester1');
 
         $this->assertEquals($login['login_name'], 'tester1');
         $this->assertEquals($login['email'], 'tester1@example.com');
@@ -130,7 +122,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
      */
     public function testRegistrationShouldCreateProfile()
     {
-        $login = $this->model->registerWithProfile(array(
+        $login = $this->model->register_with_profile(array(
             'login_name'  => 'tester1',
             'email'       => 'tester1@example.com',
             'password'    => 'tester_password',
@@ -140,7 +132,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
         ));
         $this->assertTrue(null !== $login);
 
-        $profile = $this->profiles_model->fetchByScreenName('tester1_screenname');
+        $profile = $this->profiles_model->fetch_by_screen_name('tester1_screenname');
 
         $this->assertTrue(null !== $profile);
         $this->assertEquals($profile['screen_name'], 'tester1_screenname');
@@ -148,7 +140,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($profile['bio'], 'I live!');
 
         $default_profile = 
-            $this->model->fetchDefaultProfileForLogin($login['id']);
+            $this->model->fetch_default_profile_for_login($login['id']);
         $this->assertEquals($profile['id'], $default_profile['id']);
     }
 
@@ -159,7 +151,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
     public function testFailedRegistrationShouldNotCreateLogin()
     {
         try {
-            $login_id = $this->model->registerWithProfile(array(
+            $login_id = $this->model->register_with_profile(array(
                 'login_name' => 'tester1',
                 'email'      => 'tester1@example.com',
                 'password'   => 'tester_password',
@@ -167,7 +159,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
             $this->fail('Missing profile details should cause registration to fail');
         } catch (Exception $e) {
             $this->assertContains('required', $e->getMessage());
-            $login = $this->model->fetchByLoginName('tester1');
+            $login = $this->model->fetch_by_login_name('tester1');
             $this->assertNull($login);
         }
     }

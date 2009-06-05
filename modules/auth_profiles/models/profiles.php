@@ -22,7 +22,7 @@ class Profiles_Model extends Model
             throw new Exception('screen_name required');
         if (empty($data['full_name']))
             throw new Exception('full_name required');
-        if ($this->fetchByScreenName($data['screen_name']))
+        if ($this->fetch_by_screen_name($data['screen_name']))
             throw new Exception('duplicate screen name');
 
         $data = array(
@@ -76,9 +76,9 @@ class Profiles_Model extends Model
      * @param string profile id
      * @return array profile data
      */
-    public function fetchById($profile_id)
+    public function fetch_by_id($profile_id)
     {
-        return $this->fetchOneBy($profile_id, null);
+        return $this->fetch_one_by($profile_id, null);
     }
 
     /**
@@ -87,9 +87,9 @@ class Profiles_Model extends Model
      * @param string Screen name
      * @return array profile data
      */
-    public function fetchByScreenName($screen_name)
+    public function fetch_by_screen_name($screen_name)
     {
-        return $this->fetchOneBy(null, $screen_name);
+        return $this->fetch_one_by(null, $screen_name);
     }
 
     /**
@@ -99,7 +99,7 @@ class Profiles_Model extends Model
      * @param string Screen name
      * @return array profile data
      */
-    public function fetchOneBy($id=null, $screen_name=null)
+    public function fetch_one_by($id=null, $screen_name=null)
     {
         $select = $this->db->
             select()->from('profiles');
@@ -117,7 +117,7 @@ class Profiles_Model extends Model
      * @param string Profile attribute name
      * @param string Profile attribute value
      */
-    public function setAttribute($profile_id, $name, $value)
+    public function set_attribute($profile_id, $name, $value)
     {
         $row = $this->db
             ->select()->from('profile_attribs')
@@ -149,10 +149,10 @@ class Profiles_Model extends Model
      * @param string Profile ID
      * @param array list of profile attributes
      */
-    public function setAttributes($profile_id, $attributes)
+    public function set_attributes($profile_id, $attributes)
     {
         foreach ($attributes as $name=>$value) {
-            $this->setAttribute($profile_id, $name, $value);
+            $this->set_attribute($profile_id, $name, $value);
         }
     }
 
@@ -163,7 +163,7 @@ class Profiles_Model extends Model
      * @param string Profile attribute name
      * @return string Attribute value 
      */
-    public function getAttribute($profile_id, $name)
+    public function get_attribute($profile_id, $name)
     {
         $select = $this->db
             ->select('value')
@@ -181,7 +181,7 @@ class Profiles_Model extends Model
      * @param string Profile ID
      * @return array Profile attributes
      */
-    public function getAttributes($profile_id, $names=null)
+    public function get_attributes($profile_id, $names=null)
     {
         $select = $this->db->select()
             ->from('profile_attribs')
@@ -202,7 +202,7 @@ class Profiles_Model extends Model
      *
      * @param array Form data to validate.
      */
-    public function getValidator($data)
+    public function get_validator($data)
     {
         $valid = Validation::factory($data)
             ->pre_filter('trim')
@@ -217,9 +217,9 @@ class Profiles_Model extends Model
     /**
      *
      */
-    public function isScreenNameAvailable($name)
+    public function is_screen_name_available($name)
     {
-        $profile = $this->fetchByScreenName($name);
+        $profile = $this->fetch_by_screen_name($name);
         return empty($profile);
     }
 
@@ -227,7 +227,7 @@ class Profiles_Model extends Model
      * Delete all profiles from the system.  Useful for tests, but dangerous 
      * otherwise.
      */
-    public function deleteAll()
+    public function delete_all()
     {
         if (!Kohana::config('model.enable_delete_all'))
             throw new Exception('Mass deletion not enabled');

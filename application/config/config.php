@@ -102,8 +102,8 @@ $config['extension_prefix'] = 'MY_';
 $config['modules'] = array
 (
     MODPATH.'decafbad_utils',
-    MODPATH.'messagequeue',
     MODPATH.'phpunit',
+    MODPATH.'messagequeue',
     MODPATH.'auth_profiles',
 
     MODPATH.'delicious',

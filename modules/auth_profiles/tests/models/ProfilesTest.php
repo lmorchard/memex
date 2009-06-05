@@ -4,23 +4,13 @@
  *
  * @group Models
  *
- * @package    Memex
+ * @package    auth_profiles
+ * @group      auth_profiles
  * @subpackage tests
  * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
 class ProfilesTest extends PHPUnit_Framework_TestCase 
 {
-    /**
-     * Runs the test methods of this class.
-     *
-     * @return void
-     */
-    public static function main()
-    {
-        $suite  = new PHPUnit_Framework_TestSuite("ProfilesTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
-    }
-
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
@@ -29,8 +19,10 @@ class ProfilesTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
+        DecafbadUtils_EnvConfig::apply('testing');
+
         $this->model = new Profiles_Model();
-        $this->model->deleteAll();
+        $this->model->delete_all();
     }
 
     /**
@@ -79,7 +71,7 @@ class ProfilesTest extends PHPUnit_Framework_TestCase
             'bio'         => 'I live!'
         ));
 
-        $fetched_profile = $this->model->fetchByScreenName('tester1_screenname');
+        $fetched_profile = $this->model->fetch_by_screen_name('tester1_screenname');
 
         $this->assertEquals($fetched_profile['screen_name'], 'tester1_screenname');
         $this->assertEquals($fetched_profile['full_name'], 'Tess T. Erone');
@@ -92,13 +84,13 @@ class ProfilesTest extends PHPUnit_Framework_TestCase
             'bio'         => 'Updated I live!'
         ));
 
-        $updated_profile = $this->model->fetchByScreenName('updated_tester1_screenname');
+        $updated_profile = $this->model->fetch_by_screen_name('updated_tester1_screenname');
 
         $this->assertEquals($updated_profile['screen_name'], 'updated_tester1_screenname');
         $this->assertEquals($updated_profile['full_name'], 'Updated Tess T. Erone');
         $this->assertEquals($updated_profile['bio'], 'Updated I live!');
 
-        $updated_profile_1 = $this->model->fetchById($fetched_profile['id']);
+        $updated_profile_1 = $this->model->fetch_by_id($fetched_profile['id']);
 
         $this->assertEquals($updated_profile_1['screen_name'], 'updated_tester1_screenname');
         $this->assertEquals($updated_profile_1['full_name'], 'Updated Tess T. Erone');
@@ -139,11 +131,11 @@ class ProfilesTest extends PHPUnit_Framework_TestCase
             'bio'         => 'I live!'
         ));
 
-        $this->model->setAttribute($profile['id'], 'test1', 'value1');
-        $this->model->setAttribute($profile['id'], 'test2', 'value2');
-        $this->model->setAttribute($profile['id'], 'test3', 'value3');
+        $this->model->set_attribute($profile['id'], 'test1', 'value1');
+        $this->model->set_attribute($profile['id'], 'test2', 'value2');
+        $this->model->set_attribute($profile['id'], 'test3', 'value3');
 
-        $this->model->setAttributes($profile['id'], array(
+        $this->model->set_attributes($profile['id'], array(
             'test4' => 'value4',
             'test5' => 'value5',
             'test6' => 'value6'
@@ -159,14 +151,14 @@ class ProfilesTest extends PHPUnit_Framework_TestCase
         );
 
         foreach ($test_attribs as $name=>$test_value) {
-            $result_value = $this->model->getAttribute($profile['id'], $name);
+            $result_value = $this->model->get_attribute($profile['id'], $name);
             $this->assertEquals($test_value, $result_value);
         }
 
-        $result_attribs = $this->model->getAttributes($profile['id']);
+        $result_attribs = $this->model->get_attributes($profile['id']);
         $this->assertEquals($result_attribs, $test_attribs);
 
-        $result_attribs2 = $this->model->getAttributes($profile['id'], array(
+        $result_attribs2 = $this->model->get_attributes($profile['id'], array(
             'test2', 'test4', 'test6'
         ));
         $test_attribs2 = array(
@@ -185,9 +177,9 @@ class ProfilesTest extends PHPUnit_Framework_TestCase
             'test6' => 'updated_value6'
         );
 
-        $this->model->setAttributes($profile['id'], $test_attribs3);
+        $this->model->set_attributes($profile['id'], $test_attribs3);
 
-        $result_attribs3 = $this->model->getAttributes($profile['id']);
+        $result_attribs3 = $this->model->get_attributes($profile['id']);
 
         $this->assertEquals($result_attribs3, $test_attribs3);
 

@@ -28,14 +28,14 @@ class Delicious_Api_Controller extends Local_Controller
                 break;
 
             $logins_model = new Logins_Model();
-            $login = $logins_model->fetchByLoginName($_SERVER['PHP_AUTH_USER']);
+            $login = $logins_model->fetch_by_login_name($_SERVER['PHP_AUTH_USER']);
 
             if ($login['password'] != md5($_SERVER['PHP_AUTH_PW'])) {
                 break;
             }
 
             $this->profile = 
-                $logins_model->fetchDefaultProfileForLogin($login['id']);
+                $logins_model->fetch_default_profile_for_login($login['id']);
 
             // Auth success!
             return;

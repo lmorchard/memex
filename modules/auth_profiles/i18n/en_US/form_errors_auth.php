@@ -54,4 +54,20 @@ $lang = array(
         'default' 
             => 'Valid captcha response is required.'
     ),
+    'old_password' => array(
+        'default'
+            => 'Old password is invalid.',
+        'required'
+            => 'Old password is required',
+    ),
+    'new_password' => array(
+        'required'
+            => 'New passwords is required',
+    ),
+    'new_password_confirm' => array(
+        'required'
+            => 'New password confirmation required',
+        'matches'  
+            => 'Password and confirmation must match.'
+    ),
 );

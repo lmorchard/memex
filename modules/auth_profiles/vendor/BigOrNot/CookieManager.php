@@ -139,6 +139,7 @@ class    BigOrNot_CookieManager
         /* 1980-01-01 */
         $expire = 315554400;
         setcookie($name, '', $expire, $path, $domain, $secure, $httponly);
+        unset($_COOKIE[$name]);
     }
 
 

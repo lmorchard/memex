@@ -42,7 +42,7 @@ class Util_Controller extends Controller {
         $profiles_model = new Profiles_Model();
         $posts_model    = new Posts_Model();
 
-        $login = $logins_model->fetchByLoginName($user_name);
+        $login = $logins_model->fetch_by_login_name($user_name);
         if (!empty($login)) {
             // Delete existing posts if login found.
             // HACK: Make this a command-line switch?
@@ -51,7 +51,7 @@ class Util_Controller extends Controller {
         } else {
             // Create a new login from the user name.
             echo "Registering account for '$user_name'\n";
-            $login = $logins_model->registerWithProfile(array(
+            $login = $logins_model->register_with_profile(array(
                 'login_name'  => $user_name,
                 'email'       => "{$user_name}@memex",
                 'password'    => 'password',
@@ -61,7 +61,7 @@ class Util_Controller extends Controller {
             ));
         }
 
-        $profile = $logins_model->fetchDefaultProfileForLogin($login['id']);
+        $profile = $logins_model->fetch_default_profile_for_login($login['id']);
         $profile_id = $profile['id'];
         
         $total = count($posts->post);

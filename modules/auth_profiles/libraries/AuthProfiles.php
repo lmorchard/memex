@@ -27,6 +27,20 @@ class AuthProfiles
     }
 
     /**
+     * Bounce to login, with jump back to URL.
+     *
+     * @param string URL for post-login jump, defaulting to current URL
+     */
+    public static function redirect_login($url=null)
+    {
+        if (null===$url) 
+            $url = '/'.url::current(TRUE);
+        return url::redirect(
+            url::base() . '/login?jump=' . rawurlencode($url)
+        );
+    }
+
+    /**
      * Create a new authentication cookie.
      *
      * @param string user name

@@ -12,11 +12,34 @@ class Auth_Profiles_Controller extends Local_Controller
     protected $auto_render = TRUE;
 
     /**
+     * Basic overall controller preamble
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $protected_methods = array(
+            'home', 'changepassword'
+        );
+        if (!AuthProfiles::is_logged_in()) {
+            $method = Router::$method;
+            $reset_token = $this->input->get('password_reset_token');
+            if ('changepassword' == $method && !empty($reset_token)) {
+                // Change password is okay, if there's a reset token.
+                return;
+            }
+            if (in_array($method, $protected_methods)) {
+                return AuthProfiles::redirect_login();
+            }
+        }
+    }
+
+    /**
      * Combination login / registration action.
      */
     public function index()
     {
-        return url::redirect('login');
+        return url::redirect('home');
     }
 
     /**
@@ -46,7 +69,7 @@ class Auth_Profiles_Controller extends Local_Controller
 
         $logins    = new Logins_Model();
         $form_data = $this->input->post();
-        $is_valid  = $logins->validateRegistration($form_data);
+        $is_valid  = $logins->validate_registration($form_data);
 
         $this->view->form_data = $form_data;
 
@@ -56,9 +79,66 @@ class Auth_Profiles_Controller extends Local_Controller
             return;
         }
 
-        $new_login = $logins->registerWithProfile($form_data);
+        $new_login = $logins->register_with_profile($form_data);
 
         return url::redirect('login');
+    }
+
+    /**
+     * Change password for a login
+     */
+    public function changepassword()
+    {
+        $logins    = new Logins_Model();
+        $form_data = $this->input->post();
+
+        if (AuthProfiles::is_logged_in()) {
+            // Logged in, so use auth login details.
+            $login_id = AuthProfiles::get_login('id'); 
+            $form_data['login_name'] = AuthProfiles::get_login('login_name');
+        } else {
+            // Not logged in, so try using the password reset token.
+            $login = $logins->fetch_by_password_reset_token(
+                $this->input->get('password_reset_token')
+            );
+            if (empty($login)) {
+                // Nothing retrieved for the token, so complain.
+                $this->view->invalid_reset_token = true;
+                return;
+            }
+            $login_id = $login['id']; 
+            $form_data['login_name'] = $login['login_name'];
+        }
+
+        // Jump straight to rendering if not a POST.
+        if ('post' != request::method())
+            return;
+
+        // Validate the password change attempt.
+        $is_valid  = $logins->validate_change_password($form_data);
+        $this->view->form_data = $form_data;
+        if (!$is_valid) {
+            $this->view->form_errors = 
+                $form_data->errors('form_errors_auth');
+            return;
+        }
+
+        $logins->change_password(
+            $login_id, 
+            $form_data['new_password']
+        );
+        
+        AuthProfiles::logout();
+        $this->view->password_changed = true;
+    }
+
+    /**
+     * Handle forgotten password issue.
+     */
+    public function forgotpassword() {
+        if ('post' != request::method())
+            return;
+
     }
 
     /**
@@ -71,7 +151,7 @@ class Auth_Profiles_Controller extends Local_Controller
 
         $logins    = new Logins_Model();
         $form_data = $this->input->post();
-        $is_valid  = $logins->validateLogin($form_data);
+        $is_valid  = $logins->validate_login($form_data);
 
         $this->view->form_data = $form_data;
 
@@ -81,8 +161,8 @@ class Auth_Profiles_Controller extends Local_Controller
             return;
         }
 
-        $login   = $logins->fetchByLoginName($form_data['login_name']);
-        $profile = $logins->fetchDefaultProfileForLogin($login['id']);
+        $login   = $logins->fetch_by_login_name($form_data['login_name']);
+        $profile = $logins->fetch_default_profile_for_login($login['id']);
 
         AuthProfiles::login($form_data['login_name'], $login, $profile);
 
@@ -100,10 +180,6 @@ class Auth_Profiles_Controller extends Local_Controller
      */
     public function logout()
     {
-        $this->view->set_global(array(
-            'auth_login'   => null,
-            'auth_profile' => null
-        ));
         AuthProfiles::logout();
     }
 
@@ -119,11 +195,40 @@ class Auth_Profiles_Controller extends Local_Controller
             exit;
         }
 
+        $u_name = rawurlencode(AuthProfiles::get_profile('screen_name'));
+
         // Set up initial whiteboard, fire off event to gather content from 
         // interested listeners.
         $data = array(
             'controller' => $this, 
-            'sections'   => array()
+            'sections'   => array(
+                array(
+                    'title' => 'Basics',
+                    'priority' => 999,
+                    'items' => array(
+                        array(
+                            'url' => "profiles/{$u_name}/settings/basics/details",
+                            'title' => 'Edit profile details',
+                            'description' => 'change screen name, bio, etc.'
+                        ),
+                        array(
+                            'url' => "profiles/{$u_name}/settings/basics/changepassword",
+                            'title' => 'Change login password',
+                            'description' => 'change current login password'
+                        ),
+                        array(
+                            'url' => "profiles/{$u_name}/settings/basics/logins",
+                            'title' => 'Manage profile logins',
+                            'description' => 'create and remove logins for this profile'
+                        ),
+                        array(
+                            'url' => "profiles/{$u_name}/settings/basics/delete",
+                            'title' => 'Delete profile',
+                            'description' => 'delete this profile altogether'
+                        ),
+                    )
+                )
+            )
         );
         Event::run('auth_profiles.before_settings_menu', $data);
         $this->view->sections = $data['sections'];
