@@ -1,0 +1,10 @@
+Path: .
+URL: svn://svn.phpunit.de/phpunit/phpunit/branches/release/3.3/PHPUnit
+Repository Root: svn://svn.phpunit.de/phpunit
+Repository UUID: c4a080f7-5c17-0410-a942-8af0f0140c7b
+Revision: 4778
+Node Kind: directory
+Schedule: normal
+Last Changed Author: sb
+Last Changed Rev: 4748
+Last Changed Date: 2009-04-02 07:34:34 +0100 (Thu, 02 Apr 2009)
