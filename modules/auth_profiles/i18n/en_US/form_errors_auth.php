@@ -7,6 +7,8 @@
  */
 $lang = array(
     'login_name' => array(
+        'default'
+            => 'Valid login name is required.',
         'required'             
             => 'Login name is required.',
         'length'               
@@ -17,6 +19,8 @@ $lang = array(
             => 'Login name is not available.'
     ),
     'email' => array(
+        'default'
+            => 'Valid email address is required.',
         'required' 
             => 'Email address is required.',
         'email'
@@ -69,5 +73,13 @@ $lang = array(
             => 'New password confirmation required',
         'matches'  
             => 'Password and confirmation must match.'
+    ),
+    'new_email' => array(
+        'default' =>
+            'A valid new email is required'
+    ),
+    'new_email_confirm' => array(
+        'default' =>
+            'A valid new email confirmation is required'
     ),
 );

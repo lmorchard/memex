@@ -11,7 +11,7 @@ class Auth_Profiles_Controller extends Local_Controller
 { 
     protected $auto_render = TRUE;
 
-    /**
+    /** 
      * Basic overall controller preamble
      */
     public function __construct()
@@ -19,19 +19,15 @@ class Auth_Profiles_Controller extends Local_Controller
         parent::__construct();
 
         $protected_methods = array(
-            'home', 'changepassword'
+            'home', 'changeemail', 'logout'
         );
         if (!AuthProfiles::is_logged_in()) {
-            $method = Router::$method;
-            $reset_token = $this->input->get('password_reset_token');
-            if ('changepassword' == $method && !empty($reset_token)) {
-                // Change password is okay, if there's a reset token.
-                return;
-            }
-            if (in_array($method, $protected_methods)) {
+            if (in_array(Router::$method, $protected_methods)) {
                 return AuthProfiles::redirect_login();
             }
         }
+
+        $this->logins_model = new Logins_Model();
     }
 
     /**
@@ -60,85 +56,20 @@ class Auth_Profiles_Controller extends Local_Controller
     }
 
     /**
-     * New user registration action.
+     * New user registration.
      */
-    function register()
+    public function register()
     {
-        if ('post' != request::method())
-            return;
+        $form_data = $this->validate_form(
+            $this->logins_model, 
+            'validate_registration', 'form_errors_auth'
+        );
+        if (null===$form_data) return;
 
-        $logins    = new Logins_Model();
-        $form_data = $this->input->post();
-        $is_valid  = $logins->validate_registration($form_data);
-
-        $this->view->form_data = $form_data;
-
-        if (!$is_valid) {
-            $this->view->form_errors = 
-                $form_data->errors('form_errors_auth');
-            return;
-        }
-
-        $new_login = $logins->register_with_profile($form_data);
+        $new_login = $this->logins_model
+            ->register_with_profile($form_data);
 
         return url::redirect('login');
-    }
-
-    /**
-     * Change password for a login
-     */
-    public function changepassword()
-    {
-        $logins    = new Logins_Model();
-        $form_data = $this->input->post();
-
-        if (AuthProfiles::is_logged_in()) {
-            // Logged in, so use auth login details.
-            $login_id = AuthProfiles::get_login('id'); 
-            $form_data['login_name'] = AuthProfiles::get_login('login_name');
-        } else {
-            // Not logged in, so try using the password reset token.
-            $login = $logins->fetch_by_password_reset_token(
-                $this->input->get('password_reset_token')
-            );
-            if (empty($login)) {
-                // Nothing retrieved for the token, so complain.
-                $this->view->invalid_reset_token = true;
-                return;
-            }
-            $login_id = $login['id']; 
-            $form_data['login_name'] = $login['login_name'];
-        }
-
-        // Jump straight to rendering if not a POST.
-        if ('post' != request::method())
-            return;
-
-        // Validate the password change attempt.
-        $is_valid  = $logins->validate_change_password($form_data);
-        $this->view->form_data = $form_data;
-        if (!$is_valid) {
-            $this->view->form_errors = 
-                $form_data->errors('form_errors_auth');
-            return;
-        }
-
-        $logins->change_password(
-            $login_id, 
-            $form_data['new_password']
-        );
-        
-        AuthProfiles::logout();
-        $this->view->password_changed = true;
-    }
-
-    /**
-     * Handle forgotten password issue.
-     */
-    public function forgotpassword() {
-        if ('post' != request::method())
-            return;
-
     }
 
     /**
@@ -146,23 +77,16 @@ class Auth_Profiles_Controller extends Local_Controller
      */
     public function login()
     {
-        if ('post' != request::method())
-            return;
+        $form_data = $this->validate_form(
+            $this->logins_model, 
+            'validate_login', 'form_errors_auth'
+        );
+        if (null===$form_data) return;
 
-        $logins    = new Logins_Model();
-        $form_data = $this->input->post();
-        $is_valid  = $logins->validate_login($form_data);
-
-        $this->view->form_data = $form_data;
-
-        if (!$is_valid) {
-            $this->view->form_errors = 
-                $form_data->errors('form_errors_auth');
-            return;
-        }
-
-        $login   = $logins->fetch_by_login_name($form_data['login_name']);
-        $profile = $logins->fetch_default_profile_for_login($login['id']);
+        $login = $this->logins_model->
+            fetch_by_login_name($form_data['login_name']);
+        $profile = $this->logins_model->
+            fetch_default_profile_for_login($login['id']);
 
         AuthProfiles::login($form_data['login_name'], $login, $profile);
 
@@ -181,6 +105,152 @@ class Auth_Profiles_Controller extends Local_Controller
     public function logout()
     {
         AuthProfiles::logout();
+    }
+
+    /**
+     * Start email address change process.
+     */
+    public function changeemail()
+    {
+        $form_data = $this->validate_form(
+            $this->logins_model, 
+            'validate_change_email', 'form_errors_auth'
+        );
+        if (null===$form_data) return;
+
+        $token = $this->logins_model->set_email_verification_token(
+            AuthProfiles::get_login('id'),
+            $form_data['new_email']
+        );
+
+        $this->view->email_verification_token_set = true;
+
+        email::send_view(
+            $form_data['new_email'],
+            'auth_profiles/changeemail_email',
+            array(
+                'email_verification_token' => $token,
+                'login_name' => AuthProfiles::get_login('login_name')
+            )
+        );
+    }
+
+    /**
+     * Complete verification of a new email address.
+     */
+    public function verifyemail()
+    {
+        $token = ('post' == request::method()) ?
+            $this->input->post('email_verification_token') :
+            $this->input->get('email_verification_token');
+
+        // Look up the login by token, and abort if not found.
+        $login = $this->logins_model->fetch_by_email_verification_token($token);
+        if (empty($login)) {
+            $this->view->invalid_token = true;
+            return;
+        }
+
+        $this->logins_model->change_email(
+            $login['id'], $login['new_email']
+        );
+    }
+
+    /**
+     * Change password for a login
+     */
+    public function changepassword()
+    {
+        // Try accepting a reset token from either GET or POST.
+        $reset_token = ('post' == request::method()) ?
+            $this->input->post('password_reset_token') :
+            $this->input->get('password_reset_token');
+
+        if (empty($reset_token) && !AuthProfiles::is_logged_in()) {
+        
+            // If no token and not logged in, jump to login.
+            return AuthProfiles::redirect_login();
+        
+        } elseif (empty($reset_token) && AuthProfiles::is_logged_in()) {
+        
+            // Logged in and no token, so use auth login details.
+            $login_id = AuthProfiles::get_login('id'); 
+        
+        } else {
+            
+            // Look up the login by token, and abort if not found.
+            $login = $this->logins_model->fetch_by_password_reset_token($reset_token);
+            if (empty($login)) {
+                $this->view->invalid_reset_token = true;
+                return;
+            }
+
+            // Use the fetched login ID and toss name into view.
+            $login_id = $login['id']; 
+            $this->view->forgot_password_login_name = $login['login_name'];
+            
+            // Pre-emptively force logout in case current login and login 
+            // associated with token differ.
+            AuthProfiles::logout();
+
+        }
+
+        // Now that we know who's trying to change a password, validate the 
+        // form appropriately
+        $form_data = $this->validate_form(
+            $this->logins_model, 
+            empty($reset_token) ? 
+                'validate_change_password' : 
+                'validate_change_password_with_token', 
+            'form_errors_auth'
+        );
+        if (null===$form_data) return;
+        
+        // Finally, perform the password change.
+        $changed = $this->logins_model->change_password(
+            $login_id, $form_data['new_password']
+        );
+        if (!$changed) {
+            // Something unexpected happened.
+            $this->view->password_change_failed = true;
+        } else {
+            // Force re-login after password change.
+            AuthProfiles::logout();
+            $this->view->password_changed = true;
+        }
+    }
+
+    /**
+     * Handle request to recover from a forgotten password.
+     */
+    public function forgotpassword() 
+    {
+        $form_data = $this->validate_form(
+            $this->logins_model, 
+            'validate_forgot_password', 'form_errors_auth'
+        );
+        if (null===$form_data) return;
+
+        if (!empty($form_data['login_name'])) {
+            $login = $this->logins_model
+                ->fetch_by_login_name($form_data['login_name']);
+        } elseif (!empty($form_data['email'])) {
+            $login = $this->logins_model
+                ->fetch_by_email($form_data['email']);
+        }
+
+        $reset_token = $this->logins_model
+            ->set_password_reset_token($login['id']);
+        $this->view->password_reset_token_set = true;
+
+        email::send_view(
+            $login['email'],
+            'auth_profiles/forgotpassword_email',
+            array(
+                'password_reset_token' => $reset_token,
+                'login_name' => $login['login_name']
+            )
+        );
     }
 
     /**
@@ -207,25 +277,34 @@ class Auth_Profiles_Controller extends Local_Controller
                     'priority' => 999,
                     'items' => array(
                         array(
-                            'url' => "profiles/{$u_name}/settings/basics/details",
-                            'title' => 'Edit profile details',
-                            'description' => 'change screen name, bio, etc.'
-                        ),
-                        array(
                             'url' => "profiles/{$u_name}/settings/basics/changepassword",
                             'title' => 'Change login password',
                             'description' => 'change current login password'
                         ),
                         array(
+                            'url' => "profiles/{$u_name}/settings/basics/changeemail",
+                            'title' => 'Change login email',
+                            'description' => 'change current login email'
+                        ),
+                        array(
+                            'url' => "profiles/{$u_name}/settings/basics/details",
+                            'title' => 'Edit profile details',
+                            'description' => 'change screen name, bio, etc.'
+                        ),
+                        /*
+                        array(
                             'url' => "profiles/{$u_name}/settings/basics/logins",
                             'title' => 'Manage profile logins',
                             'description' => 'create and remove logins for this profile'
                         ),
+                         */
+                        /*
                         array(
                             'url' => "profiles/{$u_name}/settings/basics/delete",
                             'title' => 'Delete profile',
                             'description' => 'delete this profile altogether'
                         ),
+                         */
                     )
                 )
             )
@@ -233,5 +312,4 @@ class Auth_Profiles_Controller extends Local_Controller
         Event::run('auth_profiles.before_settings_menu', $data);
         $this->view->sections = $data['sections'];
     }
-         
 } 

@@ -14,19 +14,30 @@ class url extends url_Core
      * @param boolean Whether or not to include the current query string.
      * @param array Additional query param data
      */
-    public static function full_current($qs=FALSE, $more=null) 
+    public static function full($uri=null, $qs=FALSE, $more=null) 
     {
         $data = $qs ? $_GET : array();
         if (!empty($more))
             $data = array_merge($data, $more);
 
-        $uri = $_SERVER['REQUEST_URI'];
+        if (null===$uri) $uri = url::base();
         if( ($qpos = strpos($uri,'?')) !== FALSE)
             $uri = substr($uri, 0, $qpos);
 
         return ( empty($_SERVER['HTTPS']) ? 'http' : 'https' ) . '://' .
             $_SERVER['HTTP_HOST'] . 
             $uri . (!empty( $data ) ? '?'.http_build_query($data) : '');
+    }
+
+    /**
+     * Produce a true absolute URL for the current request.
+     *
+     * @param boolean Whether or not to include the current query string.
+     * @param array Additional query param data
+     */
+    public static function full_current($qs=FALSE, $more=null) 
+    {
+        return self::full($_SERVER['REQUEST_URI']);
     }
 
     /**

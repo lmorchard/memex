@@ -8,6 +8,26 @@
  */
 class Model extends Model_Core {
 
+	/**
+	 * Creates and returns a new model.
+	 *
+	 * @chainable
+	 * @param   string  model name
+	 * @param   mixed   parameter for find()
+	 * @return  Model
+	 */
+	public static function factory($model)
+	{
+		// Set class name
+		$model = ucfirst($model).'_Model';
+
+		return new $model();
+	}
+
+    /**
+     * If needed, load the database instance, using a group configured as 
+     * model.database.
+     */
 	public function __construct()
 	{
 		if (!is_object($this->db)) {

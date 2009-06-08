@@ -32,6 +32,42 @@ class Controller extends Controller_Core {
     }
 
     /**
+     * Perform model-based form POST data validation.
+     *
+     * @param  string / Model   name of model or model instance
+     * @param  string / array   name of model validation method, or callback array
+     * @param  string           name of the error messages file
+     * @return Validation       validation object with data, or null on validation failure
+     */
+    public function validate_form($model, $callback, $errors, $require_post=true) {
+        
+        if ($require_post && 'post' != request::method()) {
+            return;
+        }
+        
+        if (!is_object($model)) {
+            $cls = ucfirst($model).'_Model';
+            $model = new $cls();
+        }
+        
+        if (is_string($callback)) {
+            $callback = array($model, $callback);
+        }
+
+        $form_data = ('post' == request::method()) ? 
+            $this->input->post() : $this->input->get();
+        
+        $is_valid = call_user_func_array($callback, array(&$form_data));
+
+        if (!$is_valid) {
+            $this->view->form_errors = $form_data->errors($errors);
+            return null;
+        }
+
+        return $form_data;
+    }
+
+    /**
      * Convert the arguments in the route to name/value parameters.
      *
      * @return array Parameters based on current route.
