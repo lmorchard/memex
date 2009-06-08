@@ -105,7 +105,7 @@ class Memex_Model_UrlsTest extends PHPUnit_Framework_TestCase
             'password' => md5('foobar'),
         ));
 
-        $user = $this->model->fetchUser('foo');
+        $user = $this->model->findUser('foo');
         $this->assertEquals($id, $user->id);
     }
 
@@ -118,7 +118,7 @@ class Memex_Model_UrlsTest extends PHPUnit_Framework_TestCase
             'password' => md5('foobar'),
         ));
 
-        $user = $this->model->fetchUser('foo@email.com');
+        $user = $this->model->findUser('foo@email.com');
         $this->assertEquals($id, $user->id);
     }
 
@@ -131,11 +131,11 @@ class Memex_Model_UrlsTest extends PHPUnit_Framework_TestCase
             'password' => md5('foobar'),
         ));
 
-        $user = $this->model->fetchUser('foo@email.com');
+        $user = $this->model->findUser('foo@email.com');
 
         $this->model->ban($id);
 
-        $test = $this->model->fetchUser('foo@email.com');
+        $test = $this->model->findUser('foo@email.com');
         $this->assertNotSame($user, $test);
         $this->assertNull($test);
     }

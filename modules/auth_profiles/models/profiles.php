@@ -22,7 +22,7 @@ class Profiles_Model extends Model
             throw new Exception('screen_name required');
         if (empty($data['full_name']))
             throw new Exception('full_name required');
-        if ($this->fetch_by_screen_name($data['screen_name']))
+        if ($this->find_by_screen_name($data['screen_name']))
             throw new Exception('duplicate screen name');
 
         $data = array(
@@ -76,9 +76,9 @@ class Profiles_Model extends Model
      * @param string profile id
      * @return array profile data
      */
-    public function fetch_by_id($profile_id)
+    public function find_by_id($profile_id)
     {
-        return $this->fetch_one_by($profile_id, null);
+        return $this->find_one_by($profile_id, null);
     }
 
     /**
@@ -87,9 +87,9 @@ class Profiles_Model extends Model
      * @param string Screen name
      * @return array profile data
      */
-    public function fetch_by_screen_name($screen_name)
+    public function find_by_screen_name($screen_name)
     {
-        return $this->fetch_one_by(null, $screen_name);
+        return $this->find_one_by(null, $screen_name);
     }
 
     /**
@@ -99,7 +99,7 @@ class Profiles_Model extends Model
      * @param string Screen name
      * @return array profile data
      */
-    public function fetch_one_by($id=null, $screen_name=null)
+    public function find_one_by($id=null, $screen_name=null)
     {
         $select = $this->db->
             select()->from('profiles');
@@ -219,7 +219,7 @@ class Profiles_Model extends Model
      */
     public function is_screen_name_available($name)
     {
-        $profile = $this->fetch_by_screen_name($name);
+        $profile = $this->find_by_screen_name($name);
         return empty($profile);
     }
 

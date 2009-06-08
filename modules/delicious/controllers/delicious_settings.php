@@ -68,7 +68,7 @@ class Delicious_Settings_Controller extends Local_Controller
         }
 
         if (!empty($_POST[Memex_Delicious::ENABLED])) {
-            // Attempt making an authenticated fetch against v1 del API
+            // Attempt making an authenticated find against v1 del API
             $ch = curl_init('https://api.del.icio.us/v1/posts/update');
             curl_setopt_array($ch, array(
                 CURLOPT_USERAGENT      => 'Memex/0.1',
@@ -84,7 +84,7 @@ class Delicious_Settings_Controller extends Local_Controller
             $info = curl_getinfo($ch);
             curl_close($ch);
 
-            // If the fetch wasn't successful, assume the username/password 
+            // If the find wasn't successful, assume the username/password 
             // was wrong.
             if (200 != $info['http_code']) {
                 $this->view->set('errors', array(

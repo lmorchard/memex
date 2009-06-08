@@ -44,7 +44,7 @@ class Post_Controller extends Local_Controller
         // Try to match the screen name to a profile, or bail with a 404.
         $profiles_model = new Profiles_Model();
         $profile = 
-            $profiles_model->fetch_by_screen_name($params['screen_name']);
+            $profiles_model->find_by_screen_name($params['screen_name']);
         if (!$profile) {
             return Event::run('system.404');
         }
@@ -62,7 +62,7 @@ class Post_Controller extends Local_Controller
         list($start, $count) = $this->setupPagination($posts_count);
 
         // Fetch the posts using the route tags and pagination vars.
-        $posts = $posts_model->fetchByProfileAndTags(
+        $posts = $posts_model->findByProfileAndTags(
             $profile['id'], $tags, $start, $count
         );
 
@@ -96,7 +96,7 @@ class Post_Controller extends Local_Controller
         $posts_count = $posts_model->countByTags($tags);
 
         list($start, $count) = $this->setupPagination($posts_count);
-        $posts = $posts_model->fetchByTags($tags, $start, $count);
+        $posts = $posts_model->findByTags($tags, $start, $count);
 
         $this->view->set(array(
             'tags'    => $tags,
@@ -128,7 +128,7 @@ class Post_Controller extends Local_Controller
         $posts_model = new Posts_Model();
 
         if ($uuid) {
-            $post = $posts_model->fetchOneByUUID($uuid);
+            $post = $posts_model->findOneByUUID($uuid);
         }
         $this->view->set('post', $post);
 
@@ -165,7 +165,7 @@ class Post_Controller extends Local_Controller
         $posts_model = new Posts_Model();
 
         if ($uuid) {
-            $post = $posts_model->fetchOneByUUID($uuid);
+            $post = $posts_model->findOneByUUID($uuid);
         }
         $this->view->set('post', $post);
 
@@ -176,9 +176,9 @@ class Post_Controller extends Local_Controller
 
             // If we have a URL, try looking up existing post data.
             if ($uuid) {
-                $post = $posts_model->fetchOneByUUID($uuid);
+                $post = $posts_model->findOneByUUID($uuid);
             } elseif ($url) {
-                $post = $posts_model->fetchOneByUrlAndProfile($url, $profile_id);
+                $post = $posts_model->findOneByUrlAndProfile($url, $profile_id);
             }
 
             // Make sure the post exists, and belongs to the current profile
@@ -244,10 +244,10 @@ class Post_Controller extends Local_Controller
             // If we have a URL, try looking up existing post data.
             $existing_post = null;
             if ($uuid) {
-                $existing_post = $posts_model->fetchOneByUUID($uuid);
+                $existing_post = $posts_model->findOneByUUID($uuid);
             } elseif ($url) {
                 $existing_post = 
-                    $posts_model->fetchOneByUrlAndProfile($url, $profile_id);
+                    $posts_model->findOneByUrlAndProfile($url, $profile_id);
             }
 
             if (empty($existing_post)) {

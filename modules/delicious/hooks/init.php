@@ -180,7 +180,7 @@ class Memex_Delicious {
         $url = self::$delicious_v1_api_base_url . '/' . $path . '?' . 
             http_build_query($params);
 
-        // Attempt making an authenticated fetch against v1 del API
+        // Attempt making an authenticated find against v1 del API
         $ch = curl_init($url);
         curl_setopt_array($ch, array(
             CURLOPT_USERAGENT      => 'Memex/0.1',
@@ -194,7 +194,7 @@ class Memex_Delicious {
         $info = curl_getinfo($ch);
         curl_close($ch);
 
-        // If the fetch wasn't successful, assume the username/password 
+        // If the find wasn't successful, assume the username/password 
         // was wrong.
         if (200 != $info['http_code']) {
             throw new Exception('delicious API call failed');

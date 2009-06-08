@@ -69,7 +69,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
             $this->logins[$i] = $this->logins_model->registerWithProfile(
                 $this->login_data[$i]
             );
-            $this->profiles[$i] = $this->profiles_model->fetchByScreenName(
+            $this->profiles[$i] = $this->profiles_model->findByScreenName(
                 $this->login_data[$i]['screen_name']
             );
         }
@@ -204,11 +204,11 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
             '<result code="done" />'
         );
 
-        $fetched_post = $this->posts_model->fetchOneByUrlAndProfile(
+        $found_post = $this->posts_model->findOneByUrlAndProfile(
             $post['url'], $profile['id']
         );
-        $this->assertTrue(null != $fetched_post);
-        $this->assertEquals($post['title'], $fetched_post['title']);
+        $this->assertTrue(null != $found_post);
+        $this->assertEquals($post['title'], $found_post['title']);
 
         $this->performApiCall(
             'posts/add', 'posts-add', $login, 
@@ -407,7 +407,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
                 );
 
                 // Get and sort the test dates, ensure the count of 
-                // fetched dates.
+                // found dates.
                 $dates = array_keys($test_dates);
                 sort($dates);
                 $this->assertEquals(count($dates), count($doc->date));
@@ -455,16 +455,16 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
             $this->addTestPosts($login);
 
             // Ensure the correct number of posts exist in the model.
-            $posts = $this->posts_model->fetchByProfileAndTags(
+            $posts = $this->posts_model->findByProfileAndTags(
                 $profile['id'], null, null, null
             );
             $this->assertEquals(count($this->test_posts), count($posts));
 
-            // Now, try fetching all of the posts via API and verify contents.
+            // Now, try finding all of the posts via API and verify contents.
             $cnt = 0;
             foreach ($this->test_posts as $post) {
 
-                // Alternate using hash and URL to fetch posts.
+                // Alternate using hash and URL to find posts.
                 if ( (($cnt++) % 2) == 0) {
                     $params = array( 'hash' => md5($post['url']) );
                 } else {
@@ -486,7 +486,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
 
             }
 
-            // Attempt to fetch a set of posts with a list of hashes.
+            // Attempt to find a set of posts with a list of hashes.
             $hashes = array();
             foreach ($this->test_posts as $post) {
                 $hashes[] = md5($post['url']);
@@ -517,7 +517,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
             }
 
             // Ensure there are zero posts.
-            $posts = $this->posts_model->fetchByProfileAndTags(
+            $posts = $this->posts_model->findByProfileAndTags(
                 $profile['id'], null, null, null
             );
             $this->assertEquals(0, count($posts));
@@ -830,7 +830,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
         $url = Kohana::config('config.api_v1_base_url') . '/' . $path . '?' . 
             http_build_query($params);
 
-        // Attempt making an authenticated fetch against v1 del API
+        // Attempt making an authenticated find against v1 del API
         $ch = curl_init($url);
         curl_setopt_array($ch, array(
             CURLOPT_USERAGENT      => 'Memex/0.1',
@@ -844,7 +844,7 @@ class DelApiControllerTest extends PHPUnit_Framework_TestCase
         $info = curl_getinfo($ch);
         curl_close($ch);
 
-        // If the fetch wasn't successful, assume the username/password 
+        // If the find wasn't successful, assume the username/password 
         // was wrong.
         //if (200 != $info['http_code']) {
         //    throw new Exception('delicious API call failed');

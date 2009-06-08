@@ -186,7 +186,7 @@ class PostsTest extends PHPUnit_Framework_TestCase
         $normalized_url = 'http://example.com/';
 
         // There shouldn't yet be a URL entry for this bookmark.
-        $url = $this->urls_model->fetchByUrl($post_data['url']);
+        $url = $this->urls_model->findByUrl($post_data['url']);
         $this->assertFalse($url);
 
         // Saving the bookmark should result in data returned.
@@ -201,46 +201,46 @@ class PostsTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($post_data[$name], $saved_post[$name]);
 
         // Ensure that a new URL record has been created for this bookmark.
-        $url = $this->urls_model->fetchByUrl($post_data['url']);
+        $url = $this->urls_model->findByUrl($post_data['url']);
         $this->assertTrue(null != $url);
         $this->assertEquals($normalized_url, $url['url']);
 
         // Fetch the bookmark.
-        $fetched_post = $this->model->fetchOneByUrlAndProfile(
+        $found_post = $this->model->findOneByUrlAndProfile(
             $post_data['url'], $this->profile_1['id']
         );
-        $this->assertTrue(null != $fetched_post);
+        $this->assertTrue(null != $found_post);
 
-        // Assert that the input and fetched post contents match.
-        $this->assertEquals($normalized_url, $fetched_post['url']);
+        // Assert that the input and found post contents match.
+        $this->assertEquals($normalized_url, $found_post['url']);
         foreach (array('profile_id', 'title', 'notes', 'tags') as $name)
-            $this->assertEquals($post_data[$name], $fetched_post[$name]);
+            $this->assertEquals($post_data[$name], $found_post[$name]);
 
-        $this->assertEquals($fetched_post['screen_name'], 'tester1_screenname');
+        $this->assertEquals($found_post['screen_name'], 'tester1_screenname');
 
-        // Assert that the saved and fetched post contents match.
+        // Assert that the saved and found post contents match.
         foreach (array('url','title','notes','tags','profile_id') as $name) {
             $this->assertEquals(
-                $name.'='.$fetched_post[$name],
+                $name.'='.$found_post[$name],
                 $name.'='.$saved_post[$name]
             );
         }
 
         // Fetch the bookmark by UUID.
-        $fetched_post = $this->model->fetchOneByUUID($saved_post['uuid']);
-        $this->assertTrue(null != $fetched_post);
+        $found_post = $this->model->findOneByUUID($saved_post['uuid']);
+        $this->assertTrue(null != $found_post);
 
-        // Assert that the input and fetched post contents match.
-        $this->assertEquals($normalized_url, $fetched_post['url']);
+        // Assert that the input and found post contents match.
+        $this->assertEquals($normalized_url, $found_post['url']);
         foreach (array('profile_id', 'title', 'notes', 'tags') as $name)
-            $this->assertEquals($post_data[$name], $fetched_post[$name]);
+            $this->assertEquals($post_data[$name], $found_post[$name]);
 
-        $this->assertEquals($fetched_post['screen_name'], 'tester1_screenname');
+        $this->assertEquals($found_post['screen_name'], 'tester1_screenname');
 
-        // Assert that the saved and fetched post contents match.
+        // Assert that the saved and found post contents match.
         foreach (array('url','title','notes','tags','profile_id') as $name) {
             $this->assertEquals(
-                $name.'='.$fetched_post[$name],
+                $name.'='.$found_post[$name],
                 $name.'='.$saved_post[$name]
             );
         }
@@ -262,17 +262,17 @@ class PostsTest extends PHPUnit_Framework_TestCase
             );
             $test_post = $this->model->save($post_data);
 
-            $fetched_post = $this->model->fetchOneByUrlAndProfile(
+            $found_post = $this->model->findOneByUrlAndProfile(
                 $post_data['url'], $this->profile_1['id']
             );
-            $this->assertEquals($post_data['url'], $fetched_post['url']);
+            $this->assertEquals($post_data['url'], $found_post['url']);
 
             $this->model->deleteById($test_post['id']);
 
-            $fetched_post2 = $this->model->fetchOneByUrlAndProfile(
+            $found_post2 = $this->model->findOneByUrlAndProfile(
                 $post_data['url'], $this->profile_1['id']
             );
-            $this->assertNull($fetched_post2);
+            $this->assertNull($found_post2);
 
         }
     }
@@ -293,23 +293,23 @@ class PostsTest extends PHPUnit_Framework_TestCase
             );
             $test_post = $this->model->save($post_data);
 
-            $fetched_post = $this->model->fetchOneByUrlAndProfile(
+            $found_post = $this->model->findOneByUrlAndProfile(
                 $post_data['url'], $this->profile_1['id']
             );
-            $this->assertEquals($post_data['url'], $fetched_post['url']);
-            $this->assertEquals($test_post['uuid'], $fetched_post['uuid']);
+            $this->assertEquals($post_data['url'], $found_post['url']);
+            $this->assertEquals($test_post['uuid'], $found_post['uuid']);
 
-            $rv = $this->model->deleteByUUID($fetched_post['uuid']);
+            $rv = $this->model->deleteByUUID($found_post['uuid']);
 
-            $fetched_post2 = $this->model->fetchOneByUUID(
-                $fetched_post['uuid']
+            $found_post2 = $this->model->findOneByUUID(
+                $found_post['uuid']
             );
-            $this->assertNull($fetched_post2);
+            $this->assertNull($found_post2);
 
-            $fetched_post3 = $this->model->fetchOneByUrlAndProfile(
+            $found_post3 = $this->model->findOneByUrlAndProfile(
                 $post_data['url'], $this->profile_1['id']
             );
-            $this->assertNull($fetched_post3);
+            $this->assertNull($found_post3);
 
         }
     }
@@ -330,20 +330,20 @@ class PostsTest extends PHPUnit_Framework_TestCase
             );
             $test_post = $this->model->save($post_data);
 
-            $fetched_post = $this->model->fetchOneByUrlAndProfile(
+            $found_post = $this->model->findOneByUrlAndProfile(
                 $post_data['url'], $this->profile_1['id']
             );
-            $this->assertEquals($post_data['url'], $fetched_post['url']);
+            $this->assertEquals($post_data['url'], $found_post['url']);
 
             $rv = $this->model->deleteByUrlAndProfile(
                 $post_data['url'], $this->profile_1['id']
             );
 
-            $fetched_post2 = $this->model->fetchOneByUrlAndProfile(
+            $found_post2 = $this->model->findOneByUrlAndProfile(
                 $post_data['url'], $this->profile_1['id']
             );
 
-            $this->assertNull($fetched_post2);
+            $this->assertNull($found_post2);
 
         }
     }
@@ -375,7 +375,7 @@ class PostsTest extends PHPUnit_Framework_TestCase
         $saved_post_2 = $this->model->save($changed_post);
         $this->assertEquals($uuid, $saved_post_2['uuid']);
 
-        $should_be_null_post = $this->model->fetchOneByUrlAndProfile(
+        $should_be_null_post = $this->model->findOneByUrlAndProfile(
             $url_1, $this->profile_1['id']
         );
         $this->assertNull($should_be_null_post);
@@ -403,7 +403,7 @@ class PostsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Exercise fetch and counts indexed by tags.
+     * Exercise find and counts indexed by tags.
      */
     public function testFetchAndCountByProfileAndTags()
     {
@@ -456,14 +456,14 @@ class PostsTest extends PHPUnit_Framework_TestCase
                 $this->model->countByProfileAndTags($this->profile_1['id'], $tags);
             $this->assertEquals($test_count, $result_count);
 
-            // Ensure the count for this intersection is correct, by fetching 
+            // Ensure the count for this intersection is correct, by finding 
             // actual data.
-            $result_posts = $this->model->fetchByProfileAndTags(
+            $result_posts = $this->model->findByProfileAndTags(
                 $this->profile_1['id'], $tags, null, null
             );
             $this->assertEquals($test_count, count($result_posts));
 
-            // Ensure the content for each of the fetched posts is correct.
+            // Ensure the content for each of the found posts is correct.
             foreach ($result_posts as $result_post) {
                 
                 // Double check that the profile screen name is present.
@@ -472,7 +472,7 @@ class PostsTest extends PHPUnit_Framework_TestCase
                     'tester1_screenname'
                 );
 
-                // Ensure the post content for each field of the fetched post.
+                // Ensure the post content for each field of the found post.
                 $url = $result_post['url'];
                 foreach (array('url','title','notes','tags') as $name) {
                     $this->assertEquals(
@@ -487,7 +487,7 @@ class PostsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Exercise fetch and counts indexed by tags.
+     * Exercise find and counts indexed by tags.
      *
      * HACK: This is basically a copy of the previous test, just with varying 
      * profile IDs.  Maybe refactor some day?
@@ -546,12 +546,12 @@ class PostsTest extends PHPUnit_Framework_TestCase
                 $this->model->countByTags($tags);
             $this->assertEquals($test_count, $result_count);
 
-            // Ensure the count for this intersection is correct, by fetching 
+            // Ensure the count for this intersection is correct, by finding 
             // actual data.
-            $result_posts = $this->model->fetchByTags($tags, null, null);
+            $result_posts = $this->model->findByTags($tags, null, null);
             $this->assertEquals($test_count, count($result_posts));
 
-            // Ensure the content for each of the fetched posts is correct.
+            // Ensure the content for each of the found posts is correct.
             foreach ($result_posts as $result_post) {
                 
                 // Double check that the profile screen name is present.
@@ -560,7 +560,7 @@ class PostsTest extends PHPUnit_Framework_TestCase
                     $screen_names[$result_post['profile_id']]
                 );
 
-                // Ensure the post content for each field of the fetched post.
+                // Ensure the post content for each field of the found post.
                 $url = $result_post['url'];
                 foreach (array('profile_id','url','title','notes','tags') as $name) {
                     $this->assertEquals(

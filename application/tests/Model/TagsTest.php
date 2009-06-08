@@ -139,7 +139,7 @@ class TagsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Ensure fetching by tag works.
+     * Ensure finding by tag works.
      */
     public function testFetchByTagAndProfile()
     {
@@ -171,7 +171,7 @@ class TagsTest extends PHPUnit_Framework_TestCase
         }
 
         foreach ($tags_counts as $tag=>$test_count) {
-            $tag_data = $this->model->fetchByTagAndProfile($tag, $this->profile_1['id']);
+            $tag_data = $this->model->findByTagAndProfile($tag, $this->profile_1['id']);
             $this->assertEquals($tag, $tag_data['tag']);
             $this->assertEquals($this->profile_1['id'], $tag_data['profile_id']);
             $this->assertTrue(null != $tag_data['id']);
@@ -393,7 +393,7 @@ class TagsTest extends PHPUnit_Framework_TestCase
         ));
     
         $test_tags_1 = array('foo', 'bar', 'baz', 'xyzzy');
-        $result_tags_data_1 = $this->model->fetchByPost($p1['id']);
+        $result_tags_data_1 = $this->model->findByPost($p1['id']);
         $result_tags_1 = array();
         foreach ($result_tags_data_1 as $tags_data) {
             $this->assertEquals($tags_data['post_id'], $p1['id']);
@@ -409,7 +409,7 @@ class TagsTest extends PHPUnit_Framework_TestCase
         ));
     
         $test_tags_2 = array('xyzzy', 'foo', 'bar', 'baz');
-        $result_tags_data_2 = $this->model->fetchByPost($p1_new1['id']);
+        $result_tags_data_2 = $this->model->findByPost($p1_new1['id']);
         $result_tags_2 = array();
         foreach ($result_tags_data_2 as $tags_data) {
             $this->assertEquals($tags_data['post_id'], $p1_new1['id']);
@@ -425,7 +425,7 @@ class TagsTest extends PHPUnit_Framework_TestCase
         ));
     
         $test_tags_3 = array('xyzzy', 'bar', 'foo', 'baz');
-        $result_tags_data_3 = $this->model->fetchByPost($p1_new2['id']);
+        $result_tags_data_3 = $this->model->findByPost($p1_new2['id']);
         $result_tags_3 = array();
         foreach ($result_tags_data_3 as $tags_data) {
             $this->assertEquals($tags_data['post_id'], $p1_new2['id']);

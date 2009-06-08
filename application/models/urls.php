@@ -16,9 +16,9 @@ class Urls_Model extends Model
      * @param string URL for lookup
      * @return array URL data
      */
-    public function fetchByUrl($url)
+    public function findByUrl($url)
     {
-        return $this->fetchBy($url, null);
+        return $this->findBy($url, null);
     }
 
     /**
@@ -27,9 +27,9 @@ class Urls_Model extends Model
      * @param string URL for lookup
      * @return array URL data
      */
-    public function fetchByHash($hash)
+    public function findByHash($hash)
     {
-        return $this->fetchBy(null, $hash);
+        return $this->findBy(null, $hash);
     }
 
     /**
@@ -38,9 +38,9 @@ class Urls_Model extends Model
      * @param string URL for lookup
      * @return array URL data
      */
-    public function fetchByUrlOrHash($url, $hash) 
+    public function findByUrlOrHash($url, $hash) 
     {
-        return $this->fetchBy($url, $hash);
+        return $this->findBy($url, $hash);
     }
 
     /**
@@ -49,7 +49,7 @@ class Urls_Model extends Model
      * @param string URL for lookup
      * @return array URL data
      */
-    public function fetchBy($url=null, $hash=null)
+    public function findBy($url=null, $hash=null)
     {
         $select = $this->db->select()
             ->from($this->_table_name);
@@ -70,12 +70,12 @@ class Urls_Model extends Model
      * @param string Account ID for first URL save
      * @return array URL data
      */
-    public function fetchOrCreate($url, $profile_id)
+    public function findOrCreate($url, $profile_id)
     {
         $url = url::normalize($url);
 
-        // Try fetching an existing URL and return it if found.
-        $data = $this->fetchByUrl($url);
+        // Try finding an existing URL and return it if found.
+        $data = $this->findByUrl($url);
         if (null != $data) {
             return $data;
         }

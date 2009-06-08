@@ -76,7 +76,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Ensure a login can be created and fetched by login name.
+     * Ensure a login can be created and found by login name.
      */
     public function testCreateAndFetchLogin()
     {
@@ -86,7 +86,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
             'password'   => 'tester_password',
         ));
 
-        $login = $this->model->fetch_by_login_name('tester1');
+        $login = $this->model->find_by_login_name('tester1');
 
         $this->assertEquals($login['login_name'], 'tester1');
         $this->assertEquals($login['email'], 'tester1@example.com');
@@ -132,7 +132,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
         ));
         $this->assertTrue(null !== $login);
 
-        $profile = $this->profiles_model->fetch_by_screen_name('tester1_screenname');
+        $profile = $this->profiles_model->find_by_screen_name('tester1_screenname');
 
         $this->assertTrue(null !== $profile);
         $this->assertEquals($profile['screen_name'], 'tester1_screenname');
@@ -140,7 +140,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($profile['bio'], 'I live!');
 
         $default_profile = 
-            $this->model->fetch_default_profile_for_login($login['id']);
+            $this->model->find_default_profile_for_login($login['id']);
         $this->assertEquals($profile['id'], $default_profile['id']);
     }
 
@@ -159,7 +159,7 @@ class LoginsTest extends PHPUnit_Framework_TestCase
             $this->fail('Missing profile details should cause registration to fail');
         } catch (Exception $e) {
             $this->assertContains('required', $e->getMessage());
-            $login = $this->model->fetch_by_login_name('tester1');
+            $login = $this->model->find_by_login_name('tester1');
             $this->assertNull($login);
         }
     }

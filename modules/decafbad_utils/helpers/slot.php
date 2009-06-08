@@ -71,7 +71,7 @@ class slot_Core
     /**
      * Get a named slot or get the end of the latest one.
      *
-     * @param  string name of the slot to return, or omit to fetch all
+     * @param  string name of the slot to return, or omit to find all
      * @return string|array
      */
     public static function get($name=FALSE, $default='')

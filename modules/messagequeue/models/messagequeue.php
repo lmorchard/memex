@@ -5,11 +5,11 @@
  * @TODO un-reserve a message to release it
  * @TODO mark a message as a failure
  * @todo tie a profile to a message as owner
- * @todo methods to fetch statistics on messages, ie. avg time of execution, messages over time, etc.
+ * @todo methods to find statistics on messages, ie. avg time of execution, messages over time, etc.
  *
  * @TODO allow selective dequeue of messages based on subscription pattern
  * @TODO implement dependent batches that are processed in sequence
- * @TODO somehow exercise the lock on fetching a new message?
+ * @TODO somehow exercise the lock on finding a new message?
  *
  * @package    MessageQueue
  * @subpackage models

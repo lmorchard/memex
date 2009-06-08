@@ -93,7 +93,7 @@ class Tags_Model extends Model
     /**
      * Fetch tag records by tag name and profile.
      */
-    public function fetchByTagAndProfile($tag_name, $profile_id)
+    public function findByTagAndProfile($tag_name, $profile_id)
     {
         return $this->db->select()
             ->from($this->_table_name)
@@ -105,7 +105,7 @@ class Tags_Model extends Model
     /**
      * Fetch tag records for a given post, in position order.
      */
-    public function fetchByPost($post_id)
+    public function findByPost($post_id)
     {
         return $this->db->select()
             ->from($this->_table_name)

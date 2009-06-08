@@ -84,9 +84,9 @@ class Auth_Profiles_Controller extends Local_Controller
         if (null===$form_data) return;
 
         $login = $this->logins_model->
-            fetch_by_login_name($form_data['login_name']);
+            find_by_login_name($form_data['login_name']);
         $profile = $this->logins_model->
-            fetch_default_profile_for_login($login['id']);
+            find_default_profile_for_login($login['id']);
 
         AuthProfiles::login($form_data['login_name'], $login, $profile);
 
@@ -145,7 +145,7 @@ class Auth_Profiles_Controller extends Local_Controller
             $this->input->get('email_verification_token');
 
         // Look up the login by token, and abort if not found.
-        $login = $this->logins_model->fetch_by_email_verification_token($token);
+        $login = $this->logins_model->find_by_email_verification_token($token);
         if (empty($login)) {
             $this->view->invalid_token = true;
             return;
@@ -179,13 +179,13 @@ class Auth_Profiles_Controller extends Local_Controller
         } else {
             
             // Look up the login by token, and abort if not found.
-            $login = $this->logins_model->fetch_by_password_reset_token($reset_token);
+            $login = $this->logins_model->find_by_password_reset_token($reset_token);
             if (empty($login)) {
                 $this->view->invalid_reset_token = true;
                 return;
             }
 
-            // Use the fetched login ID and toss name into view.
+            // Use the found login ID and toss name into view.
             $login_id = $login['id']; 
             $this->view->forgot_password_login_name = $login['login_name'];
             
@@ -233,10 +233,10 @@ class Auth_Profiles_Controller extends Local_Controller
 
         if (!empty($form_data['login_name'])) {
             $login = $this->logins_model
-                ->fetch_by_login_name($form_data['login_name']);
+                ->find_by_login_name($form_data['login_name']);
         } elseif (!empty($form_data['email'])) {
             $login = $this->logins_model
-                ->fetch_by_email($form_data['email']);
+                ->find_by_email($form_data['email']);
         }
 
         $reset_token = $this->logins_model

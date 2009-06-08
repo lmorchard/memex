@@ -40,7 +40,7 @@ class Logins_Model extends Model
             throw new Exception('email required');
         if (empty($data['password']))
             throw new Exception('password required');
-        if ($this->fetch_by_login_name($data['login_name']))
+        if ($this->find_by_login_name($data['login_name']))
             throw new Exception('duplicate login name');
 
         $data = array(
@@ -106,7 +106,7 @@ class Logins_Model extends Model
      *
      * @param string Screen name
      */
-    public function fetch_by_login_name($login_name)
+    public function find_by_login_name($login_name)
     {
         $row = $this->db->select()->from($this->_table_name)
             ->where('login_name', $login_name)
@@ -120,7 +120,7 @@ class Logins_Model extends Model
      *
      * @param string email
      */
-    public function fetch_by_email($email)
+    public function find_by_email($email)
     {
         $row = $this->db->select()->from($this->_table_name)
             ->where('email', $email)
@@ -135,7 +135,7 @@ class Logins_Model extends Model
      * @param string Screen name
      * @
      */
-    public function fetch_by_password_reset_token($token)
+    public function find_by_password_reset_token($token)
     {
         $row = $this->db->select($this->_table_name . '.*')
             ->from($this->_table_name)
@@ -159,7 +159,7 @@ class Logins_Model extends Model
      * @param string Screen name
      * @
      */
-    public function fetch_by_email_verification_token($token)
+    public function find_by_email_verification_token($token)
     {
         $row = $this->db->select(
                 $this->_table_name . '.*',
@@ -183,16 +183,16 @@ class Logins_Model extends Model
     /**
      * Fetch the default profile for a login.
      */
-    public function fetch_default_profile_for_login($login_id)
+    public function find_default_profile_for_login($login_id)
     {
-        $profiles = $this->fetch_profiles_for_login($login_id);
+        $profiles = $this->find_profiles_for_login($login_id);
         return (!$profiles) ? null : $profiles[0];
     }
 
     /**
      * Get all profiles for a login
      */
-    public function fetch_profiles_for_login($login_id)
+    public function find_profiles_for_login($login_id)
     {
         $login_row = $this->db->select()
             ->from($this->_table_name)
@@ -446,7 +446,7 @@ class Logins_Model extends Model
      */
     public function is_login_name_available($name)
     {
-        $login = $this->fetch_by_login_name($name);
+        $login = $this->find_by_login_name($name);
         return empty($login);
     }
 
@@ -464,7 +464,7 @@ class Logins_Model extends Model
      * login, for use in form validation.
      */
     public function is_email_registered($email) {
-        $login = $this->fetch_by_email($email);
+        $login = $this->find_by_email($email);
         return !(empty($login));
     }
 
@@ -476,7 +476,7 @@ class Logins_Model extends Model
     {
         $login_name = (isset($valid['login_name'])) ?
             $valid['login_name'] : AuthProfiles::get_login('login_name');
-        $login = $this->fetch_by_login_name($login_name);
+        $login = $this->find_by_login_name($login_name);
         if ($this->encrypt_password($valid[$field]) != $login['password'])
             $valid->add_error($field, 'invalid');
     }
@@ -490,7 +490,7 @@ class Logins_Model extends Model
     public function is_password_reset_token_valid($reset_token)
     {
         // TODO: Do a count() query or something simpler.
-        $login = $this->fetch_by_password_reset_token($reset_token);
+        $login = $this->find_by_password_reset_token($reset_token);
         return !empty($login);
     }
 

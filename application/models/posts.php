@@ -44,7 +44,7 @@ class Posts_Model extends Model
 
         // Get an ID for the post's URL and set the ID in post data
         $urls_model = new Urls_Model();
-        $url_data = $urls_model->fetchOrCreate(
+        $url_data = $urls_model->findOrCreate(
             $post_data['url'], $post_data['profile_id']
         );
         $post_data['url_id'] = $url_data['id'];
@@ -120,9 +120,9 @@ class Posts_Model extends Model
                 ->insert_id();
         }
         
-        // HACK: Re-fetch the just-saved post.  Ensures consistent data, but 
+        // HACK: Re-find the just-saved post.  Ensures consistent data, but 
         // probably needs some work to avoid cache issues later on.
-        $saved_post = $this->fetchOneById($row['id']);
+        $saved_post = $this->findOneById($row['id']);
 
         // Send out message that a post has been updated
         Event::run('Memex.model_posts.post_updated', $saved_post);
@@ -137,7 +137,7 @@ class Posts_Model extends Model
      * @param string Profile ID
      * @return array list of signature/hash pairs
      */
-    public function fetchHashesByProfile($profile_id)
+    public function findHashesByProfile($profile_id)
     {
         $select = $this->db
             ->select('signature', 'urls.hash')
@@ -154,7 +154,7 @@ class Posts_Model extends Model
      * @param string Profile ID
      * @return string last modified date
      */
-    public function fetchLastModifiedDateByProfile($profile_id)
+    public function findLastModifiedDateByProfile($profile_id)
     {
         $select = $this->db
             ->select('MAX(modified) as last_modified')
@@ -171,7 +171,7 @@ class Posts_Model extends Model
      * @param string Profile ID
      * @return array List of tags and counts
      */
-    public function fetchDatesByTagsAndProfile($tags, $profile_id)
+    public function findDatesByTagsAndProfile($tags, $profile_id)
     {
         $select = $this->db
             ->select(
@@ -194,9 +194,9 @@ class Posts_Model extends Model
      * @param string Post ID
      * @return array A single post
      */
-    public function fetchOneById($id) 
+    public function findOneById($id) 
     {
-        return $this->fetchOneBy($id, null, null, null, null);
+        return $this->findOneBy($id, null, null, null, null);
     }
 
     /**
@@ -205,33 +205,33 @@ class Posts_Model extends Model
      * @param string Post UUID
      * @return array A single post
      */
-    public function fetchOneByUUID($uuid) 
+    public function findOneByUUID($uuid) 
     {
-        return $this->fetchOneBy(null, null, null, $uuid, null);
+        return $this->findOneBy(null, null, null, $uuid, null);
     }
 
     /**
-     * Attempt to fetch a post for the given URL and profile ID.
+     * Attempt to find a post for the given URL and profile ID.
      *
      * @param string URL
      * @param string Profile ID
      * @return array Post data
      */
-    public function fetchOneByUrlAndProfile($url, $profile_id)
+    public function findOneByUrlAndProfile($url, $profile_id)
     {
-        return $this->fetchOneBy(null, $url, null, null, $profile_id);
+        return $this->findOneBy(null, $url, null, null, $profile_id);
     }
 
     /**
-     * Attempt to fetch a post for the given hash and profile ID.
+     * Attempt to find a post for the given hash and profile ID.
      *
      * @param string Hash
      * @param string Profile ID
      * @return array Post data
      */
-    public function fetchOneByHashAndProfile($hash, $profile_id)
+    public function findOneByHashAndProfile($hash, $profile_id)
     {
-        return $this->fetchOneBy(null, null, $hash, null, $profile_id);
+        return $this->findOneBy(null, null, $hash, null, $profile_id);
     }
 
     /**
@@ -243,7 +243,7 @@ class Posts_Model extends Model
      * @param string Profile ID
      * @return array A single post
      */
-    public function fetchOneBy($id=null, $url=null, $hash=null, $uuid=null, $profile_id=null)
+    public function findOneBy($id=null, $url=null, $hash=null, $uuid=null, $profile_id=null)
     {
         // Try looking up an existing post for this URL and profile.
         $select = $this->_getPostsSelect();
@@ -276,9 +276,9 @@ class Posts_Model extends Model
      * @param string Order ({field} {asc,desc})
      * @return array Posts
      */
-    public function fetchByTags($tags, $start=0, $count=10, $order='user_date desc')
+    public function findByTags($tags, $start=0, $count=10, $order='user_date desc')
     {
-        return $this->fetchBy(null, null, null, null, $tags, null, null, $start, $count, $order);
+        return $this->findBy(null, null, null, null, $tags, null, null, $start, $count, $order);
     }
 
     /**
@@ -291,9 +291,9 @@ class Posts_Model extends Model
      * @param string Order ({field} {asc,desc})
      * @return array Posts
      */
-    public function fetchByProfileAndTags($profile_id, $tags, $start=0, $count=10, $order='user_date desc')
+    public function findByProfileAndTags($profile_id, $tags, $start=0, $count=10, $order='user_date desc')
     {
-        return $this->fetchBy(null, null, null, $profile_id, $tags, null, null, $start, $count, $order);
+        return $this->findBy(null, null, null, $profile_id, $tags, null, null, $start, $count, $order);
     }
 
     /**
@@ -303,12 +303,12 @@ class Posts_Model extends Model
      * @param string Profile ID
      * @return array posts
      */
-    public function fetchByHashesAndProfile($hashes, $profile_id)
+    public function findByHashesAndProfile($hashes, $profile_id)
     {
         if (empty($hashes) || !is_array($hashes))
             throw new Exception('Array of hashes required');
 
-        $posts = $this->fetchBy($hashes, null, null, $profile_id, 
+        $posts = $this->findBy($hashes, null, null, $profile_id, 
             null, null, null, null, null);
 
         // HACK: Reorder posts by the arbitrary order of hashes provided
@@ -335,7 +335,7 @@ class Posts_Model extends Model
      * @param string Order ({field} {asc,desc})
      * @return array Posts
      */
-    public function fetchBy($hashes=null, $uuid=null, $id=null, $profile_id=null, $tags=null,
+    public function findBy($hashes=null, $uuid=null, $id=null, $profile_id=null, $tags=null,
             $start_date=null, $end_date=null, $start=0, $count=10, $order='user_date desc')
     {
         $select = $this->_getPostsSelect();
@@ -425,7 +425,7 @@ class Posts_Model extends Model
      */
     public function deleteById($post_id)
     {
-        $data = $this->fetchOneById($post_id);
+        $data = $this->findOneById($post_id);
         if (!$data) return false;
 
         Event::run('Memex.model_posts.before_post_delete', $data);
@@ -441,7 +441,7 @@ class Posts_Model extends Model
     public function deleteByUUID($uuid)
     {
         if (empty($uuid)) return false;
-        $data = $this->fetchOneByUUID($uuid);
+        $data = $this->findOneByUUID($uuid);
         if (!$data) return false;
 
         Event::run('Memex.model_posts.before_post_delete', $data);
@@ -458,7 +458,7 @@ class Posts_Model extends Model
     public function deleteByUrlAndProfile($url, $profile_id)
     {
         if (empty($url) || empty($profile_id)) return false;
-        $data = $this->fetchOneByUrlAndProfile($url, $profile_id);
+        $data = $this->findOneByUrlAndProfile($url, $profile_id);
         if (null == $data) return null;
 
         $this->deleteById($data['id']);
@@ -496,7 +496,7 @@ class Posts_Model extends Model
     }
 
     /**
-     * Build the common select statement for all fetches.
+     * Build the common select statement for all findes.
      */
     private function _getPostsSelect()
     {

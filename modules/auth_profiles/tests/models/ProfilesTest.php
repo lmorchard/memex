@@ -61,7 +61,7 @@ class ProfilesTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Ensure a login can be created and fetched by login name.
+     * Ensure a login can be created and found by login name.
      */
     public function testCreateFetchUpdate()
     {
@@ -71,26 +71,26 @@ class ProfilesTest extends PHPUnit_Framework_TestCase
             'bio'         => 'I live!'
         ));
 
-        $fetched_profile = $this->model->fetch_by_screen_name('tester1_screenname');
+        $found_profile = $this->model->find_by_screen_name('tester1_screenname');
 
-        $this->assertEquals($fetched_profile['screen_name'], 'tester1_screenname');
-        $this->assertEquals($fetched_profile['full_name'], 'Tess T. Erone');
-        $this->assertEquals($fetched_profile['bio'], 'I live!');
+        $this->assertEquals($found_profile['screen_name'], 'tester1_screenname');
+        $this->assertEquals($found_profile['full_name'], 'Tess T. Erone');
+        $this->assertEquals($found_profile['bio'], 'I live!');
 
         $updated_profile = $this->model->update(array(
-            'id'          => $fetched_profile['id'],
+            'id'          => $found_profile['id'],
             'screen_name' => 'updated_tester1_screenname',
             'full_name'   => 'Updated Tess T. Erone',
             'bio'         => 'Updated I live!'
         ));
 
-        $updated_profile = $this->model->fetch_by_screen_name('updated_tester1_screenname');
+        $updated_profile = $this->model->find_by_screen_name('updated_tester1_screenname');
 
         $this->assertEquals($updated_profile['screen_name'], 'updated_tester1_screenname');
         $this->assertEquals($updated_profile['full_name'], 'Updated Tess T. Erone');
         $this->assertEquals($updated_profile['bio'], 'Updated I live!');
 
-        $updated_profile_1 = $this->model->fetch_by_id($fetched_profile['id']);
+        $updated_profile_1 = $this->model->find_by_id($found_profile['id']);
 
         $this->assertEquals($updated_profile_1['screen_name'], 'updated_tester1_screenname');
         $this->assertEquals($updated_profile_1['full_name'], 'Updated Tess T. Erone');

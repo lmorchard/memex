@@ -28,14 +28,14 @@ class Delicious_Api_Controller extends Local_Controller
                 break;
 
             $logins_model = new Logins_Model();
-            $login = $logins_model->fetch_by_login_name($_SERVER['PHP_AUTH_USER']);
+            $login = $logins_model->find_by_login_name($_SERVER['PHP_AUTH_USER']);
 
             if ($login['password'] != md5($_SERVER['PHP_AUTH_PW'])) {
                 break;
             }
 
             $this->profile = 
-                $logins_model->fetch_default_profile_for_login($login['id']);
+                $logins_model->find_default_profile_for_login($login['id']);
 
             // Auth success!
             return;
@@ -51,13 +51,13 @@ class Delicious_Api_Controller extends Local_Controller
      *  items in the user's inbox since it was last visited.
      *
      *  Use this before calling posts/all to see if the data has changed since 
-     *  the last fetch.
+     *  the last find.
      */
     public function posts_update()
     {
         $posts_model = new Posts_Model();
         
-        $last_update = $posts_model->fetchLastModifiedDateByProfile(
+        $last_update = $posts_model->findLastModifiedDateByProfile(
             $this->profile['id']
         );
 
@@ -97,7 +97,7 @@ class Delicious_Api_Controller extends Local_Controller
 
             // Fetch a single post by URL.
             return $this->renderPosts(array( 
-                $posts_model->fetchOneByUrlAndProfile(
+                $posts_model->findOneByUrlAndProfile(
                     $params['url'], $this->profile['id']
                 )
             ));
@@ -106,7 +106,7 @@ class Delicious_Api_Controller extends Local_Controller
 
             // Fetch a single post by hash.
             return $this->renderPosts(array(
-                $posts_model->fetchOneByHashAndProfile(
+                $posts_model->findOneByHashAndProfile(
                     $params['hash'], $this->profile['id']
                 )
             ));
@@ -116,7 +116,7 @@ class Delicious_Api_Controller extends Local_Controller
             // Fetch a set of posts by hashes
             $hashes = explode(' ', $params['hashes']);
             return $this->renderPosts(
-                $posts_model->fetchByHashesAndProfile(
+                $posts_model->findByHashesAndProfile(
                     $hashes, $this->profile['id']
                 )
             );
@@ -133,7 +133,7 @@ class Delicious_Api_Controller extends Local_Controller
         $tags_model = new Tags_Model();
         $tags = $tags_model->parseTags($this->input->get('tag', ''));
 
-        $posts = $posts_model->fetchBy(
+        $posts = $posts_model->findBy(
             null, null, null, $this->profile['id'], 
             $tags, $start_date, $end_date, 0, null, 
             'user_date desc'
@@ -161,7 +161,7 @@ class Delicious_Api_Controller extends Local_Controller
         if ($count < 1) $count = 1;
         if ($count > 100) $count = 100;
 
-        $posts = $posts_model->fetchBy(
+        $posts = $posts_model->findBy(
             null, null, null, $this->profile['id'], 
             $tags, null, null, 0, $count, 
             'user_date desc'
@@ -193,7 +193,7 @@ class Delicious_Api_Controller extends Local_Controller
         if ($this->input->get('hashes', false) !== false) {
             // If ?hashes parameter sent, switch to send hash manifest.
 
-            $hashes = $posts_model->fetchHashesByProfile($this->profile['id']);
+            $hashes = $posts_model->findHashesByProfile($this->profile['id']);
 
             $x = new Memex_XmlWriter(array(
                 'parents' => array('posts')
@@ -225,7 +225,7 @@ class Delicious_Api_Controller extends Local_Controller
             $end_date = !empty($params['todt']) ?
                 date('c', strtotime($params['todt'])) : null;
 
-            $posts = $posts_model->fetchBy(
+            $posts = $posts_model->findBy(
                 null, null, null, 
                 $this->profile['id'], 
                 $tags, 
@@ -234,7 +234,7 @@ class Delicious_Api_Controller extends Local_Controller
                 'user_date desc'
             );
 
-            $last_update = $posts_model->fetchLastModifiedDateByProfile(
+            $last_update = $posts_model->findLastModifiedDateByProfile(
                 $this->profile['id']
             );
             $posts_count = $posts_model->countByProfileAndTags(
@@ -266,7 +266,7 @@ class Delicious_Api_Controller extends Local_Controller
         ));
 
         $posts_model = new Posts_Model();
-        $dates = $posts_model->fetchDatesByTagsAndProfile(
+        $dates = $posts_model->findDatesByTagsAndProfile(
             $tags, $this->profile['id']
         );
 
@@ -315,10 +315,10 @@ class Delicious_Api_Controller extends Local_Controller
         );
 
         if ($this->input->get('replace', 'yes') == 'no') {
-            $fetched_post = $posts_model->fetchOneByUrlAndProfile(
+            $found_post = $posts_model->findOneByUrlAndProfile(
                 $new_post_data['url'], $this->profile['id']
             );
-            if (null != $fetched_post) {
+            if (null != $found_post) {
                 return $this->renderError();
             }
         }
@@ -357,11 +357,11 @@ class Delicious_Api_Controller extends Local_Controller
         $posts_model = new Posts_Model();
 
         if (!empty($params['url'])) {
-            $post = $posts_model->fetchOneByUrlAndProfile(
+            $post = $posts_model->findOneByUrlAndProfile(
                 $params['url'], $this->profile['id']
             );
         } else if (!empty($params['hash'])) {
-            $post = $posts_model->fetchOneByHashAndProfile(
+            $post = $posts_model->findOneByHashAndProfile(
                 $params['hash'], $this->profile['id']
             );
         }
