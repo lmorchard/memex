@@ -7,20 +7,11 @@
  * @package    MessageQueue
  * @subpackage tests
  * @author     l.m.orchard <l.m.orchard@pobox.com>
+ * @group      models
+ * @group      models.messagequeue
  */
 class MessageQueueTest extends PHPUnit_Framework_TestCase 
 {
-    /**
-     * Runs the test methods of this class.
-     *
-     * @return void
-     */
-    public static function main()
-    {
-        $suite  = new PHPUnit_Framework_TestSuite("MessageQueueTest");
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
-    }
-
     /**
      * This method is called before a test is executed.
      *
@@ -28,6 +19,8 @@ class MessageQueueTest extends PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
+        DecafbadUtils_EnvConfig::apply('testing');
+
         $log = MessageQueueTest_LogCollector::getInstance();
         $log->reset();
 

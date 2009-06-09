@@ -8,6 +8,9 @@
  */
 class ORM extends ORM_Core {
 
+    /**
+     * Initialize the object with a configured database.
+     */
 	public function __initialize()
 	{
 		if (!is_object($this->db)) {
@@ -17,5 +20,41 @@ class ORM extends ORM_Core {
         }
         parent::__initialize();
 	}
+
+    /**
+	 * Sets object values from an array.
+	 *
+	 * @chainable
+	 * @return  ORM
+     */
+    public function set($arr)
+    {
+        foreach ($arr as $name=>$value) {
+            if (isset($this->table_columns[$name]))
+                $this->{$name} = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * Before saving, update created/modified timestamps and generate a UUID if 
+     * necessary.
+     *
+	 * @chainable
+	 * @return  ORM
+     */
+    public function save()
+    {
+        if (isset($this->table_columns['created']) && empty($this->created)) {
+            $this->created = gmdate('c');
+        }
+        if (isset($this->table_columns['modified'])) {
+            $this->modified = gmdate('c');
+        }
+        if (isset($this->table_columns['uuid']) && empty($this->uuid)) {
+            $this->uuid = uuid::uuid();
+        }
+        return parent::save();
+    }
 
 }

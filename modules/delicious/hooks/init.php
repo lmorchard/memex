@@ -211,10 +211,10 @@ class Memex_Delicious {
      */
     public static function getProfileSettings($profile_id)
     {
-        $profiles_model = new Profiles_Model();
-        $settings = $profiles_model->get_attributes($profile_id, array(
-            self::ENABLED, self::USER_NAME, self::PASSWORD
-        ));
+        $settings = ORM::factory('profile', $profile_id)
+            ->get_attributes(array(
+                self::ENABLED, self::USER_NAME, self::PASSWORD
+            ));
         return $settings;
     }
 }

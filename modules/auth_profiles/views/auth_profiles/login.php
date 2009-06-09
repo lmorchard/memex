@@ -7,6 +7,14 @@ slot::set('head_title', ' / login');
 
 <?php slot::start('crumbs') ?> / <span>login</span> <?php slot::end() ?>
 
+<?php if (!empty($login_inactive)): ?>
+    <p>Sorry, that login has been disabled.
+<?php endif ?>
+
+<?php if (!empty($no_verified_email)): ?>
+    <p>Sorry, the email address for that login has not yet been verified.</p>
+<?php endif ?>
+
 <?= 
 form::build('login', array('class'=>'login'), array(
     form::field('hidden', 'jump', ''),

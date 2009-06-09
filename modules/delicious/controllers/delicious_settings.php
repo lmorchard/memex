@@ -32,9 +32,7 @@ class Delicious_Settings_Controller extends Local_Controller
     {
         $params = $this->getParamsFromRoute(array());
 
-        $profile_id = AuthProfiles::get_profile('id');
-
-        $profiles_model = new Profiles_Model();
+        $profile = ORM::factory('profile', AuthProfiles::get_profile('id'));
 
         $attr_names = array(
             Memex_Delicious::ENABLED,
@@ -45,7 +43,7 @@ class Delicious_Settings_Controller extends Local_Controller
         if ('post' != request::method()) {
             // For a GET request, try pre-populating the form with the existing 
             // profile settings.
-            $existing = $profiles_model->get_attributes($profile_id, $attr_names);
+            $existing = $profile->get_attributes($attr_names);
             $valid = $this->_getReplicationValidator(array_merge(
                 $existing, $this->input->get()
             ));
@@ -104,7 +102,7 @@ class Delicious_Settings_Controller extends Local_Controller
         foreach ($attr_names as $k) 
             $attrs[$k] = (Memex_Delicious::ENABLED==$k) ? 
                 !empty($data[$k]) : $data[$k];
-        $profiles_model->set_attributes($profile_id, $attrs);
+        $profile->set_attributes($attrs);
     }
 
 }

@@ -39,7 +39,7 @@ $config['default'] = array
 	),
 	'character_set' => 'utf8',
 	'table_prefix'  => '',
-	'object'        => FALSE,
+	'object'        => TRUE,
 	'cache'         => FALSE,
 	'escape'        => TRUE
 );
@@ -60,7 +60,7 @@ $config['testing'] = array
 	),
 	'character_set' => 'utf8',
 	'table_prefix'  => '',
-	'object'        => FALSE,
+	'object'        => TRUE,
 	'cache'         => FALSE,
 	'escape'        => TRUE
 );

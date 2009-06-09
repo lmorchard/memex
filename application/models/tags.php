@@ -119,11 +119,11 @@ class Tags_Model extends Model
      *
      * @param string post ID
      */
-    public function deleteTagsForPost($post_id)
+    public function deleteTagsForPost($post_data)
     {
         $this->db->delete(
             $this->_table_name, 
-            array('post_id' => $post_id)
+            array('post_id' => $post_data->id)
         );
     }
 
@@ -133,17 +133,17 @@ class Tags_Model extends Model
      */
     public function updateTagsForPost($post_data)
     {
-        $new_tags = $this->parseTags($post_data['tags']);
+        $new_tags = $this->parseTags($post_data->tags);
 
         // Look up all existing tags for the post.
         $tag_rows = $this->db->select()
             ->from($this->_table_name)
-            ->where('post_id', $post_data['id'])
+            ->where('post_id', $post_data->id)
             ->get();
 
         $old_tags = array();
         foreach ($tag_rows as $row) {
-            $old_tags[] = $row['tag'];
+            $old_tags[] = $row->tag;
         }
 
         // The existing tags to delete are the difference between old and new
@@ -152,7 +152,7 @@ class Tags_Model extends Model
             $this->db->delete(
                 $this->_table_name, 
                 array(
-                    'post_id' => $post_data['id'],
+                    'post_id' => $post_data->id,
                     'tag'     => $tag
                 )
             );
@@ -165,9 +165,9 @@ class Tags_Model extends Model
                 $this->_table_name,
                 array( 
                     'tag'        => $tag,
-                    'post_id'    => $post_data['id'], 
-                    'profile_id' => $post_data['profile_id'], 
-                    'url_id'     => $post_data['url_id'],
+                    'post_id'    => $post_data->id, 
+                    'profile_id' => $post_data->profile_id, 
+                    'url_id'     => $post_data->url_id,
                     'created'    => gmdate('c'),
                     'modified'   => gmdate('c')
                 )
@@ -183,7 +183,7 @@ class Tags_Model extends Model
                     'modified' => gmdate('c')
                 ),
                 array(
-                    'post_id'  => $post_data['id'],
+                    'post_id'  => $post_data->id,
                     'tag'      => $tag
                 )
             );

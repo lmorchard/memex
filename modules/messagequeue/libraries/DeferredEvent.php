@@ -75,8 +75,8 @@ class DeferredEvent
             !Kohana::config('messagequeue.deferred_events');
 
         // HACK: Accept a scheduled_for parameter in Event::run() data.
-        $scheduled_for = !empty(Event::$data['scheduled_for']) ?
-            Event::$data['scheduled_for'] : null;
+        $scheduled_for = !empty(Event::$data->scheduled_for) ?
+            Event::$data->scheduled_for : null;
 
         // Finally, publish the event as a message.
         $this->mq->publish($name, Event::$data, $scheduled_for, self::$owner);

@@ -52,7 +52,10 @@ class AuthProfiles
         if (empty($duration)) $duration = ( 52 * 7 * 24 * 60 * 60 );
         self::$cookie_manager->setCookie(
             self::$cookie_name, 
-            serialize(array('login' => $login, 'profile' => $profile)),
+            serialize(array(
+                'login_name' => $login->login_name, 
+                'profile_id' => $profile->id
+            )),
             $user_name,
             time() + $duration
         );
@@ -68,6 +71,44 @@ class AuthProfiles
     }
 
     /**
+     * Return the data for the currently logged in user, if any.
+     *
+     * @return mixed
+     */
+    public static function get_user_data()
+    {
+        if (null===self::$user_data) {
+
+            $data = self::$cookie_manager->getCookieValue(self::$cookie_name);
+            self::$user_data = $data ? unserialize($data) : null;
+
+            if (empty(self::$user_data['login_name']) || 
+                    empty(self::$user_data['profile_id'])) {
+                // Force cookie clear if data is invalid.
+                return self::logout();
+            }
+
+            $login = ORM::factory('login', self::$user_data['login_name']);
+            if (empty($login) || !$login->active) {
+                // Force cookie clear if no such login, or login disabled.
+                return self::logout();
+            } else {
+                self::$user_data['login'] = $login->as_array();
+            }
+
+            $profile = ORM::factory('profile', self::$user_data['profile_id']);
+            if (!$profile->loaded) {
+                // Force cookie clear if no such profile.
+                return self::logout();
+            } else {
+                self::$user_data['profile'] = $profile->as_array();
+            }
+
+        }
+        return self::$user_data;
+    }
+
+    /**
      * Determine whether there's a valid existing authenticated login.
      *
      * @return boolean
@@ -76,20 +117,6 @@ class AuthProfiles
     {
         $data = self::get_user_data();
         return !empty( $data );
-    }
-
-    /**
-     * Return the data for the currently logged in user, if any.
-     *
-     * @return mixed
-     */
-    public static function get_user_data()
-    {
-        if (null===self::$user_data) {
-            $data = self::$cookie_manager->getCookieValue(self::$cookie_name);
-            self::$user_data = $data ? unserialize($data) : null;
-        }
-        return self::$user_data;
     }
 
     /**

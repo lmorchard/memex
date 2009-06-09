@@ -42,10 +42,8 @@ class Post_Controller extends Local_Controller
         ));
 
         // Try to match the screen name to a profile, or bail with a 404.
-        $profiles_model = new Profiles_Model();
-        $profile = 
-            $profiles_model->find_by_screen_name($params['screen_name']);
-        if (!$profile) {
+        $profile = ORM::factory('profile', $params['screen_name']);
+        if (!$profile->loaded) {
             return Event::run('system.404');
         }
 
@@ -53,17 +51,17 @@ class Post_Controller extends Local_Controller
         $tags_model = new Tags_Model();
         $tags = $tags_model->parseTags($params['tags']);
 
-        $tag_counts = $tags_model->countByProfile($profile['id']);
+        $tag_counts = $tags_model->countByProfile($profile->id);
 
         $posts_model = new Posts_Model();
         $posts_count = 
-            $posts_model->countByProfileAndTags($profile['id'], $tags);
+            $posts_model->countByProfileAndTags($profile->id, $tags);
 
         list($start, $count) = $this->setupPagination($posts_count);
 
         // Fetch the posts using the route tags and pagination vars.
         $posts = $posts_model->findByProfileAndTags(
-            $profile['id'], $tags, $start, $count
+            $profile->id, $tags, $start, $count
         );
 
         $this->view->set(array(
@@ -136,7 +134,7 @@ class Post_Controller extends Local_Controller
         $profile_id = AuthProfiles::get_profile('id');
         if (empty($post)) {
             return Event::run('system.404');
-        } elseif ($post['profile_id'] != $profile_id && $post['visibility'] > 0) {
+        } elseif ($post->profile_id != $profile_id && $post->visibility > 0) {
             // TODO: Need more work on the visibility / privacy thing.
             header('HTTP/1.1 403 Forbidden');
             exit;
@@ -184,7 +182,7 @@ class Post_Controller extends Local_Controller
             // Make sure the post exists, and belongs to the current profile
             if (empty($post)) {
                 return Event::run('system.404');
-            } elseif ($post['profile_id'] != $profile_id) {
+            } elseif ($post->profile_id != $profile_id) {
                 header('HTTP/1.1 403 Forbidden'); exit;
             }
             $this->view->set('post', $post);
@@ -250,26 +248,26 @@ class Post_Controller extends Local_Controller
                     $posts_model->findOneByUrlAndProfile($url, $profile_id);
             }
 
-            if (empty($existing_post)) {
-                $existing_post = array();
-            } else {
+            if (!empty($existing_post)) {
                 $have_url = true;
                 $this->view->set('have_url', $have_url);
-                if ($existing_post['profile_id'] != $profile_id) {
+                if ($existing_post->profile_id != $profile_id) {
                     // If the logged in profile and the post profile ID don't 
                     // match, then this is a cross-profile copy and the UUID 
                     // should be nuked to force a copy instead of update.
-                    unset($existing_post['profile_id']);
-                    unset($existing_post['uuid']);
-                    unset($existing_post['id']);
+                    unset($existing_post->profile_id);
+                    unset($existing_post->uuid);
+                    unset($existing_post->id);
                 }
             }
+
+            $existing_post_data = 
+                $existing_post ? get_object_vars($existing_post) : array();
 
             if ('post' != request::method()) {
                 // For GET method, at least run the filters from the validator.
                 $validator = $posts_model->getValidator(array_merge(
-                    $existing_post,
-                    $this->input->get()
+                    $existing_post_data, $this->input->get()
                 ));
                 $validator->validate();
                 $_GET = $validator->as_array();
@@ -277,8 +275,7 @@ class Post_Controller extends Local_Controller
             }
 
             $validator = $posts_model->getValidator(array_merge(
-                $existing_post,
-                $this->input->post()
+                $existing_post_data, $this->input->post()
             ));
             if (!$validator->validate()) {
                 $_POST = $validator->as_array();
@@ -290,8 +287,7 @@ class Post_Controller extends Local_Controller
 
             // Now, try validating the POST request.
             $new_post_data = array_merge(
-                $existing_post, 
-                $validator->as_array()
+                $existing_post_data, $validator->as_array()
             );
 
             $new_post_data['profile_id'] = $profile_id;

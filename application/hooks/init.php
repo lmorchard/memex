@@ -38,7 +38,7 @@ class Memex_Init {
      */
     public static function handlePostDeleted()
     {
-        self::$tags_model->deleteTagsForPost(Event::$data['id']);
+        self::$tags_model->deleteTagsForPost(Event::$data);
     }
 
     /**

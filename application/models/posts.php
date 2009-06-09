@@ -47,10 +47,10 @@ class Posts_Model extends Model
         $url_data = $urls_model->findOrCreate(
             $post_data['url'], $post_data['profile_id']
         );
-        $post_data['url_id'] = $url_data['id'];
+        $post_data['url_id'] = $url_data->id;
 
         // Try looking up an existing post for this URL and profile.
-        $row = null;
+        $row = false;
         if (!empty($post_data['id'])) {
             $row = $this->db->select()->from($this->_table_name)
                 ->where('id', $post_data['id'])
@@ -61,7 +61,7 @@ class Posts_Model extends Model
                 ->get()->current();
         } else {
             $row = $this->db->select()->from($this->_table_name)
-                ->where('url_id', $url_data['id'])
+                ->where('url_id', $url_data->id)
                 ->where('profile_id', $post_data['profile_id'])
                 ->get()->current();
         }
@@ -69,22 +69,22 @@ class Posts_Model extends Model
         // If there's no existing post, create a new one.
         if (false == $row) {
             $update = false;
-            $row = array(
+            $row = arr::to_object(array(
                 'uuid'       => uuid::uuid(),
-                'url_id'     => $url_data['id'],
+                'url_id'     => $url_data->id,
                 'profile_id' => $post_data['profile_id'],
                 'created'    => gmdate('c'),
                 'user_date'  => gmdate('c'),
                 'tags'       => '',
                 'notes'      => ''
-            );
+            ));
         } else {
             $update = true;
         }
-        $row['modified'] = gmdate('c');
+        $row->modified = gmdate('c');
 
         // Has the URL been changed in an existing post?
-        if ($row['url_id'] != $url_data['id']) {
+        if ($row->url_id != $url_data->id) {
             // TODO: Delete URL record if last bookmark reference gone?
             // Probably a good job for an offline queue.
         }
@@ -96,33 +96,33 @@ class Posts_Model extends Model
             'visibility', 'user_date'
         );
         foreach ($accepted_post_fields as $key) {
-            if (isset($post_data[$key]))
-                $row[$key] = $post_data[$key];
+            if (isset($post_data->{$key}))
+                $row->{$key} = $post_data[$key];
         }
-        $row['signature'] = $this->buildPostSignature($post_data);
+        $row->signature = $this->buildPostSignature($post_data);
 
         // Allow modules the chance to munge post data before finally saving.
         Event::run('Memex.model_posts.before_post_update', $row);
 
         // URL was included in the row for the event's sake, but not needed for 
         // actual update. 
-        unset($row['url']);
+        unset($row->url);
 
         if ($update) {
             $this->db->update(
                 $this->_table_name, 
-                $row, 
-                array('id' => $row['id'])
+                get_object_vars($row), 
+                array('id' => $row->id)
             );
         } else {
-            $row['id'] = $this->db
-                ->insert($this->_table_name, $row)
+            $row->id = $this->db
+                ->insert($this->_table_name, get_object_vars($row))
                 ->insert_id();
         }
         
         // HACK: Re-find the just-saved post.  Ensures consistent data, but 
         // probably needs some work to avoid cache issues later on.
-        $saved_post = $this->findOneById($row['id']);
+        $saved_post = $this->findOneById($row->id);
 
         // Send out message that a post has been updated
         Event::run('Memex.model_posts.post_updated', $saved_post);
@@ -405,17 +405,14 @@ class Posts_Model extends Model
      */
     public function countBy($profile_id=null, $tags=null)
     {
-        $select = $this->db
-            ->select('count(posts.id) as count')
-            ->from($this->_table_name);
+        $select = $this->db;
 
         if (null !== $profile_id)
             $select->where('posts.profile_id', $profile_id);
         if (null !== $tags)
             $this->_addWhereForTags($select, $tags);
 
-        $row = $select->get()->current();
-        return $row['count'];
+        return $select->count_records($this->_table_name);
     }
 
     /**
@@ -486,10 +483,10 @@ class Posts_Model extends Model
         $tags_model = new Tags_Model();
         $posts_out = array();
         foreach ($posts as $row) {
-            $row['tags_parsed'] = 
-                $tags_model->parseTags($row['tags']);
+            $row->tags_parsed = 
+                $tags_model->parseTags($row->tags);
             foreach(array('user_date', 'created', 'modified') as $field)
-                $row[$field] = gmdate('c', strtotime($row[$field] . ' GMT'));
+                $row->{$field} = gmdate('c', strtotime($row->{$field} . ' GMT'));
             $posts_out[] = $row;
         }
         return $posts_out;

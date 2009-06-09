@@ -38,12 +38,11 @@ class Util_Controller extends Controller {
 
         $user_name = (string)$posts['user'];
 
-        $logins_model   = new Logins_Model();
-        $profiles_model = new Profiles_Model();
-        $posts_model    = new Posts_Model();
+        $login_model = new Login_Model();
+        $posts_model = new Posts_Model();
 
-        $login = $logins_model->find_by_login_name($user_name);
-        if (!empty($login)) {
+        $login = ORM::factory('login', $user_name);
+        if ($login->loaded) {
             // Delete existing posts if login found.
             // HACK: Make this a command-line switch?
             // $posts_model->deleteAll();
@@ -51,18 +50,19 @@ class Util_Controller extends Controller {
         } else {
             // Create a new login from the user name.
             echo "Registering account for '$user_name'\n";
-            $login = $logins_model->register_with_profile(array(
+            $login_data = $login_model->register_with_profile(array(
                 'login_name'  => $user_name,
                 'email'       => "{$user_name}@memex",
                 'password'    => 'password',
                 'screen_name' => $user_name,
                 'full_name'   => $user_name,
                 'bio'         => ''
-            ));
+            ), true);
+            $login = ORM::factory('login', $login_data->id);
         }
 
-        $profile = $logins_model->find_default_profile_for_login($login['id']);
-        $profile_id = $profile['id'];
+        $profile = $login->find_default_profile_for_login();
+        $profile_id = $profile->id;
         
         $total = count($posts->post);
         echo "Importing " . $total . " posts...\n";

@@ -80,11 +80,11 @@ class Memex_Autotags {
     public static function applyAutoTags()
     {
         // Parse the post URL for rules ahead.
-        $url_parsed = parse_url(Event::$data['url']);
+        $url_parsed = parse_url(Event::$data->url);
 
         // Use the tags model to parse the tag string in the post.
         $tags_model = new Tags_Model();
-        $tags_in = $tags_model->parseTags(Event::$data['tags']);
+        $tags_in = $tags_model->parseTags(Event::$data->tags);
 
         // Prepare outgoing tags by stripping known autotags from list to have 
         // a clean slate.
@@ -122,7 +122,7 @@ class Memex_Autotags {
 
         // Finally, replace the post's tags with the unique results of the 
         // applied rules.
-        Event::$data['tags'] = 
+        Event::$data->tags = 
             $tags_model->concatenateTags(array_unique($tags_out));
     }
 

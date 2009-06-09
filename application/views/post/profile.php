@@ -39,8 +39,8 @@
             <ul>
                 <?php foreach ($tag_counts as $tag_ct): ?>
                     <li>
-                        <span class="count"><?= html::specialchars($tag_ct['count']) ?></span>
-                        <a href="<?= $profile_home_url . '/' . rawurlencode($tag_ct['tag']) ?>" class="tag"><?= html::specialchars($tag_ct['tag']) ?></a>
+                        <span class="count"><?= html::specialchars($tag_ct->count) ?></span>
+                        <a href="<?= $profile_home_url . '/' . rawurlencode($tag_ct->tag) ?>" class="tag"><?= html::specialchars($tag_ct->tag) ?></a>
                     </li>
                 <?php endforeach ?>
             </ul>

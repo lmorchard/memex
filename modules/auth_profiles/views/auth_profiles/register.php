@@ -11,7 +11,8 @@ slot::set('head_title', ' / register');
     echo form::build('register', array('class'=>'register'), array(
         form::fieldset('login details', array('class'=>'login'), array(
             form::field('input',    'login_name',       'Login name'),
-            form::field('input',    'email',            'Email address'),
+            form::field('input',    'email',            'Email'),
+            form::field('input',    'email_confirm',    'Email (confirm)'),
             form::field('password', 'password',         'Password'),
             form::field('password', 'password_confirm', 'Password (confirm)'),
         )),

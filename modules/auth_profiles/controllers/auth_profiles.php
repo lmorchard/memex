@@ -3,7 +3,7 @@
  * Controller handling all auth activities, including registration and 
  * login / logout
  *
- * @package    Memex
+ * @package    auth_profiles
  * @subpackage controllers
  * @author     l.m.orchard <l.m.orchard@pobox.com>
  */
@@ -27,8 +27,9 @@ class Auth_Profiles_Controller extends Local_Controller
             }
         }
 
-        $this->logins_model = new Logins_Model();
+        $this->login_model = new Login_Model();
     }
+
 
     /**
      * Combination login / registration action.
@@ -55,20 +56,33 @@ class Auth_Profiles_Controller extends Local_Controller
         }
     }
 
+
     /**
      * New user registration.
      */
     public function register()
     {
         $form_data = $this->validate_form(
-            $this->logins_model, 
+            $this->login_model, 
             'validate_registration', 'form_errors_auth'
         );
         if (null===$form_data) return;
 
-        $new_login = $this->logins_model
+        $new_login = $this->login_model
             ->register_with_profile($form_data);
 
+        if (!empty($new_login->email_verification_token)) {
+            email::send_view(
+                $new_login->new_email,
+                'auth_profiles/register_email',
+                array(
+                    'email_verification_token' => 
+                        $new_login->email_verification_token,
+                    'login_name' => 
+                        $new_login->login_name
+                )
+            );
+        }
         return url::redirect('login');
     }
 
@@ -78,15 +92,22 @@ class Auth_Profiles_Controller extends Local_Controller
     public function login()
     {
         $form_data = $this->validate_form(
-            $this->logins_model, 
+            $this->login_model, 
             'validate_login', 'form_errors_auth'
         );
         if (null===$form_data) return;
 
-        $login = $this->logins_model->
-            find_by_login_name($form_data['login_name']);
-        $profile = $this->logins_model->
-            find_default_profile_for_login($login['id']);
+        $login = ORM::factory('login', $form_data['login_name']);
+        if (!$login->active) {
+            $this->view->login_inactive = TRUE;
+            return;
+        } elseif (empty($login->email)) {
+            $this->view->no_verified_email = TRUE;
+            return;
+        }
+
+        // TODO: Allow profile selection here if multiple.
+        $profile = $login->find_default_profile_for_login();
 
         AuthProfiles::login($form_data['login_name'], $login, $profile);
 
@@ -107,21 +128,20 @@ class Auth_Profiles_Controller extends Local_Controller
         AuthProfiles::logout();
     }
 
+
     /**
      * Start email address change process.
      */
     public function changeemail()
     {
         $form_data = $this->validate_form(
-            $this->logins_model, 
+            $this->login_model, 
             'validate_change_email', 'form_errors_auth'
         );
         if (null===$form_data) return;
 
-        $token = $this->logins_model->set_email_verification_token(
-            AuthProfiles::get_login('id'),
-            $form_data['new_email']
-        );
+        $token = ORM::factory('login', AuthProfiles::get_login('id'))
+            ->set_email_verification_token($form_data['new_email']);
 
         $this->view->email_verification_token_set = true;
 
@@ -144,17 +164,15 @@ class Auth_Profiles_Controller extends Local_Controller
             $this->input->post('email_verification_token') :
             $this->input->get('email_verification_token');
 
-        // Look up the login by token, and abort if not found.
-        $login = $this->logins_model->find_by_email_verification_token($token);
-        if (empty($login)) {
+        list($login, $new_email) = ORM::factory('login')
+            ->find_by_email_verification_token($token);
+        if (!$login) {
             $this->view->invalid_token = true;
             return;
         }
-
-        $this->logins_model->change_email(
-            $login['id'], $login['new_email']
-        );
+        $login->change_email($new_email);
     }
+
 
     /**
      * Change password for a login
@@ -174,20 +192,20 @@ class Auth_Profiles_Controller extends Local_Controller
         } elseif (empty($reset_token) && AuthProfiles::is_logged_in()) {
         
             // Logged in and no token, so use auth login details.
-            $login_id = AuthProfiles::get_login('id'); 
+            $login = ORM::factory('login', AuthProfiles::get_login('id')); 
         
         } else {
             
             // Look up the login by token, and abort if not found.
-            $login = $this->logins_model->find_by_password_reset_token($reset_token);
-            if (empty($login)) {
+            $login = ORM::factory('login')
+                ->find_by_password_reset_token($reset_token);
+            if (!$login->loaded) {
                 $this->view->invalid_reset_token = true;
                 return;
             }
 
             // Use the found login ID and toss name into view.
-            $login_id = $login['id']; 
-            $this->view->forgot_password_login_name = $login['login_name'];
+            $this->view->forgot_password_login_name = $login->login_name;
             
             // Pre-emptively force logout in case current login and login 
             // associated with token differ.
@@ -198,7 +216,7 @@ class Auth_Profiles_Controller extends Local_Controller
         // Now that we know who's trying to change a password, validate the 
         // form appropriately
         $form_data = $this->validate_form(
-            $this->logins_model, 
+            $this->login_model, 
             empty($reset_token) ? 
                 'validate_change_password' : 
                 'validate_change_password_with_token', 
@@ -207,9 +225,7 @@ class Auth_Profiles_Controller extends Local_Controller
         if (null===$form_data) return;
         
         // Finally, perform the password change.
-        $changed = $this->logins_model->change_password(
-            $login_id, $form_data['new_password']
-        );
+        $changed = $login->change_password($form_data['new_password']);
         if (!$changed) {
             // Something unexpected happened.
             $this->view->password_change_failed = true;
@@ -226,32 +242,32 @@ class Auth_Profiles_Controller extends Local_Controller
     public function forgotpassword() 
     {
         $form_data = $this->validate_form(
-            $this->logins_model, 
+            $this->login_model, 
             'validate_forgot_password', 'form_errors_auth'
         );
         if (null===$form_data) return;
 
         if (!empty($form_data['login_name'])) {
-            $login = $this->logins_model
-                ->find_by_login_name($form_data['login_name']);
+            $login = ORM::factory('login', $form_data['login_name']);
         } elseif (!empty($form_data['email'])) {
-            $login = $this->logins_model
-                ->find_by_email($form_data['email']);
+            $login = ORM::factory('login', array(
+                'email' => $form_data['email']
+            ));
         }
 
-        $reset_token = $this->logins_model
-            ->set_password_reset_token($login['id']);
+        $reset_token = $login->set_password_reset_token();
         $this->view->password_reset_token_set = true;
 
         email::send_view(
-            $login['email'],
+            $login->email,
             'auth_profiles/forgotpassword_email',
             array(
                 'password_reset_token' => $reset_token,
-                'login_name' => $login['login_name']
+                'login_name' => $login->login_name
             )
         );
     }
+
 
     /**
      * Profiles settings.
